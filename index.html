@@ -1162,6 +1162,8 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function wpick(items,wf){ let t=0; const w=items.map(x=>{const v=Math.max(0,wf(x)); t+=v; return v;}); if(t<=0) return pick(items); let r=Math.random()*t; for(let i=0;i<items.length;i++){ r-=w[i]; if(r<=0) return items[i]; } return items[items.length-1]; }
 function money(n){n=Math.round(n||0);const a=Math.abs(n),s=n<0?'-':'';return s+'€'+(a>=1e6?(a/1e6).toFixed(a>=1e8?0:a>=1e7?1:2)+'M':a>=1e3?(a/1e3).toFixed(a>=1e5?0:1)+'k':a);}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function ftIn(cm){ const t=Math.round(cm/2.54); return `${Math.floor(t/12)}'${t%12}"`; }
+function htStr(cm){ return `${cm} cm (${ftIn(cm)})`; }
 const ordinal=n=>n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
 
 const WEEKS=40, INTL_WEEKS=[6,11,16,30], WINDOW_SUMMER=[1,4], WINDOW_WINTER=[22,25];
@@ -1687,7 +1689,7 @@ function endWeek(){
   if(MONTH_END.includes(S.week)) monthAwards();
   S.week++; S.day=0; S.myDone={};
   // youth growth spurts
-  if(m.growth>0&&Math.random()<.35){ const cm=Math.min(m.growth,ri(1,2)); m.height+=cm; m.growth-=cm; m.weight+=Math.random()<.6?1:0; if(cm&&Math.random()<.5){ m.attrs.str=Math.min(99,m.attrs.str+1); m.attrs.hea=Math.min(99,m.attrs.hea+1); } if(m.growth===0) news('you','Growth spurt finished',`You've settled at ${m.height} cm.`); }
+  if(m.growth>0&&Math.random()<.35){ const cm=Math.min(m.growth,ri(1,2)); m.height+=cm; m.growth-=cm; m.weight+=Math.random()<.6?1:0; if(cm&&Math.random()<.5){ m.attrs.str=Math.min(99,m.attrs.str+1); m.attrs.hea=Math.min(99,m.attrs.hea+1); } if(m.growth===0) news('you','Growth spurt finished',`You've settled at ${htStr(m.height)}.`); }
   if(S.week>WEEKS){ seasonEnd(); return; }
   // transfer windows
   if(typeof approachTick==='function') approachTick();
@@ -3068,8 +3070,8 @@ function renderWizard(){
     <div class="fld"><label for="ncNat">Nationality</label><select id="ncNat" data-ch="nat">${natOpts}</select></div><div class="fld"><label for="ncNat2">Second nationality</label><select id="ncNat2" data-ch="nat2">${nat2Opts}</select></div>
     <div class="fld"><label for="ncAge">Age</label><select id="ncAge" data-ch="age">${[15,16,17,18,19,20,21].map(a=>`<option ${o.age===a?'selected':''}>${a}</option>`).join('')}</select></div>
     <div class="fld"><label for="ncFoot">Preferred foot</label><select id="ncFoot" data-ch="foot">${['Right','Left'].map(f=>`<option ${o.foot===f?'selected':''}>${f}</option>`).join('')}</select></div>
-    <div class="fld"><label for="ncH">Height · ${o.height} cm${o.age<=17?' (still growing)':''}</label><input type="range" id="ncH" min="160" max="200" value="${o.height}" data-ch="height"></div>
-    <div class="fld"><label for="ncW">Weight · ${o.weight} kg</label><input type="range" id="ncW" min="55" max="95" value="${o.weight}" data-ch="weight"></div></div>
+    <div class="fld"><label for="ncH">Height · ${htStr(o.height)}${o.age<=17?' (still growing)':''}</label><input type="range" id="ncH" min="160" max="200" value="${o.height}" data-ch="height"></div>
+    <div class="fld"><label for="ncW">Weight · ${o.weight} kg (${Math.round(o.weight*2.2046)} lbs)</label><input type="range" id="ncW" min="55" max="95" value="${o.weight}" data-ch="weight"></div></div>
     <div class="fld" style="margin-top:8px"><span>Position</span><div class="chips">${['ST','LW','RW','CAM','CM','CDM','LB','RB','CB'].map(p=>`<button class="chip" aria-pressed="${o.pos===p}" data-act="ncSet" data-arg="pos:${p}">${p}</button>`).join('')}</div></div>`)}
    ${W(`PlayStyles · pick 3 (${o.traits.length}/3)`,`<div class="chips">${TRAITS.map(t=>`<button class="chip" aria-pressed="${o.traits.includes(t[0])}" data-act="ncTrait" data-arg="${esc(t[0])}" ${!o.traits.includes(t[0])&&o.traits.length>=3?'disabled':''} title="${t[1]}">${esc(t[0])}</button>`).join('')}</div><p class="note" style="margin-top:6px">You can develop more PlayStyles later by training them.</p>`)}
    ${W('Starting point',`<div class="chips">${startOpts.map(([k,l,d])=>`<button class="chip" aria-pressed="${o.start===k}" data-act="ncSet" data-arg="start:${k}" ${k==='academy'&&o.age>16||k==='club'&&o.age<17?'disabled':''} title="${d}">${l}</button>`).join('')}</div>
@@ -3102,7 +3104,7 @@ function wNext(){ const n=nextMatchDay(); const m=S.me;
    <div class="mid"><span>${fmtDate(md)}</span><b>${det.home?'HOME':'AWAY'}</b><span>${esc(det.name)}</span><span>${esc(h.stadium)} · ${tv}</span></div>
    <div class="t">${crest(a,true)}<span>${esc(a.name)}</span><span class="note">${pos(a.id)}</span></div></div>
    <div class="kv"><span>Your selection</span><b class="${sel==='Likely starter'?'c-hi':sel==='Bench likely'?'c-mid':'c-lo'}">${sel}</b><span>Tactical familiarity</span><b>${Math.round(m.rel.tactical)}%</b></div></div>`,'schedule:0'); }
-function wStatus(){ const m=S.me; return W('Player status',`<div class="stack"><div class="ovrline"><span class="ovr num">${ovr()}</span><div class="meta"><b>${m.pos}</b> · Age ${m.age} · ${m.height} cm<br>Value <b>${money(myValue())}</b> · ${m.contract&&m.club!=null?`<b>${money(m.contract.wage)}</b>/wk`:'No contract'}</div></div>
+function wStatus(){ const m=S.me; return W('Player status',`<div class="stack"><div class="ovrline"><span class="ovr num">${ovr()}</span><div class="meta"><b>${m.pos}</b> · Age ${m.age} · ${htStr(m.height)}<br>Value <b>${money(myValue())}</b> · ${m.contract&&m.club!=null?`<b>${money(m.contract.wage)}</b>/wk`:'No contract'}</div></div>
   <div class="row" style="gap:6px"><span class="lbl">Form</span><div class="form">${m.form.slice(-5).map(r=>rt(r)).join('')||'<span class="note">No games yet</span>'}</div></div>
   ${meter('Energy',m.energy)}${meter('Sharpness',m.sharp)}${meter('Morale',m.morale)}${meter('Manager',m.rel.manager)}
   ${m.injury?`<span class="eff down" style="align-self:flex-start">${esc(m.injury.type)} · ${m.injury.days} days</span>`:''}<div class="row"><span class="pill b">${esc(m.status||'Newcomer')}</span>${m.captain?`<span class="pill y">${m.captain==='C'?'Captain':'Vice-captain'}</span>`:''}${m.transferReq?'<span class="pill r">Transfer listed</span>':''}</div></div>`,'home:1'); }
@@ -3129,7 +3131,7 @@ VIEWS['home:0']=()=>`<div class="dash home">${wNext()}${wStatus()}${wFixtures()}
 VIEWS['home:1']=()=>{ const m=S.me; const lo=Math.max(ovr()+1,m.pot-5), hi=Math.min(99,m.pot+3);
   return `<div class="dash c2">${W('Player details',`<div class="stack"><div class="ovrline"><span class="ovr num">${ovr()}</span><div class="meta"><b>${esc(m.first)} ${esc(m.last)}</b><br>${POS_NAME[m.pos]} · ${esc(NAT_NAMES[m.nat]||m.nat)}${m.nat2?' / '+esc(NAT_NAMES[m.nat2]||m.nat2):''}</div></div>
    <div class="face">${['PAC','SHO','PAS','DRI','DEF','PHY'].map(k=>`<div><b class="${cv(face(k))}">${face(k)}</b><span>${k}</span></div>`).join('')}</div>
-   <div class="kv"><span>Age</span><b>${m.age}</b><span>Height</span><b>${m.height} cm${m.growth>0?' · growing':''}</b><span>Weight</span><b>${m.weight} kg</b><span>Preferred foot</span><b>${m.foot}</b><span>Weak foot</span><b>${stars(m.wf)}</b><span>Skill moves</span><b>${stars(m.sm)}</b><span>PlayStyles</span><b>${m.traits.map(esc).join(', ')}</b><span>Scout potential</span><b>${lo}–${hi}</b><span>Reputation</span><b>${Math.round(m.rep)}/100</b><span>Followers</span><b>${m.followers.toLocaleString()}</b><span>Level</span><b>${m.level} · ${m.xp}/${xpNeed()} XP</b></div></div>`)}
+   <div class="kv"><span>Age</span><b>${m.age}</b><span>Height</span><b>${htStr(m.height)}${m.growth>0?' · growing':''}</b><span>Weight</span><b>${m.weight} kg (${Math.round(m.weight*2.2046)} lbs)</b><span>Preferred foot</span><b>${m.foot}</b><span>Weak foot</span><b>${stars(m.wf)}</b><span>Skill moves</span><b>${stars(m.sm)}</b><span>PlayStyles</span><b>${m.traits.map(esc).join(', ')}</b><span>Scout potential</span><b>${lo}–${hi}</b><span>Reputation</span><b>${Math.round(m.rep)}/100</b><span>Followers</span><b>${m.followers.toLocaleString()}</b><span>Level</span><b>${m.level} · ${m.xp}/${xpNeed()} XP</b></div></div>`)}
    ${W('Best attributes',`<table><tbody>${Object.entries(m.attrs).sort((a,b)=>b[1]-a[1]).slice(0,14).map(([k,v])=>`<tr><td class="l">${ANAME[k]}</td><td><b class="${cv(v)}">${v}</b></td></tr>`).join('')}</tbody></table>`,'dev:0','w-tbl')}</div>`; };
 VIEWS['inbox:0']=()=>{ const it=inboxItems(); const sel=it[INBOX_SEL]||it[0];
   return `<div class="dash c2">${W('Messages',it.map((n,i)=>`<button class="li ${n.read?'':'unread'}" data-act="openMsg" data-arg="${i}" style="${n===sel?'background:rgba(59,123,246,.1)':''}"><i class="${n.kind}"></i><div><b>${esc(n.title)}</b></div><time>${esc(n.when)}</time></button>`).join('')||'<p class="empty">No messages.</p>')}
@@ -3343,7 +3345,7 @@ document.addEventListener('change',e=>{ const el=e.target.closest('[data-ch]'); 
   else if(k==='att'){ m.att[+el.dataset.i]=v; saveSoon(); } else if(k==='pers'){ m.pers[+el.dataset.i]=v; saveSoon(); } else if(k==='offPlan'){ m.offPlan=v; saveSoon(); } else if(k==='traitTarget'){ m.traitTarget=v||null; saveSoon(); } else if(k==='coachFocus'){ m.coachFocus=v; saveSoon(); }
   else if(k==='vseason') VSEASON=v; else if(k==='vleague') VLEAGUE=v; else if(k==='cseason') CSEASON=v; render(); });
 document.addEventListener('change',e=>{ const el=e.target; if(el.dataset&&el.dataset.import&&el.files&&el.files[0]){ const meta=allMeta(); const slot=(S&&S.me&&S.me.first&&S.slot)||[1,2,3].find(n=>!meta[n]); if(!slot){ toast('All slots are full. Delete one first.'); el.value=''; return; } importSave(el.files[0],slot); el.value=''; } });
-document.addEventListener('input',e=>{ const el=e.target; if(el.id==='ncH'||el.id==='ncW'){ const lab=document.querySelector(`label[for="${el.id}"]`); if(lab) lab.textContent=(el.id==='ncH'?'Height · ':'Weight · ')+el.value+(el.id==='ncH'?' cm':' kg'); } });
+document.addEventListener('input',e=>{ const el=e.target; if(el.id==='ncH'||el.id==='ncW'){ const lab=document.querySelector(`label[for="${el.id}"]`); if(lab) lab.textContent=el.id==='ncH'?'Height · '+htStr(+el.value):'Weight · '+el.value+' kg ('+Math.round(el.value*2.2046)+' lbs)'; } });
 function boot(data){
   if(data&&data.S&&((data.S.me&&data.S.me.first)||(data.S.mode==='mgr'&&data.S.M))){ S=data.S; refreshLevels(); render(); return; }
   renderStart(); cloudInit();
