@@ -411,13 +411,14 @@ button:active:not(:disabled):not(.tok){transform:scale(.97);filter:brightness(1.
 .nav .more{display:none}
 .dchip{display:none;flex-direction:column;align-items:center;justify-content:center;min-width:46px;height:40px;border-radius:5px;overflow:hidden;background:var(--panel-2);border:1px solid var(--line-2);line-height:1}
 .dchip .dm{display:block;width:100%;text-align:center;background:var(--club);color:#fff;font-family:var(--cond);font-weight:700;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 0}
-.dchip b{font-family:var(--cond);font-size:17px;padding-top:2px}.dchip .dy2{font-size:8.5px;color:var(--mute);padding-bottom:2px;white-space:nowrap}
+.dchip b{font-family:var(--cond);font-size:17px;padding-top:2px}.dchip .dy2{font-size:8.5px;color:var(--mute);padding:0 3px 2px;white-space:nowrap;font-weight:600}
 .dchip.flip{animation:flip .45s ease both}@keyframes flip{0%{transform:perspective(200px) rotateX(-80deg);opacity:.2}100%{transform:none;opacity:1}}
 .moregrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .mg{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 6px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;font-size:12.5px;font-weight:500;color:var(--mute)}
 .mg svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .mg.on{color:var(--text);border-color:var(--accent);background:rgba(59,123,246,.14)}.mg .cnt{position:absolute;top:6px;right:8px;background:var(--accent);color:#fff;font-size:10px;border-radius:8px;padding:0 5px}
 @media (max-width:700px){ .dchip{display:flex} }
+.dchip{display:flex}.date{display:none}
 @media (orientation:portrait) and (max-width:820px){
   .side{padding-bottom:max(20px,calc(env(safe-area-inset-bottom,0px) + 10px));overflow:hidden;background:color-mix(in srgb,var(--side) 92%,#000)}
   .nav{justify-content:space-around;width:100%}
@@ -442,6 +443,29 @@ button:active:not(:disabled):not(.tok){transform:scale(.97);filter:brightness(1.
 .tarrows line{stroke:rgba(255,255,255,.55);stroke-width:.5;stroke-dasharray:1.4 1.1;vector-effect:non-scaling-stroke}
 .tarrows circle{fill:rgba(255,255,255,.4)}
 .tok .tpos{font-size:9.5px;font-weight:700;color:var(--warn)}
+
+/* v11: stats */
+.stiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.stile{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.stile span{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.stile b{font-family:var(--cond);font-size:24px;line-height:1.1}.stile i{font-style:normal;font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trend{width:100%;height:84px;display:block}.trend polyline{fill:none;stroke:var(--accent-2);stroke-width:2;vector-effect:non-scaling-stroke}
+.trend circle{fill:var(--warn)}.trend circle.g{fill:var(--pos)}.trend circle.r{fill:var(--neg)}
+.trend .ref{stroke:rgba(255,255,255,.25);stroke-dasharray:4 4;vector-effect:non-scaling-stroke}.trend .avg{stroke:rgba(106,160,255,.45);vector-effect:non-scaling-stroke}
+.tscroll{overflow-x:auto}.stbl td .sub{display:block;font-size:10px;color:var(--dim)}
+@media (orientation:portrait) and (max-width:820px){ .stiles{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.ans.evans{grid-template-columns:1fr;font-size:14px;padding:11px 12px}
+
+
+/* v11: badges */
+.medal{--t:#e3b324;position:relative;flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--t) 70%,#fff) 0,var(--t) 45%,color-mix(in srgb,var(--t) 55%,#000) 100%);box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--t) 40%,#000),0 2px 6px rgba(0,0,0,.4)}
+.medal b{font-family:var(--cond);font-weight:700;font-size:15px;color:#141414;letter-spacing:.02em}
+.medal.lock{background:var(--panel-3);box-shadow:inset 0 0 0 3px var(--line-2);filter:none}.medal.lock b{color:var(--dim)}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}
+.bcard{display:grid;grid-template-columns:46px minmax(0,1fr);gap:10px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;opacity:.6}
+.bcard.got{opacity:1;border-color:var(--line-2)}.bcard b{font-size:13px}.bcard p{margin:1px 0 3px;font-size:11.5px;color:var(--mute)}
+.pins{display:flex;gap:10px;flex-wrap:wrap}.pin{display:flex;align-items:center;gap:8px;background:var(--panel-2);border-radius:23px;padding:3px 12px 3px 3px;font-size:12px;font-weight:600}
+.bunlock{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center}.bunlock .medal{width:64px;height:64px;animation:pop .45s cubic-bezier(.2,1.5,.4,1) both}.bunlock .medal b{font-size:21px}
 </style>
 
 <div class="app" id="app" hidden>
@@ -1237,6 +1261,7 @@ function roundRobin(ids){ const t=ids.slice(); if(t.length%2) t.push(-1); const 
   return R; }
 function leagueRounds(lid){ const L=league(lid); if(L._r&&L._rs===S.season) return L._r; let R=roundRobin(L.order); R=R.concat(R.map(r=>r.map(([h,a])=>[a,h]))); if(lid.startsWith('IRL')) R=R.concat(R.map(r=>r.map(([h,a])=>[a,h]))); Object.defineProperty(L,'_r',{value:R,writable:true,enumerable:false}); Object.defineProperty(L,'_rs',{value:S.season,writable:true,enumerable:false}); return R; }
 function leagueWeekRounds(lid,week){ const R=leagueRounds(lid).length, n=LEAGUE_WEEKS.length, out=[]; for(let r=0;r<R;r++){ if(LEAGUE_WEEKS[Math.floor(r*n/R)]===week) out.push(r); } return out; }
+function leagueRoundWhen(lid,r){ const R=leagueRounds(lid).length, n=LEAGUE_WEEKS.length; const w=LEAGUE_WEEKS[Math.floor(r*n/R)]; const rs=leagueWeekRounds(lid,w); return {w,d:rs.indexOf(r)===1?2:5}; }
 function myLeague(){ const c=myClubObj(); return c?c.league:null; }
 function myClubId(){ if(S.mode==='mgr') return S.M?S.M.club:null; return S.me.loan?S.me.loan.club:S.me.club; }
 function myClubObj(){ const id=myClubId(); return id==null?null:club(id); }
@@ -1299,7 +1324,8 @@ function planWeek(){
   else if(intl) days=[T('recovery'),T('team'),T('team'),T('team'),T('team'),T('off'),T('off')];
   else {
     const wk=league[0]||null, mw=mid[0]||league[1]||null;
-    if(mw) days=[T('team'),T('prep',{fx:mw}),T('match',{fx:mw}),T('recovery'),T('prep',{fx:wk}),wk?T('match',{fx:wk}):T('team'),T('off')];
+    if(mid[0]&&league[1]) days=[T('match',{fx:league[1]}),T('prep',{fx:mid[0]}),T('match',{fx:mid[0]}),T('recovery'),T('prep',{fx:wk}),T('match',{fx:wk}),T('off')];
+    else if(mw) days=[T('team'),T('prep',{fx:mw}),T('match',{fx:mw}),T('recovery'),T('prep',{fx:wk}),wk?T('match',{fx:wk}):T('team'),T('off')];
     else days=[T('recovery'),T('team'),T('team'),T('team'),T('prep',{fx:wk}),wk?T('match',{fx:wk}):T('team'),T('off')];
     if(!wk&&!mw) days[4]=T('team');
   }
@@ -1365,7 +1391,7 @@ function wageBase(c){ return 50*Math.exp(c.rep/11.5); }
 function wageFor(cid,o,role){ const c=club(cid); return roundWage(wageBase(c)*Math.pow(1.11,o-clubLevel(c))*(ROLE_WAGE[role]||1)); }
 function roundWage(w){ const r=w<1000?10:w<10000?50:w<100000?500:1000; return Math.max(60,Math.round(w/r)*r); }
 function roleFor(cid,o,age){ const d=o-clubLevel(club(cid)); if(age<17) return 'Youth'; return d>=7?'Star player':d>=3?'Key player':d>=-1?'First team':d>=-5?'Rotation':'Prospect'; }
-function xpNeed(){ return 900+S.me.level*200; }
+function xpNeed(){ return 700+S.me.level*140; }
 function agentObj(){ return S.me.agent==null?null:AGENCIES[S.me.agent]; }
 function gameDate(w,d){ const dt=new Date(Date.UTC(S.year,7,3)); dt.setUTCDate(dt.getUTCDate()+((w==null?S.week:w)-1)*7+(d==null?S.day:d)); return dt; }
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1430,20 +1456,22 @@ function resolveNext(){ S.pending=null; S.queue=S.queue||[]; if(S.queue.length){
 function finishDay(i){
   S.dayOpen=false;
   simWorldDay(i);
-  const m=S.me;
+  const m=S.me; if(typeof evDue==='function') try{ evDue(); }catch(e){}
+  if(typeof badgeCheck==='function'&&(i===2||i===5||i===6)) try{ badgeCheck(); }catch(e){}
   if(m.injury){ m.injury.days--; if(m.injury.days<=0){ news('good','Back in training',`You've recovered from your ${m.injury.type}.`); m.injury=null; } }
-  m.energy=clamp(m.energy+2,0,100);
+  m.energy=clamp(m.energy+2+(m.nearHome?.5:0)+(m.chef?.6:0),0,100);
   S.day++;
   if(S.day>6){ endWeek(); autosave(); }
 }
-function runDay(i,d){
+function runDay(i,d){ runDay0(i,d); if(typeof evMaybe==='function') try{ evMaybe(i,d); }catch(e){} }
+function runDay0(i,d){
   const m=S.me;
   if(m.club==null&&!m.loan){ freeAgentDay(i); return; }
   if(m.injury&&!['match','intlmatch'].includes(d.type)){ m.energy=clamp(m.energy+6,0,100); if(i===0) toast(`Rehab · ${m.injury.days} days left`); return; }
   switch(d.type){
     case 'recovery': m.energy=clamp(m.energy+14,0,100); personalSession(i,true); break;
     case 'team': teamSession(i,d); personalSession(i); break;
-    case 'prep': m.energy=clamp(m.energy+4,0,100); if(d.fx) maybePress('pre',d.fx); break;
+    case 'prep': m.energy=clamp(m.energy+5,0,100); if(d.fx) maybePress('pre',d.fx); break;
     case 'match': if(d.fx) myMatch(d.fx); break;
     case 'off': offDay(); break;
     case 'travel': m.energy=clamp(m.energy+6,0,100); break;
@@ -1468,7 +1496,7 @@ function teamSession(i,d){
   if(d.sess==='Tactical') m.rel.tactical=clamp(m.rel.tactical+3*mult,0,100); else m.rel.tactical=clamp(m.rel.tactical+.8,0,100);
   (SESS_ATTRS[d.sess]||[]).forEach(k=>{ if(addTXP(k,3.6*g*(S.me.ftTrain>0?1.25:1)*rnd(.7,1.2))) ups.push(`${ANAME[k]} +1`); });
   if(a==='early'&&m.talent==='Grafter'&&Math.random()<.08){ m.pot=Math.min(95,m.pot+1); news('good','Hard work pays','The coaches think your ceiling is higher than they first thought.',true); }
-  m.energy=clamp(m.energy-6,0,100); m.sharp=clamp(m.sharp+1.5,0,100); gainXP(12*mult);
+  m.energy=clamp(m.energy-7,0,100); m.sharp=clamp(m.sharp+1.5,0,100); gainXP(12*mult);
   if(Math.random()<.18){ const ids=Object.keys(m.mates); if(ids.length){ const pid=+pick(ids); m.mates[pid]=clamp(m.mates[pid]+ri(1,3),0,100); } }
   if(Math.random()<.004+(m.energy<30?.02:0)){ injure('training'); }
   if(ups.length){ news('good',`${d.sess} session paid off`,ups.join(', ')+'.',true); toast(ups.join(' · ')); }
@@ -1575,10 +1603,37 @@ const TONE={humble:{manager:2,fans:1,media:0,morale:1,mates:1,head:['%s keeps hi
   fiery:{manager:-3,fans:3,media:4,morale:1,mates:-1,head:['%s fires a shot in fiery presser','Explosive words from %s']},
   arrogant:{manager:-2,fans:-1,media:3,morale:2,mates:-3,head:['Arrogant %s rubs teammates up the wrong way','%s: "I carry this team"']},
   decline:{manager:0,fans:-1,media:-3,morale:0,mates:0,head:['%s snubs the media','%s refuses to face the press']}};
-function toneOf(text){ const t=text.toLowerCase(); const has=ws=>ws.reduce((n,w)=>n+(t.includes(w)?1:0),0);
-  const sc={humble:has(['team','lads','we ','credit','work hard','proud','respect','thank','together','improve','on me','fans']),confident:has(['win','score','best','trust','will ','ready','believe','bounce back','top','title']),
-    fiery:has(['ref','joke','disgrace','rubbish','robbed','shocking','pundit','hate','worried','liar','nonsense','embarrass']),arrogant:has(['i carry','carry this','without me','better than','i am the','i\'m the best','me alone','nobody else','too good','greatest']),deflect:has(['next question','no comment','ask the','not sure','we\'ll see','focus'])};
-  let best='deflect',bv=0; for(const k in sc){ if(sc[k]>bv){bv=sc[k];best=k;} } return best; }
+// ---- reading a custom press answer: hostility, swearing, blame, sarcasm, arrogance, humility ----
+const LEX={
+ swear:['fuck','f*ck','fck','fuk','shit','bollocks','bastard','prick','dick','wanker','twat','cunt','piss','arse','asshole','dickhead','bitch','motherf'],
+ insult:['idiot','stupid','moron','clown','muppet','joke of a','pathetic','useless','dumb','loser','waste of'],
+ atPress:['picking on','leave me alone','stupid question','shut up','get lost','go away','who asked','not answering','mind your','you lot','do your job','your job','f off','fuck off','piss off','do one','talk to me like','always on my back','on my case','why do you','you people','you journalists','you media','agenda','lies','fake news','next question'],
+ mates:['teammate','team-mate','the lads didn','lads need','they didn','defence','defenders','defending was','midfield','nobody pass','no service','they need to','others need','some players','certain players','not my fault','wasn\'t my fault','not on me'],
+ manager:['manager','gaffer','the coach','tactics','his decision','dropped me','subbed me','sub me','took me off','doesn\'t play me','bench me','benched','his system','doesn\'t trust','no respect'],
+ ref:['ref','referee','var','official','robbed','cheat','disgrace','scandal','bent'],
+ sarcasm:['yeah right','oh sure','great question','oh wow','genius','lol','lmao','whatever','sure mate','cheers for that','thanks for that','obviously'],
+ arrogant:['i carry','carry this','without me','better than','i am the','i\'m the best','im the best','me alone','nobody else','too good','greatest','goat','best player','on another level','i don\'t need','can\'t stop me','cant stop me'],
+ humble:['team effort','the lads','credit to','work hard','proud','respect','thank','together','improve','that\'s on me','thats on me','my fault','learn','grateful','blessed','supporters','the fans','keep going','head down'],
+ confident:['we will','we\'ll win','we can win','score','bounce back','ready','believe','top four','title','trophy','confident','big game','go and win','three points'],
+ deflect:['no comment','we\'ll see','focus on','one game at a time','not for me to say','ask the','can\'t comment','next game']};
+function toneRead(text){ const t=' '+text.toLowerCase().replace(/[’']/g,"'")+' '; const tn=t.replace(/\b(not|no|wasn't|isn't|never|zero|lack of)\s+(my fault|respect|proud|grateful|credit|thank\w*)/g,' '); const n=k=>LEX[k].reduce((c,w)=>c+((k==='humble'?tn:t).includes(w)?1:0),0);
+  const f={swear:n('swear'),insult:n('insult'),press:n('atPress'),mates:n('mates'),manager:n('manager'),ref:n('ref'),sarcasm:n('sarcasm'),arrogant:n('arrogant'),humble:n('humble'),confident:n('confident'),deflect:n('deflect')};
+  const caps=(text.match(/[A-Z]{3,}/g)||[]).length; const excl=(text.match(/!/g)||[]).length; f.shout=caps+excl>=3?1:0;
+  let tone;
+  if((f.swear||f.insult)&&(f.press||/\byou\b|\byour\b/.test(t))) tone='hostile';
+  else if(f.press>=1&&(f.shout||f.insult)) tone='hostile';
+  else if(f.manager>=1&&(f.swear||f.insult||/\bhe\b|\bhis\b|\bhim\b/.test(t))&&!f.humble) tone='blame';
+  else if(f.mates>=1&&!f.humble) tone='blame';
+  else if(f.arrogant>=1) tone='arrogant';
+  else if(f.ref>=1||f.swear) tone='fiery';
+  else if(f.sarcasm>=1||f.press>=1) tone='sarcastic';
+  else { const sc={humble:f.humble,confident:f.confident,deflect:f.deflect}; tone='deflect'; let bv=0; for(const k in sc){ if(sc[k]>bv){ bv=sc[k]; tone=k; } } if(!bv) tone=text.length<25?'deflect':'confident'; }
+  f.target=f.manager?'manager':f.mates?'mates':f.ref?'ref':f.press?'press':null; return {tone,flags:f}; }
+function toneOf(text){ return toneRead(text).tone; }
+Object.assign(TONE,{
+ hostile:{manager:-5,fans:-1,media:-7,morale:-1,mates:-1,head:['%s loses it with reporters','"Leave me alone": %s snaps at the press','%s storms out of press conference']},
+ blame:{manager:-3,fans:-2,media:4,morale:0,mates:-5,head:['%s points the finger','%s throws teammates under the bus','Cracks appear as %s goes public']},
+ sarcastic:{manager:-1,fans:1,media:-3,morale:0,mates:0,head:['%s in no mood for questions','Prickly %s gives reporters short shrift']}});
 function pressAnswer(tone,txt){
   const P0=S.pending, T=TONE[tone], m=S.me; const eff=[]; const ch=(k,l,v)=>{ if(!v) return; m.rel[k]=clamp(m.rel[k]+v,0,100); eff.push([l,v]); };
   ch('manager','Manager',T.manager); ch('fans','Fans',T.fans); ch('media','Media',T.media);
@@ -1586,9 +1641,13 @@ function pressAnswer(tone,txt){
   if(T.mates){ for(const k in m.mates) m.mates[k]=clamp(m.mates[k]+T.mates,0,100); eff.push(['Teammates',T.mates]); }
   const head=pick(T.head).replace('%s',m.last);
   (m.press=m.press||[]).unshift({when:fmtDate(gameDate()),kind:P0.press,q:P0.q?P0.q.q:'',a:txt,tone,head,outlet:P0.outlet}); if(m.press.length>60) m.press.length=60;
-  news(tone==='fiery'||tone==='arrogant'||tone==='decline'?'bad':'you',head,txt?`"${txt}"`:'You declined to speak to the media.',true);
+  news(['fiery','arrogant','decline','hostile','blame','sarcastic'].includes(tone)?'bad':'you',head,txt?`"${txt}"`:'You declined to speak to the media.',true);
+  const F=txt?toneRead(txt).flags:{}; 
+  if(F.swear&&tone!=='decline'){ const f=roundWage((m.contract?m.contract.wage:500)*(tone==='hostile'?1.2:.6)+1000); m.bank-=f; m.fines=(m.fines||0)+f; news('bad','Club fines you for your language',`Swearing in front of the cameras cost you ${money(f)}. ${myClubObj()?myClubObj().mgr:'The manager'} wants it sorted.`); eff.push(['Fine',-f]); if(Math.random()<.35){ m.rel.manager=clamp(m.rel.manager-3,0,100); eff.push(['Manager',-3]); } }
+  if(tone==='blame'&&F.target==='manager'){ m.rel.manager=clamp(m.rel.manager-6,0,100); eff.push(['Manager',-6]); m.grudge=(m.grudge||0)+1; news('bad','Manager hits back',`${myClubObj()?myClubObj().mgr:'The manager'}: "If he has a problem, my door is open. Not the newspapers."`); }
+  if(tone==='hostile'&&m.rep>40) m.followers+=ri(2000,12000);
   if(tone==='fiery'&&Math.random()<.3){ const f=roundWage(m.contract.wage*.5+500); m.bank-=f; m.fines+=f; news('bad','Fined for comments',`Your comments about the officials cost you ${money(f)}.`); eff.push(['Fine',-f]); }
-  if(tone!=='decline') gainXP(10); m.followers+=tone==='fiery'?ri(500,3000):ri(50,400);
+  if(tone!=='decline') gainXP(10); m.followers+=tone==='fiery'||tone==='hostile'?ri(500,3000):ri(50,400);
   S.pending={kind:'pressDone',head,txt,tone,eff,after:P0.press}; }
 
 // ---------- manager talks & promises ----------
@@ -1909,7 +1968,7 @@ function buildSim(H,A,meSide,meOn,homeAdv){
     const subs=[ri(56,66),ri(66,76),ri(75,85)]; subs.forEach(mn=>{ if(side===meSide&&meOn&&Math.abs(mn-meOn)<5) return; const off=pick(sim[side].xi.filter(x=>x.slot!=='GK'&&!x.me&&!x.off)); const on=sim[side].bench.find(x=>!x.me&&!x.used&&x.p!=='GK'); if(!off||!on) return; off.off=true; on.used=true; push(mn+sim.st1,{type:'sub',side,on:on.n,off:off.n}); }); });
   if(meSide&&meOn){ const off=sim[meSide].xi.filter(x=>(SEL_GROUP[S.me.pos]||[S.me.pos]).includes(x.slot)&&!x.off)[0]||sim[meSide].xi[9]; if(off) off.off=true; push(meOn+sim.st1+.01,{type:'sub',side:meSide,on:meName,off:off?off.n:'',meOn:true}); }
   // my key moments
-  if(meSide){ const grp=momentGroup(); const start=meOn?meOn+sim.st1+1:4; const n=meOn?1:grp==='ATT'?(Math.random()<.2?3:2):2;
+  if(meSide){ const grp=momentGroup(); const start=meOn?meOn+sim.st1+1:4; const n=meOn?(Math.random()<.5?2:1):grp==='ATT'?(Math.random()<.3?4:3):grp==='MID'?(Math.random()<.4?3:2):(Math.random()<.5?3:2);
     const used=[]; for(let i=0;i<n;i++){ let t,tries=0; do{ t=rnd(start,T-1); tries++; }while(used.some(u=>Math.abs(u-t)<6)&&tries<20); used.push(t); const M=wpick(MOMENTS[grp],x=>/corner|Penalty/.test(x.t)?.4:1); push(t,{type:'moment',mo:M,mi:i}); } }
   push(45+sim.st1,{type:'ht'}); push(T,{type:'ft'}); push(0,{type:'ko'});
   ev.sort((x,y)=>x.t-y.t||(x.type==='ko'?-1:0));
@@ -1934,7 +1993,7 @@ function momentPick(ix,ev){ const c=S.mctx, sim=c.sim, M=ev.mo; c.curMoment=M; l
   if(o[3]==='n'){ const taker=sim[side].xi.find(p=>p.slot==='ST'&&!p.me)||sim[side].xi[9]; if(Math.random()<.78){ pushE({type:'goal',side,who:taker.n,ast:null}); res.txt=`You hand the ball to ${taker.n}. He scores.`; } else { pushE({type:'save',side,who:taker.n}); res.txt=`You hand the ball to ${taker.n}. Saved! The fans wanted you to take it.`; } }
   else if(o[3]==='s'){ res.txt='You play it safe. Nothing lost, nothing gained.'; }
   else if(o[3]==='f'){ res.txt='You take him down. Yellow card, but the danger is gone.'; c.yellow++; c.keyOk++; pushE({type:'card',side,who:meName,me:true}); }
-  else { const ok=Math.random()<momentChance(o); c.lastChoice=o[0];
+  else { const pch=momentChance(o); const ok=Math.random()<pch; c.lastChoice=o[0]; if(o[3]==='g') c.xg=(c.xg||0)+pch*.8;
     if(ok){ c.keyOk++; if(o[3]==='g'){ pushE({type:'goal',side,who:meName,ast:Math.random()<.6?pick(sim[side].xi.filter(p=>!p.me&&p.slot!=='GK')).n:null,meG:true}); c.shots++; res.txt=pick(['GOAL! What a finish.',"It's in! Clinical.",'Back of the net!']); res.kind='goal'; if(o[4]&&S.me.traits.includes(o[4])) res.txt+=` ${o[4]} at its best.`; }
       else if(o[3]==='a'){ if(Math.random()<.68){ const sc=pick(sim[side].xi.filter(p=>!p.me&&p.slot!=='GK'&&!p.off)); pushE({type:'goal',side,who:sc.n,ast:meName,meA:true}); res.txt=`Perfect ball. ${sc.n} finishes. Assist!`; res.kind='assist'; } else { res.txt='Great ball, but your teammate can\'t finish it.'; c.kp=(c.kp||0)+1; } }
       else if(o[3]==='k'){ res.txt='You beat the press and the move flows. The crowd loves it.'; c.kp=(c.kp||0)+1; }
@@ -1972,13 +2031,15 @@ function finishMyMatch(){
   // stats
   const key=ctx.key;
   if(played){ const st=m.ss[key]=m.ss[key]||{apps:0,starts:0,mins:0,g:0,a:0,motm:0,rat:[],cs:0,yc:0}; st.apps++; if(!sim.meOn) st.starts++; st.mins+=mins; st.g+=g; st.a+=a; if(motm) st.motm++; st.rat.push(rating); if(them===0) st.cs++; if(ctx.yellow) st.yc+=ctx.yellow;
+    if(mstats){ st.sh=(st.sh||0)+mstats.shots; st.sot=(st.sot||0)+mstats.sot; st.kp=(st.kp||0)+mstats.kp; st.drib=(st.drib||0)+mstats.drib; st.tk=(st.tk||0)+mstats.tackles; st.xg=Math.round(((st.xg||0)+(ctx.xg||0)+Math.max(0,mstats.shots-(ctx.shots||0))*.07)*100)/100; }
     if(!ctx.intl){ m.form.push(rating); if(m.form.length>8) m.form.shift(); m.monthR=(m.monthR||[]); if(!ctx.youth) m.monthR.push({r:rating,g,a}); }
     if(!ctx.youth&&!ctx.intl&&m.contract) m.bank+=m.contract.appBonus+g*m.contract.goalBonus+a*m.contract.assistBonus; }
   const xp=[]; if(played){ const f=ctx.youth?.7:1; xp.push(['Appearance',Math.round(50*f*Math.max(.35,mins/90))]); if(g) xp.push([`Goals ×${g}`,Math.round(g*70*f)]); if(a) xp.push([`Assists ×${a}`,Math.round(a*45*f)]); if(res==='W') xp.push(['Win',Math.round(30*f)]); if(motm) xp.push(['Player of the Match',Math.round(90*f)]); if(them===0&&def) xp.push(['Clean sheet',Math.round(35*f)]); if(ctx.keyOk) xp.push([`Key moments won ×${ctx.keyOk}`,ctx.keyOk*15]); if(fx&&fx.comp==='E') xp.push(['European night',30]); if(ctx.intl) xp.push(['International duty',40]); } else xp.push(['Squad member',10]);
   let xpt=0; xp.forEach(x=>xpt+=x[1]); gainXP(xpt);
+  if(played&&!ctx.youth){ let bsp=0; if(rating>=7.5) bsp++; if(g>=2) bsp++; if(motm) bsp++; if(bsp){ m.sp+=bsp; S.lastMatch&&(S.lastMatch.bsp=bsp); xp.push([`Bonus skill points +${bsp}`,0]); } }
   // in-match development: a good game teaches you something
   if(played){ const gm=growthMult()*(rating>=7.5?1.4:rating>=6.8?1:.6); const ks=Object.keys(OVRW[posKey(m.pos)]); const ups=[]; for(let i=0;i<2;i++){ const k=pick(ks); if(addTXP(k,3*gm)) ups.push(`${ANAME[k]} +1`); } if(ups.length) news('good','Learning on the pitch',ups.join(', ')+'.',true); ctx.ups=ups; }
-  if(played){ m.sharp=clamp(m.sharp+(mins>=60?7:4),0,100); m.energy=clamp(m.energy-mins/90*27*({max:1.35,min:.6}[ctx.eff]||1),0,100);
+  if(played){ m.sharp=clamp(m.sharp+(mins>=60?7:4),0,100); m.energy=clamp(energyAt(T+1),0,100);
     if(!ctx.intl){ m.rel.manager=clamp(m.rel.manager+(rating>=7.5?2.5:rating<6?-2.5:0)*(ctx.youth?.6:1),0,100); m.rel.tactical=clamp(m.rel.tactical+1.5,0,100); }
     if(!ctx.youth&&!ctx.intl){ m.rel.fans=clamp(m.rel.fans+g*1.5+(motm?1:0)-(rating<5.8?2:0),0,100); m.rep=clamp(m.rep+(rating-6.5)*.35+g*.25+(fx.comp==='E'?.2:0)+(club(cid).rep-50)/300,0,100); m.followers=Math.round(m.followers*(1+g*.012+(motm?.01:0))+g*ri(100,600)*(1+m.rep/30)); }
     m.morale=clamp(m.morale+(rating-6.6)*4+(res==='W'?3:res==='L'?-3:0),0,100);
@@ -1990,6 +2051,7 @@ function finishMyMatch(){
   if(fx&&fx.comp==='E'&&!ctx.youth&&S.euro[fx.euro].winner===cid&&played){ m.trophies.push({s:S.season,y:S.year,name:EURO_NAME[fx.euro],club:cid}); news('good',`${EURO_NAME[fx.euro]} winners!`,'Champions of Europe.'); m.rep=clamp(m.rep+6,0,100); }
   const hS=sim.h, aS=sim.a;
   S.lastMatch={hT:{name:hS.name,short:hS.short,c1:hS.c1,c2:hS.c2},aT:{name:aS.name,short:aS.short,c1:aS.c1,c2:aS.c2},gh,ga,us,them,res,g,a,rating,motm,mins,sel:ctx.sel.status,youth:ctx.youth,intl:ctx.intl,comp:ctx.compName,pens:ctx.pens,cupWin:ctx.cupWin,xp,xpt,mstats,stats:sim.stats,moments:ctx.momentLog||[],det:ctx.det,ups:ctx.ups||[],played,home:homeIsUs,fxComp:fx?fx.comp:'I'};
+  try{ badgeMatch(S.lastMatch); }catch(e){}
   if(played&&ctx.youth) youthProgress(rating,g,a); if(played&&!ctx.youth&&!ctx.intl&&ctx.sel&&ctx.sel.callUp) callUpResult(rating,g); else if(!ctx.youth&&!ctx.intl&&ctx.sel&&ctx.sel.callUp) S.me.callUp=false;
   if(!ctx.intl) { (m.results=m.results||[]).push({s:S.season,w:S.week,comp:ctx.compName,key,opp:ctx.oppCid,home:ctx.home,us,them,res,rating,g,a,mins,youth:ctx.youth,pens:ctx.pens}); if(m.results.length>400) m.results.shift(); promiseTick('match',ctx); }
   const big=played&&!ctx.youth&&!ctx.intl&&(g>=1||rating>=7.8||rating<=5.8||fx.comp!=='L'||m.status==='Team leader'||Math.random()<.25)&&ovr()>=clubLevel(myClubObj())-4;
@@ -2010,7 +2072,7 @@ function resimFrom(t0){
   ['h','a'].forEach(sd=>{ const n=poisson(lam[sd]); for(let i=0;i<n;i++){ const t=rnd(t0+.5,T); let meG=false,meA=false; if(sd===side&&meOnPitch(t)){ const r=Math.random(); const pw=sim.pw*(c.ment==='off'?1.3:c.ment==='con'?.6:1); if(r<pw) meG=true; else if(r<pw+sim.aw) meA=true; }
       const sc=meG?{n:meName}:scorerFrom(sd); let as=null; if(meA) as={n:meName}; else if(Math.random()<.72){ const x=scorerFrom(sd,sc); if(x) as=x; } push(t,{type:'goal',side:sd,who:sc.n,ast:as?as.n:null,meG,meA}); }
     const sh=poisson(7*frac*Math.exp((sd==='h'?sim.d:-sim.d)*.35)*(active?(sd===side?M.us:M.them):1)); for(let i=0;i<sh;i++){ const p=scorerFrom(sd); if(p) push(rnd(t0+.5,T),{type:pick(['save','save','miss','miss','block','post']),side:sd,who:p.n}); } });
-  if(active){ const grpBase=momentGroup(); const grp=c.ment==='con'?'DEF':c.ment==='off'&&grpBase==='DEF'?'MID':grpBase; const rate=(grpBase==='ATT'?2.2:2)*M.mom*(c.eff==='max'?1.15:c.eff==='min'?.7:1);
+  if(active){ const grpBase=momentGroup(); const grp=c.ment==='con'?'DEF':c.ment==='off'&&grpBase==='DEF'?'MID':grpBase; const rate=(grpBase==='ATT'?3.1:grpBase==='MID'?2.6:2.4)*M.mom*(c.eff==='max'?1.15:c.eff==='min'?.7:1);
     let n=rate*frac; n=Math.floor(n)+(Math.random()<n%1?1:0); const used=[]; for(let i=0;i<n;i++){ let t,tries=0; do{ t=rnd(t0+2,T-1); tries++; }while(used.some(u=>Math.abs(u-t)<5)&&tries<20); used.push(t); const Mo=wpick(MOMENTS[grp],x=>/corner|Penalty/.test(x.t)?.4:1); push(t,{type:'moment',mo:Mo,mi:100+i}); } }
   sim.events.sort((x,y)=>x.t-y.t); }
 function setMentality(v,t){ const c=S.mctx; if(c.ment===v) return; c.ment=v; if(c.shout&&c.shout.want===v){ c.shout.followed=true; } resimFrom(t); }
@@ -2034,7 +2096,7 @@ function requestSub(t){ const c=S.mctx, m=S.me; const r=liveRating(t)||6.5; cons
   if(!ok) return {ok:false,txt:`${c.mgr} waves you away: "Not now, I need you out there."`};
   const niggle=m.energy<45; m.rel.manager=clamp(m.rel.manager+(niggle||r>=7?0:-1),0,100); subOffMe(t,'request'); return {ok:true,txt:`${c.mgr} makes the change. You head off${r>=7?' to applause':''}.`}; }
 // called by the UI when an event becomes visible
-function energyAt(t){ const c=S.mctx; const m=S.me; if(!c||!c.involved||!c.sim) return m.energy; const on=c.sim.meOn?c.sim.meOn+c.sim.st1:0; const end=c.subOff!=null?Math.min(t,c.subOff):t; if(end<=on) return m.energy; return clamp(m.energy-clamp((end-on)/90,0,1.15)*27*({max:1.35,min:.6}[c.eff]||1),0,100); }
+function energyAt(t){ const c=S.mctx; const m=S.me; if(!c||!c.involved||!c.sim) return m.energy; const on=c.sim.meOn?c.sim.meOn+c.sim.st1:0; const end=c.subOff!=null?Math.min(t,c.subOff):t; if(end<=on) return m.energy; const ht=45+c.sim.st1; const htBack=on<ht&&end>ht?8:0; return clamp(m.energy-clamp((end-on)/90,0,1.15)*27*({max:1.35,min:.6}[c.eff]||1)+htBack,0,100); }
 function fatiguePen(en){ return en>=55?0:(55-en); }
 function afterEventCheck(e,t){ const c=S.mctx, sim=c.sim; if(!c.involved||c.subOff!=null||!meOnPitch(t)) return null; const m=S.me;
   const other=sim.meSide==='h'?'a':'h';
@@ -2042,7 +2104,12 @@ function afterEventCheck(e,t){ const c=S.mctx, sim=c.sim; if(!c.involved||c.subO
   const mm=tToHalfMin(t,sim).min;
   if(mm>=80&&c.shout&&c.shout.ignored&&c.shout.want==='off'&&!c.shout.punished){ const [h,a]=liveScore(t); const us=sim.meSide==='h'?h:a, them=sim.meSide==='h'?a:h; if(us<them){ c.shout.punished=true; m.rel.manager=clamp(m.rel.manager-3,0,100); if(Math.random()<.45){ subOffMe(t,'ignored'); return {sub:true,txt:`Still behind and you never pushed on. ${c.mgr} takes you off.`}; } } }
   if(mm>=60&&!c.poorCheck){ const r=liveRating(t); if(r!=null&&r<5.9){ c.poorCheck=true; if(Math.random()<.5){ subOffMe(t,'poor'); return {sub:true,txt:`Not your day. ${c.mgr} takes you off on the hour.`}; } } }
-  if(mm>=50&&!c.fatigueSub){ const en=energyAt(t), r=liveRating(t); if(en<22||(en<33&&r!=null&&r<6.7)||(en<40&&mm>=75&&r!=null&&r<6.4)){ c.fatigueSub=true; if(Math.random()<(en<22?.8:.5)){ subOffMe(t,'tired'); return {sub:true,txt:`You're running on empty (${Math.round(en)}% energy). ${c.mgr} brings you off.`}; } } }
+  if(mm>=55){ const k=Math.floor(mm/5); if(c.subChk!==k){ c.subChk=k; const en=Math.round(energyAt(t)), r=liveRating(t)||6.5; const [h,a]=liveScore(t); const us=sim.meSide==='h'?h:a, them=sim.meSide==='h'?a:h, diff=us-them; const att=['ST','LW','RW','CAM'].includes(m.pos); const mg=c.mgr;
+    let p=0, why='';
+    if(en<18){ p=.85; why=`You're out on your feet (${en}% energy). ${mg} brings you off.`; }
+    else if(en<32){ if(diff<0&&att&&r>=6.9){ p=.08; } else if(diff>=2){ p=.6; why=`Game won and you're running low (${en}%). ${mg} saves your legs for the next one.`; } else if(r<6.6){ p=.6; why=`Tired (${en}%) and not in the game. ${mg} makes the change.`; } else if(diff<0&&!att){ p=.45; why=`${mg} needs fresh legs to chase the game. You come off.`; } else p=.25, why=`${mg} sees you're tiring (${en}%) and makes the switch.`; }
+    else if(en<45&&mm>=72){ if(diff>=2&&r<7.3){ p=.35; why=`Job done. ${mg} gives you a breather.`; } else if(r<6.3){ p=.4; why=`Fading at ${en}% energy. ${mg} takes you off.`; } }
+    if(p&&Math.random()<p){ subOffMe(t,'tired'); return {sub:true,txt:why||`${mg} takes you off.`}; } } }
   if(mm>=70&&!c.tiredCheck&&c.eff==='max'&&energyAt(t)<30){ c.tiredCheck=true; if(Math.random()<.25){ injure('a match'); subOffMe(t,'injury'); return {sub:true,txt:'You pull up holding your hamstring. Running on empty has cost you.'}; } }
   return null; }
 
@@ -2262,6 +2329,195 @@ function approachTick(){ const m=S.me; if(!m.approaches||m.club==null||m.loan) r
     if(a.bid>=a.max||a.rej>=3){ a.stage='dead'; apLog(a,`Final bid of ${money(a.bid)} rejected. ${c.name} walk away.`); news('you',`${c.name} pull out`,`After ${a.rej} rejected bid${a.rej>1?'s':''} (last ${money(a.bid)}), ${c.name} have ended their interest. ${mine.name} valued you at ${money(ask)}.`); continue; }
     apLog(a,`Bid of ${money(a.bid)} rejected.`); news('you',`${c.name} bid ${money(a.bid)}`,`${mine.name} rejected it. ${a.rej===1?'Expect an improved offer.':'They are considering their next move.'}`,a.rej>1); }
   m.approaches=m.approaches.filter(a=>a.stage!=='dead'||S.week-a.w<10); }
+
+// ===================== PLAYER CAREER: decision events between matches =====================
+// Each event fires at most once per season (most once per career), uses real names from your club, and some have delayed consequences.
+function evDayAbs(){ return S.season*400+S.week*7+S.day; }
+function evMate(excl){ const c=myClubObj(); if(!c) return null; const ids=c.squad.filter(id=>!excl||!excl.includes(id)); const known=ids.filter(id=>S.me.mates[id]!=null); const pool=known.length?known:ids; return pool.length?P(pick(pool)):null; }
+function evYoung(){ const c=myClubObj(); const ys=c.squad.map(P).filter(p=>p.a<=20); return ys.length?pick(ys):null; }
+function evCaptain(){ const c=myClubObj(); return c&&c.cap!=null?P(c.cap):null; }
+function evRival(){ const r=rivals().sort((a,b)=>b.o-a.o); return r[0]||null; }
+function lastRes(){ const r=(S.me.results||[]).filter(x=>!x.youth); return r[r.length-1]||null; }
+function teamForm(){ const r=(S.me.results||[]).filter(x=>!x.youth).slice(-5); return r.reduce((s,x)=>s+(x.res==='W'?3:x.res==='D'?1:0),0); }
+// effect applier: returns chip list
+function evApply(fx){ const m=S.me, out=[]; const add=(l,v)=>{ if(v) out.push([l,v]); };
+  for(const k of ['manager','fans','media','tactical']) if(fx[k]){ m.rel[k]=clamp(m.rel[k]+fx[k],0,100); add({manager:'Manager',fans:'Fans',media:'Media',tactical:'Tactical'}[k],fx[k]); }
+  if(fx.morale){ m.morale=clamp(m.morale+fx.morale,0,100); add('Morale',fx.morale); }
+  if(fx.energy){ m.energy=clamp(m.energy+fx.energy,0,100); add('Energy',fx.energy); }
+  if(fx.mates){ for(const k in m.mates) m.mates[k]=clamp(m.mates[k]+fx.mates,0,100); add('Teammates',fx.mates); }
+  if(fx.mate){ const [pid,v,name]=fx.mate; m.mates[pid]=clamp((m.mates[pid]==null?45:m.mates[pid])+v,0,100); add(name,v); }
+  if(fx.bank){ m.bank+=fx.bank; add(fx.bank>0?'Cash':'Cost',fx.bank); }
+  if(fx.followers){ m.followers=Math.max(0,m.followers+fx.followers); add('Followers',fx.followers); }
+  if(fx.rep){ m.rep=clamp(m.rep+fx.rep,0,100); add('Reputation',fx.rep); }
+  if(fx.sharp){ m.sharp=clamp(m.sharp+fx.sharp,0,100); add('Sharpness',fx.sharp); }
+  if(fx.xp){ gainXP(fx.xp); add('XP',fx.xp); }
+  if(fx.train){ fx.train.forEach(k=>addTXP(k,14*growthMult())); add('Training','+'); }
+  return out; }
+function evLater(days,key,data){ (S.me.evLater=S.me.evLater||[]).push({at:evDayAbs()+days,key,data}); }
+const EVENTS=[
+ {id:'night_out',once:false,cond:()=>Object.keys(S.me.mates).length>3,make:()=>{ const t=evMate(); const tmrw=S.days[S.day+1]&&S.days[S.day+1].type==='match'; return {t,title:`${t.n.split(' ')[0]}'s night out`,txt:`${t.n} is organising a night out in town${tmrw?' tonight. You have a match tomorrow.':' with a few of the lads.'} The group chat is buzzing.`,
+   o:[['Go all out',()=>{ const r=evApply({morale:5,mate:[t.id,9,t.n],energy:tmrw?-22:-12}); if(Math.random()<(tmrw?.55:.3)) evLater(2,'leak_night',{tmrw}); return {txt:'Great night. You crawl home at 3am.',r}; }],['Go, leave early',()=>({txt:'You show face, have a laugh and are home by midnight.',r:evApply({mate:[t.id,4,t.n],energy:-5,morale:2})})],['Stay in',()=>({txt:`You stay in. ${t.n.split(' ')[0]} sends a few "boring" messages in the chat.`,r:evApply({mate:[t.id,-3,t.n],energy:4})})]]}; }},
+ {id:'leak_tactics',cond:()=>teamForm()<=5,make:()=>{ const t=evMate(); return {t,title:'Who leaked the team?',txt:`The starting XI was in the papers before kick-off. ${myClubObj().mgr} pulls you aside: "You're close with the lads. Do you know who's talking to the press?" You've heard it was ${t.n}.`,
+   o:[['Name him',()=>({txt:`${t.n} is fined and dropped. Word gets around the dressing room that you grassed.`,r:evApply({manager:7,mate:[t.id,-30,t.n],mates:-4})})],['"No idea, gaffer"',()=>({txt:'He stares at you for a long second. "Fine."',r:evApply({manager:-2,mates:2})})],['Have a word with him yourself',()=>({txt:`You quietly tell ${t.n.split(' ')[0]} to knock it off. He's embarrassed but grateful.`,r:evApply({mate:[t.id,6,t.n],morale:1})})]]}; }},
+ {id:'charity',make:()=>({title:'Children\'s hospital visit',txt:'The club foundation asks if you\'ll visit the local children\'s hospital on your day off.',
+   o:[['Go and spend the afternoon',()=>({txt:'The kids lose their minds when you walk in. The photos go everywhere.',r:evApply({fans:6,followers:ri(800,4000),rep:1,energy:-3,morale:4})})],['Send signed shirts',()=>({txt:'A nice gesture. A few fans notice.',r:evApply({fans:1})})],['Skip it',()=>({txt:'You rest instead. Nobody says anything, this time.',r:evApply({energy:4,fans:-1})})]]})},
+ {id:'boot_deal',cond:()=>S.me.rep>=30&&!S.me.bootDeal,make:()=>{ const v=roundWage(2000+S.me.rep*S.me.rep*6); return {title:'Boot deal on the table',txt:`A sportswear brand offers you ${money(v)} a year to wear their boots. Your agent thinks a bigger brand might come in if you wait.`,
+   o:[['Sign it',()=>{ S.me.bootDeal=v; return {txt:'Done. New boots, new money.',r:evApply({bank:v,followers:ri(300,2000)})}; }],['Wait for a bigger offer',()=>{ if(Math.random()<.45) evLater(ri(14,28),'boot_better',{v}); else evLater(ri(14,28),'boot_none',{v}); return {txt:'You hold out. Risky.',r:[]}; }],['Not interested',()=>({txt:'You stay loyal to your old boots.',r:evApply({morale:1})})]]}; }},
+ {id:'fan_dm',cond:()=>{ const r=lastRes(); return r&&(r.rating||7)<6.3; },make:()=>({title:'Abuse in your DMs',txt:'After your last game, your inbox is full of abuse. One account has sent you twenty messages.',
+   o:[['Ignore it',()=>({txt:'You mute your phone and go to bed.',r:evApply({morale:-2})})],['Reply calmly',()=>({txt:'"I\'ll keep working for this club." Fans screenshot it and back you.',r:evApply({fans:3,media:1,followers:ri(200,1500)})})],['Fire back',()=>({txt:'Your reply goes viral for the wrong reasons.',r:evApply({fans:-4,media:-2,followers:ri(2000,9000),morale:2})})],['Report it to the club',()=>({txt:'The club issues a statement condemning online abuse.',r:evApply({fans:2,manager:1,morale:1})})]]})},
+ {id:'captain_vs_manager',cond:()=>teamForm()<=4&&evCaptain()&&evCaptain().id!==undefined,make:()=>{ const c=evCaptain(); return {title:'The captain wants your backing',txt:`${c.n} gathers a few senior players: "The gaffer's lost the dressing room. We need to tell the board." He looks at you.`,
+   o:[['Back the captain',()=>{ S.me.unrest=(S.me.unrest||0)+1; return {txt:'You\'re in. The board hears that the squad are unhappy.',r:evApply({mate:[c.id,12,c.n],mates:3,manager:-7})}; }],['Stay out of it',()=>({txt:'"Leave me out of it." Nobody\'s impressed, nobody\'s offended.',r:evApply({mate:[c.id,-3,c.n]})})],['Warn the manager',()=>({txt:`The manager appreciates the heads-up. ${c.n.split(' ')[0]} finds out it was you.`,r:evApply({manager:8,mate:[c.id,-18,c.n],mates:-5})})]]}; }},
+ {id:'rival_question',cond:()=>!!evRival(),make:()=>{ const rv=evRival(); return {title:'Asked about your rival',txt:`A reporter from ${outlet()} corners you at a sponsor event: "Is there room for you and ${rv.n} in the same team?"`,
+   o:[['Praise him',()=>({txt:'"He\'s top. Competition makes us both better."',r:evApply({mate:[rv.id,8,rv.n],media:1,manager:2})})],['"I\'m the better player"',()=>{ S.me.rivalHeat=(S.me.rivalHeat||0)+1; return {txt:'The quote makes the back pages. The dressing room goes quiet when you walk in.',r:evApply({mate:[rv.id,-15,rv.n],media:4,followers:ri(1000,5000),morale:2})}; }],['"No comment"',()=>({txt:'You keep walking.',r:evApply({media:-1})})]]}; }},
+ {id:'mentor',cond:()=>S.me.age>=25&&!!evYoung(),make:()=>{ const y=evYoung(); return {title:'A youngster asks for advice',txt:`${y.n}, ${y.a}, catches you after training: "How do I get in the team? I feel like I'm getting nowhere."`,
+   o:[['Take him under your wing',()=>({txt:'You stay behind and work with him. He hangs on every word.',r:evApply({mate:[y.id,15,y.n],morale:3,energy:-3,rep:1})})],['Quick word of advice',()=>({txt:'"Train like you play. Be patient." He nods.',r:evApply({mate:[y.id,5,y.n]})})],['Brush him off',()=>({txt:'"Not now, mate."',r:evApply({mate:[y.id,-8,y.n]})})]]}; }},
+ {id:'extra_finishing',once:false,make:()=>({title:'Extra session offer',txt:`${myClubObj().mgr}'s assistant offers you a one-on-one session on your day off.`,
+   o:[['Finishing drills',()=>({txt:'Two hours of finishing. Your legs are gone but your touch feels sharp.',r:evApply({train:['fin','pos','com'],energy:-9,manager:2})})],['Passing and vision',()=>({txt:'Rondos and switches of play until the light goes.',r:evApply({train:['sho','vis','lpa'],energy:-8,manager:2})})],['Rest instead',()=>({txt:'You rest. Fresh legs matter too.',r:evApply({energy:6})})]]})},
+ {id:'podcast',cond:()=>S.me.rep>=25,make:()=>({title:'Podcast invite',txt:'A big football podcast wants you on for an hour. "Nothing\'s off limits," says the host.',
+   o:[['Go on and be open',()=>{ if(Math.random()<.4) evLater(2,'podcast_clip',{}); return {txt:'A great chat. You said a lot.',r:evApply({followers:ri(3000,15000),media:3,rep:1})}; }],['Go on, stay safe',()=>({txt:'Solid, a bit boring.',r:evApply({followers:ri(500,3000),media:1})})],['Decline',()=>({txt:'Maybe another time.',r:[]})]]})},
+ {id:'body_fat',cond:()=>S.me.age>=20,make:()=>({title:'Body fat test',txt:'The sports science team say your body fat is up two percent. They put a strict diet plan in front of you.',
+   o:[['Follow it strictly',()=>({txt:'Grilled chicken and broccoli for a month. You feel lighter.',r:evApply({energy:6,morale:-2,manager:2,train:['stm','acc']})})],['Follow it loosely',()=>({txt:'Mostly good. Mostly.',r:evApply({energy:2})})],['Ignore it',()=>({txt:'The sports scientist reports back to the manager.',r:evApply({manager:-3})})]]})},
+ {id:'training_fight',make:()=>{ const t=evMate(); return {title:'Training ground flashpoint',txt:`${t.n} leaves a late one on you in a training match. Everyone stops.`,
+   o:[['Square up to him',()=>({txt:'Pushing and shoving. The coaches drag you apart.',r:evApply({mate:[t.id,-14,t.n],manager:-4,morale:2,media:-1})})],['Laugh it off',()=>({txt:'"Save it for Saturday, mate." The lads laugh.',r:evApply({mate:[t.id,4,t.n],mates:2})})],['Tell the coach',()=>({txt:`${t.n.split(' ')[0]} gets a telling-off. Some of the lads think you're soft.`,r:evApply({mate:[t.id,-8,t.n],manager:2,mates:-2})})]]}; }},
+ {id:'injured_mate',make:()=>{ const t=evMate(); return {title:`${t.n.split(' ')[0]} is out for months`,txt:`${t.n} has done his knee. He's at home, gutted, and hasn't been in since.`,
+   o:[['Visit him',()=>({txt:'You bring food and a games console. He doesn\'t forget it.',r:evApply({mate:[t.id,14,t.n],mates:2,energy:-2})})],['Send a message',()=>({txt:'"Head up, you\'ll come back stronger."',r:evApply({mate:[t.id,4,t.n]})})]]}; }},
+ {id:'derby_banter',cond:()=>S.days.some((d,i)=>i>=S.day&&d.type==='match'&&d.fx&&d.fx.comp==='L'),make:()=>{ const d=S.days.find((d,i)=>i>=S.day&&d.type==='match'&&d.fx); const det=d?fxDetails(d.fx):null; const opp=det?club(det.opp).name:'them'; return {title:`${opp} fans on your case`,txt:`${opp} fans are trolling you online ahead of the game, posting clips of your worst misses.`,
+   o:[['Banter them back',()=>({txt:'Your reply gets 50,000 likes. Now you have to back it up.',r:evApply({fans:4,followers:ri(3000,12000),media:2,morale:3})})],['Ignore them',()=>({txt:'Do your talking on the pitch.',r:evApply({manager:1})})],['Post a training clip',()=>({txt:'A screamer from training. Message received.',r:evApply({fans:2,followers:ri(1000,4000)})})]]}; }},
+ {id:'move_rumour',cond:()=>S.me.rep>=30&&S.me.club!=null,make:()=>{ const big=S.clubs.filter(c=>c.league&&!c.b&&c.rep>myClubObj().rep+6&&c.id!==S.me.club); const b=big.length?pick(big):null; if(!b) return null; return {title:'Transfer rumour',txt:`${outlet()} report that ${b.name} are tracking you. ${myClubObj().mgr} asks you straight: "Is your head turned?"`,
+   o:[['"I\'m going nowhere"',()=>({txt:'He nods. The fans love the quote.',r:evApply({manager:4,fans:3})})],['"It\'s flattering..."',()=>{ evLater(ri(5,20),'rumour_bid',{club:b.id}); return {txt:'You stay coy. The rumour grows legs.',r:evApply({manager:-3,media:2})}; }],['Ask your agent to find out more',()=>{ evLater(ri(5,20),'rumour_bid',{club:b.id}); return {txt:'Your agent makes some calls.',r:evApply({manager:-1})}; }]]}; }},
+ {id:'language',cond:()=>{ const c=myClubObj(); return c&&c.country&&c.country!==({ENG:'ENG',IRL:'IRL',SCO:'ENG',WAL:'ENG',NIR:'ENG'}[S.me.nat]||S.me.nat); },make:()=>({title:'Language lessons',txt:'The club offers you lessons in the local language.',
+   o:[['Take them seriously',()=>({txt:'You order your first coffee in the local language. The lads cheer.',r:evApply({mates:4,morale:3,tactical:3,energy:-2})})],['Learn the basics',()=>({txt:'Enough to get by on the pitch.',r:evApply({mates:1,tactical:1})})],['Skip them',()=>({txt:'You stick with English. Some lads find it hard to connect with you.',r:evApply({mates:-2})})]]})},
+ {id:'homesick',cond:()=>S.me.age<=22&&S.me.joined===S.season,make:()=>({title:'Feeling homesick',txt:'New city, new club. You\'re missing home more than you expected.',
+   o:[['Fly family over',()=>({txt:'A weekend with family resets you.',r:evApply({morale:7,bank:-ri(1500,4000)})})],['Throw yourself into training',()=>({txt:'You bury it in work.',r:evApply({manager:2,morale:-1,energy:-4})})],['Lean on the lads',()=>({txt:'A FIFA night at a teammate\'s house helps.',r:evApply({mates:3,morale:3})})]]})},
+ {id:'video_analysis',once:false,make:()=>({title:'Optional video session',txt:'The analyst has clipped up your last few games and offers to go through them with you.',
+   o:[['Go through every clip',()=>({txt:'You spot a habit in your movement you never noticed.',r:evApply({tactical:5,manager:2,xp:40})})],['Quick look',()=>({txt:'Ten minutes, a few notes.',r:evApply({tactical:2})})],['Skip it',()=>({txt:'You head home.',r:evApply({manager:-1})})]]})},
+ {id:'sponsor_shoot',cond:()=>S.me.rep>=20,make:()=>({title:'Sponsor photoshoot',txt:'A sponsor wants a three-hour shoot. It\'s the day before a match.',
+   o:[['Do it',()=>({txt:'Smile, pose, repeat. Your feet ache.',r:evApply({bank:roundWage(800+S.me.rep*90),energy:-7})})],['Ask to move it',()=>({txt:'They push it back a week. Slightly annoyed.',r:evApply({bank:roundWage(400+S.me.rep*50)})})],['Cancel',()=>({txt:'The sponsor isn\'t happy.',r:evApply({media:-1})})]]})},
+ {id:'ref_rant',cond:()=>{ const r=lastRes(); return r&&r.res==='L'; },make:()=>({title:'That refereeing decision',txt:'Replays show the penalty given against you last game was never a foul. Journalists are waiting outside training.',
+   o:[['Slam the referee',()=>{ const f=roundWage((S.me.contract?S.me.contract.wage:500)*.5+800); return {txt:'Box office quotes. The FA charge follows.',r:evApply({fans:4,media:3,bank:-f,manager:-2})}; }],['"It is what it is"',()=>({txt:'Measured. The manager approves.',r:evApply({manager:2})})],['Say nothing',()=>({txt:'You walk past.',r:[]})]]})},
+ {id:'kit_man',make:()=>({title:'Kit man\'s 60th',txt:'The kit man has been at the club 30 years. It\'s his 60th birthday and the squad are chipping in for a present.',
+   o:[['Chip in big',()=>({txt:'He tears up. The lads notice who put their hand in their pocket.',r:evApply({mates:3,bank:-500,morale:2})})],['Chip in a little',()=>({txt:'Nice gesture.',r:evApply({mates:1,bank:-100})})]]})},
+ {id:'lucky_ritual',make:()=>({title:'Pre-match ritual',txt:'You\'ve scored every time you\'ve worn the same old shin pads. The kit man wants to bin them.',
+   o:[['Keep them',()=>({txt:'Some things you don\'t mess with.',r:evApply({morale:3})})],['New ones',()=>({txt:'Fresh start.',r:evApply({morale:-1})})]]})},
+ {id:'agent_push',cond:()=>!!agentObj()&&S.me.club!=null,make:()=>{ const ag=agentObj(); return {title:`${ag[0]} on the phone`,txt:`Your agent: "You're worth more than they pay you. Let me push for a new deal, or let me shop you around."`,
+   o:[['Push for a new deal',()=>{ evLater(ri(3,10),'agent_renew',{}); return {txt:'He starts making calls to the club.',r:evApply({manager:-1})}; }],['Shop me around',()=>{ evLater(ri(5,15),'rumour_bid',{club:null}); return {txt:'Your name starts doing the rounds.',r:evApply({manager:-3,media:1})}; }],['"I\'m happy here"',()=>({txt:'He sighs. "Your call."',r:evApply({morale:1})})]]}; }},
+ {id:'ex_club',cond:()=>(S.me.history||[]).length>0,make:()=>{ const h=S.me.history[S.me.history.length-1]; const ex=club(h.from); return {title:`Old ${ex.short} fans`,txt:`A group of ${ex.name} fans spot you in a café. Some are friendly. Some are not.`,
+   o:[['Stop for photos',()=>({txt:'A few selfies. They still love you.',r:evApply({followers:ri(200,1500),morale:2})})],['Keep your head down',()=>({txt:'You finish your coffee and leave.',r:[]})]]}; }},
+ {id:'teammate_party_invite_mgr',cond:()=>S.me.rel.manager<45,make:()=>({title:'The manager\'s door is open',txt:`${myClubObj().mgr}'s assistant tells you the gaffer is "open to a chat" if you want to clear the air.`,
+   o:[['Go and see him',()=>({txt:'A frank half hour. It helps.',r:evApply({manager:6,morale:2})})],['Leave it',()=>({txt:'You don\'t go.',r:evApply({manager:-1})})]]})},
+ {id:'fan_kid',make:()=>({title:'A young fan at the gates',txt:'A kid in your shirt has waited three hours at the training ground gates in the rain.',
+   o:[['Give him your boots',()=>({txt:'The video gets millions of views.',r:evApply({fans:5,followers:ri(5000,20000),rep:1})})],['Sign his shirt',()=>({txt:'He\'s made up.',r:evApply({fans:2})})],['Drive past',()=>({txt:'Someone filmed it.',r:evApply({fans:-3,followers:ri(500,2000)})})]]})},
+ {id:'gym_challenge',make:()=>{ const t=evMate(); return {title:'Gym challenge',txt:`${t.n} bets you can't beat his squat record before the end of the month.`,
+   o:[['Accept and train for it',()=>({txt:'Extra gym sessions every morning.',r:evApply({train:['str','jum'],energy:-8,mate:[t.id,5,t.n]})})],['Decline',()=>({txt:'"Not worth the injury risk, mate."',r:[]})]]}; }},
+ {id:'new_signing_welcome',cond:()=>(S.transfers||[]).some(t=>t.to===S.me.club&&t.s===S.season&&t.w>=S.week-1),make:()=>{ const t=(S.transfers||[]).find(x=>x.to===S.me.club&&x.s===S.season&&x.w>=S.week-1); const p=S.players.find(x=>x.n===t.n&&x.c===S.me.club); if(!p) return null; return {title:`New signing: ${p.n}`,txt:`${p.n} has just arrived. He doesn't know anyone yet.`,
+   o:[['Show him around the city',()=>({txt:'You become his first friend at the club.',r:evApply({mate:[p.id,18,p.n],energy:-2})})],['Say hello at training',()=>({txt:'A handshake and a welcome.',r:evApply({mate:[p.id,6,p.n]})})],['Ignore him',()=>({txt:SEL_GROUP[S.me.pos].includes(p.p)?'He plays your position. Message sent.':'You don\'t make the effort.',r:evApply({mate:[p.id,-6,p.n]})})]]}; }},
+ {id:'documentary',cond:()=>S.me.rep>=55,make:()=>({title:'Documentary crew',txt:'A streaming service is filming a behind-the-scenes series on the club. They want you as a main character.',
+   o:[['Full access',()=>({txt:'Cameras follow you everywhere, even home.',r:evApply({followers:ri(20000,80000),rep:2,morale:-2,media:4})})],['Training only',()=>({txt:'You keep your private life private.',r:evApply({followers:ri(3000,12000),media:1})})],['Refuse',()=>({txt:'You\'re barely in it.',r:evApply({media:-1})})]]})},
+ {id:'award_gala',cond:()=>S.me.rep>=45&&avg((S.me.form||[]).slice(-6))>=7,make:()=>({title:'Awards night',txt:'You\'re invited to a big awards gala. It\'s two days before a league game.',
+   o:[['Go, suit and all',()=>({txt:'Red carpet, flashing lights, a late night.',r:evApply({followers:ri(4000,15000),rep:1,energy:-8,morale:3})})],['Send a video message',()=>({txt:'Polite and professional.',r:evApply({media:1})})]]})},
+ {id:'hometown_match',cond:()=>S.me.rep>=35,make:()=>({title:'Charity match back home',txt:'Your old school asks if you\'ll organise a charity match in your hometown.',
+   o:[['Organise and pay for it',()=>({txt:'The whole town turns out. You raise a fortune for charity.',r:evApply({bank:-ri(3000,8000),fans:4,rep:2,morale:5,followers:ri(2000,9000)})})],['Turn up and play',()=>({txt:'You score a bicycle kick against the PE teachers.',r:evApply({morale:3,energy:-4,fans:1})})],['Send a signed shirt to auction',()=>({txt:'It raises a few thousand.',r:evApply({fans:1})})]]})},
+ {id:'invest_pitch',cond:()=>S.me.bank>20000,make:()=>{ const amt=roundWage(Math.min(S.me.bank*.25,ri(10000,60000))); return {title:'A friend\'s business idea',txt:`An old friend wants you to invest ${money(amt)} in his clothing brand.`,
+   o:[['Invest',()=>{ evLater(ri(40,90),'invest_result',{amt}); return {txt:'You transfer the money. Fingers crossed.',r:evApply({bank:-amt})}; }],['Promote it for free',()=>({txt:'You post a photo in his hoodie.',r:evApply({followers:ri(200,1000)})})],['Say no',()=>({txt:'He says he understands. He doesn\'t text for a while.',r:evApply({morale:-1})})]]}; }},
+ {id:'house_move',cond:()=>!S.me.nearHome&&S.me.bank>30000,make:()=>{ const c=roundWage(Math.min(S.me.bank*.3,ri(25000,120000))); return {title:'House near the training ground',txt:`A house ten minutes from training comes up. Deposit: ${money(c)}. No more hour-long drives.`,
+   o:[['Buy it',()=>{ S.me.nearHome=1; return {txt:'You move in. More sleep, less traffic.',r:evApply({bank:-c,morale:4,energy:5})}; }],['Keep renting',()=>({txt:'The commute continues.',r:[]})]]}; }},
+ {id:'personal_chef',cond:()=>S.me.rep>=40&&!S.me.chef,make:()=>({title:'Personal chef',txt:'Teammates swear by their personal chefs. One can start Monday.',
+   o:[['Hire one',()=>{ S.me.chef=1; return {txt:'Meal prep sorted. You recover faster between games.',r:evApply({bank:-roundWage(4000+S.me.rep*80),energy:5})}; }],['Cook for yourself',()=>({txt:'Pasta again.',r:[]})]]})},
+ {id:'loan_request',make:()=>{ const t=evMate(); const amt=roundWage(ri(2000,15000)); return {title:'Teammate needs money',txt:`${t.n} quietly asks if you can lend him ${money(amt)}. He's in a bit of trouble.`,
+   o:[['Lend it',()=>{ if(Math.random()<.65) evLater(ri(20,50),'loan_back',{amt,n:t.n}); return {txt:'He promises to pay you back.',r:evApply({bank:-amt,mate:[t.id,15,t.n]})}; }],['Say no',()=>({txt:'He says it\'s fine. It isn\'t.',r:evApply({mate:[t.id,-8,t.n]})})]]}; }},
+ {id:'first_coach',make:()=>({title:'Your first coach calls',txt:'The coach who ran your under-10s team calls to say how proud he is. He\'d love to bring the kids to a game.',
+   o:[['Sort tickets for the whole team',()=>({txt:'Twenty kids in your shirt behind the goal.',r:evApply({morale:5,bank:-600,fans:1})})],['Have a long chat',()=>({txt:'It reminds you why you started.',r:evApply({morale:3})})]]})},
+ {id:'crypto_promo',cond:()=>S.me.rep>=40,make:()=>({title:'Easy money?',txt:'An app you\'ve never heard of offers a big fee for one sponsored post. Your agent has doubts.',
+   o:[['Take the money',()=>{ if(Math.random()<.45) evLater(ri(10,30),'promo_scandal',{}); return {txt:'One post, done.',r:evApply({bank:roundWage(5000+S.me.rep*400)})}; }],['Turn it down',()=>({txt:'Not worth the risk.',r:evApply({morale:1})})]]})},
+ {id:'karaoke',cond:()=>Object.keys(S.me.mates).length>5,make:()=>{ const t=evMate(); return {title:'Squad karaoke night',txt:`${t.n} has booked a karaoke room for the squad. New signings have to sing.`,
+   o:[['Grab the mic first',()=>({txt:'You murder a power ballad. The squad will never let you forget it.',r:evApply({mates:4,morale:4,energy:-5})})],['Go, sing badly, leave',()=>({txt:'You do your bit.',r:evApply({mates:2,energy:-2})})],['Skip it',()=>({txt:'You miss the bonding night.',r:evApply({mates:-2})})]]}; }},
+ {id:'tactics_opinion',cond:()=>S.me.rel.manager>=55&&ROLES.indexOf(S.me.contract?S.me.contract.role:'Rotation')>=3,make:()=>({title:'The manager wants your view',txt:`${myClubObj().mgr}: "Be honest with me. Are we too deep at the moment?"`,
+   o:[['"We need to press higher"',()=>({txt:'He listens. Next week, the line moves up.',r:evApply({manager:Math.random()<.6?4:-2,tactical:3})})],['"The system\'s fine, we just need to execute"',()=>({txt:'He nods. "Good."',r:evApply({manager:2})})],['"Not my place, gaffer"',()=>({txt:'He seems a bit disappointed.',r:evApply({manager:-1})})]]})},
+ {id:'niggle',make:()=>({title:'Tight hamstring',txt:'You feel something tighten in your hamstring at the end of training.',
+   o:[['Tell the physio',()=>({txt:'Two days of treatment. No harm done.',r:evApply({energy:8,sharp:-3})})],['Play through it',()=>{ if(Math.random()<.35) evLater(ri(2,6),'niggle_injury',{}); return {txt:'You keep it to yourself.',r:[]}; }]]})},
+ {id:'fan_wedding',cond:()=>S.me.rep>=30,make:()=>({title:'Fan wedding invite',txt:'A couple who met at one of your games go viral asking you to their wedding.',
+   o:[['Surprise them at the wedding',()=>({txt:'Tears, dancing, millions of views.',r:evApply({fans:4,followers:ri(10000,40000),energy:-4,morale:4})})],['Send a video message',()=>({txt:'They play it at the reception. Lovely.',r:evApply({fans:2,followers:ri(1000,5000)})})]]})},
+ {id:'paparazzi',cond:()=>S.me.rep>=50,make:()=>({title:'Photographers outside',txt:'Photographers are waiting outside the restaurant where you\'re having dinner.',
+   o:[['Smile for the cameras',()=>({txt:'Nice photos in the morning papers.',r:evApply({media:2,followers:ri(1000,5000)})})],['Leave by the back door',()=>({txt:'You slip out unseen.',r:[]})],['Confront them',()=>({txt:'The video of you shouting is everywhere.',r:evApply({media:-5,fans:-2,followers:ri(3000,10000)})})]]})}];
+// delayed consequences
+function evDue(){ const m=S.me; if(!m.evLater||!m.evLater.length) return; const now=evDayAbs(); const due=m.evLater.filter(x=>x.at<=now); m.evLater=m.evLater.filter(x=>x.at>now);
+  for(const d of due){ if(d.key==='leak_night'){ news('bad','Night out exposed',`${outlet()} publish photos of you leaving a club at 3am${d.data.tmrw?' the night before a match':''}.`); m.rel.manager=clamp(m.rel.manager-6,0,100); m.rel.fans=clamp(m.rel.fans-4,0,100); m.followers+=ri(2000,8000); if(d.data.tmrw&&m.contract){ const f=roundWage(m.contract.wage*.5+500); m.bank-=f; news('bad','Fined by the club',`${money(f)} for breaching club rules.`); } }
+    else if(d.key==='boot_better'){ const v=roundWage(d.data.v*rnd(1.6,2.4)); m.bootDeal=v; m.bank+=v; news('good','Bigger boot deal signed',`The waiting paid off. A global brand signs you for ${money(v)} a year.`); }
+    else if(d.key==='boot_none'){ news('you','Boot deal falls through','The bigger offer never came, and the first brand signed someone else.'); }
+    else if(d.key==='podcast_clip'){ news('bad','Podcast clip goes viral',`A clip of you saying the dressing room "lacks leaders" is everywhere.`); m.rel.manager=clamp(m.rel.manager-4,0,100); for(const k in m.mates) m.mates[k]=clamp(m.mates[k]-2,0,100); }
+    else if(d.key==='rumour_bid'){ if(m.club!=null&&typeof startApproach==='function'){ let cid=d.data.club; if(cid==null){ const big=S.clubs.filter(c=>c.league&&!c.b&&c.rep>myClubObj().rep&&c.id!==m.club); if(big.length) cid=pick(big).id; } if(cid!=null){ startApproach(cid); if(windowOpen()) approachTick(); } } }
+    else if(d.key==='invest_result'){ if(Math.random()<.4){ const g=roundWage(d.data.amt*rnd(1.5,3)); m.bank+=g; news('good','Investment pays off',`Your friend's brand takes off. You get back ${money(g)}.`); } else news('bad','Investment goes under',`The business folds. The ${money(d.data.amt)} is gone.`); }
+    else if(d.key==='loan_back'){ m.bank+=d.data.amt; news('good','Loan repaid',`${d.data.n} pays you back the ${money(d.data.amt)} with a thank-you note.`); }
+    else if(d.key==='promo_scandal'){ news('bad','Sponsored post backfires','The app you promoted turns out to be a scam. Fans are furious.'); m.rel.fans=clamp(m.rel.fans-8,0,100); m.rel.media=clamp(m.rel.media-6,0,100); m.rep=clamp(m.rep-2,0,100); }
+    else if(d.key==='niggle_injury'){ if(!m.injury){ injure('training'); } }
+    else if(d.key==='agent_renew'){ if(m.contract&&m.club!=null&&!m.offers.some(o=>o.type==='renew')){ if(m.rel.manager>=45||Math.random()<.4){ const ft=fairTerms(m.club); m.offers.push({id:'r'+Math.random().toString(36).slice(2),club:m.club,type:'renew',fee:0,wage:ft.wage,role:ft.role,years:ft.years,blocked:false,expires:S.week+3,via:'Agent'}); news('good','New contract offer',`Your agent got the club to the table. Details in Transfers.`); } else news('you','Club stall on contract','The club say talks will wait until the end of the season.'); } } } }
+// pick an event for today
+function evMaybe(i,d){ const m=S.me; if(!m||m.club==null||m.loan&&Math.random()<.5) return; if(['match','intlmatch','travel','intltrain'].includes(d.type)) return; if(S.pending||(S.queue&&S.queue.length)) return;
+  const now=evDayAbs(); if(m.evNext&&now<m.evNext) return; if(Math.random()>.33) return;
+  m.evSeen=m.evSeen||{}; const pool=EVENTS.filter(e=>{ const seen=m.evSeen[e.id]; if(seen!=null){ if(e.once===true) return false; if(S.season-seen<(e.once===false?1:2)) return false; } try{ return !e.cond||e.cond(); }catch(_){ return false; } });
+  if(!pool.length) return; const e=pick(pool); let inst=null; try{ inst=e.make(); }catch(_){ inst=null; } if(!inst) return;
+  m.evSeen[e.id]=S.season; m.evNext=now+ri(5,9); S.evCur={id:e.id,inst}; S.queue.push({kind:'event',id:e.id,title:inst.title,txt:inst.txt,opts:inst.o.map(o=>o[0])}); }
+function evChoose(ix){ const cur=S.evCur; if(!cur||!cur.inst||!cur.inst.o) { S.evCur=null; return {title:'Moving on',choice:'',txt:'You put it behind you.',eff:[]}; } const o=cur.inst.o[ix]; if(!o||typeof o[1]!=='function'){ S.evCur=null; return {title:cur.inst.title||'Moving on',choice:'',txt:'You put it behind you.',eff:[]}; } const res=o[1](); S.evCur=null; (S.me.evLog=S.me.evLog||[]).unshift({when:fmtDate(gameDate()),title:cur.inst.title,choice:o[0],txt:res.txt}); if(S.me.evLog.length>60) S.me.evLog.length=60; return {title:cur.inst.title,choice:o[0],txt:res.txt,eff:res.r||[]}; }
+
+// ===================== BADGES =====================
+const TIER={b:{n:'Bronze',sp:2,c:'#c08457'},s:{n:'Silver',sp:4,c:'#b8c2cc'},g:{n:'Gold',sp:6,c:'#e3b324'},l:{n:'Legendary',sp:10,c:'#a78bfa'}};
+function careerTot(f){ const m=S.me; const all=(m.career||[]).map(c=>c.ss).concat([m.ss||{}]); const t={apps:0,g:0,a:0,motm:0,cs:0,yc:0}; for(const ss of all) for(const k in ss){ if(!f(k)) continue; const x=ss[k]; t.apps+=x.apps; t.g+=x.g; t.a+=x.a; t.motm+=x.motm; t.cs+=x.cs; t.yc+=x.yc||0; } return t; }
+const SENIOR=k=>!k.startsWith('U:')&&!k.startsWith('I:');
+function clubsPlayed(){ const m=S.me; const set=new Set((m.history||[]).map(h=>h.from)); if(m.club!=null) set.add(m.club); return set.size; }
+function seasonsAt(){ const m=S.me; return (m.career||[]).filter(c=>c.club===m.club&&!c.loan).length+(m.club!=null?1:0); }
+const hasTrophy=re=>(S.me.trophies||[]).some(t=>re.test(t.name));
+const hasAward=re=>(S.me.awards||[]).some(a=>re.test(a.name));
+const BADGES=[
+ ['debut','b','Professional debut','Make your first senior club appearance.',()=>careerTot(SENIOR).apps>=1],
+ ['first_goal','b','Off the mark','Score your first senior goal.',()=>careerTot(SENIOR).g>=1],
+ ['first_assist','b','Provider','Get your first senior assist.',()=>careerTot(SENIOR).a>=1],
+ ['first_motm','b','Star of the show','Win Player of the Match.',()=>careerTot(SENIOR).motm>=1],
+ ['brace','b','Brace','Score twice in a senior match.',()=>(S.me.bc||{}).brace>=1],
+ ['apps50','b','Regular','50 senior appearances.',()=>careerTot(SENIOR).apps>=50],
+ ['goals10','b','Double figures','10 senior goals.',()=>careerTot(SENIOR).g>=10],
+ ['cap1','b','International','Win your first senior cap.',()=>(S.me.intl&&S.me.intl.caps>=1)],
+ ['trophy1','b','Silverware','Win your first trophy.',()=>(S.me.trophies||[]).length>=1],
+ ['viral','b','Going viral','Reach 100k followers.',()=>S.me.followers>=100000],
+ ['fan_fav','b','Fan favourite','Get fan rating to 85.',()=>S.me.rel.fans>=85],
+ ['super_sub','b','Super sub','Score 3 goals off the bench.',()=>(S.me.bc||{}).subGoals>=3],
+ ['hattrick','s','Hat-trick hero','Score a senior hat-trick.',()=>(S.me.bc||{}).hat>=1],
+ ['goals50','s','Half century','50 senior goals.',()=>careerTot(SENIOR).g>=50],
+ ['apps150','s','Mr Dependable','150 senior appearances.',()=>careerTot(SENIOR).apps>=150],
+ ['assists50','s','Creator','50 senior assists.',()=>careerTot(SENIOR).a>=50],
+ ['caps10','s','Established international','10 senior caps.',()=>(S.me.intl&&S.me.intl.caps>=10)],
+ ['captain','s','Armband','Be named club captain.',()=>S.me.captain==='C'],
+ ['promotion','s','Going up','Win promotion.',()=>hasTrophy(/^Promotion/)],
+ ['cup','s','Cup winner','Win a domestic cup.',()=>(S.me.trophies||[]).some(t=>t.club!=null&&/Cup|Copa|Coupe|Pokal|Coppa|Taça|Beker/.test(t.name)&&!/Champions|Europa|Conference/.test(t.name))],
+ ['streak','s','Mr Consistent','Rate 7.0+ in 8 senior games in a row.',()=>(S.me.bc||{}).bestStreak>=8],
+ ['winners','s','Match winner','Score the winner in 10 one-goal wins.',()=>(S.me.bc||{}).winners>=10],
+ ['young_poty','s','Bright future','Win a Young Player of the Season award.',()=>hasAward(/Young Player/)],
+ ['tots','s','Team of the Season','Make a Team of the Season.',()=>hasAward(/Team of the Season/)],
+ ['bad_boy','s','Bad boy','Pick up 20 senior yellow cards.',()=>careerTot(SENIOR).yc>=20],
+ ['goals100','g','Centurion','100 senior goals.',()=>careerTot(SENIOR).g>=100],
+ ['apps300','g','Club legend in the making','300 senior appearances.',()=>careerTot(SENIOR).apps>=300],
+ ['league','g','Champions','Win a league title.',()=>(S.me.trophies||[]).some(t=>t.club!=null&&LEAGUES.some(l=>l.name===t.name))],
+ ['golden_boot','g','Golden Boot','Finish as league top scorer.',()=>hasAward(/Golden Boot/)],
+ ['poty','g','Player of the Season','Win a Player of the Season award.',()=>hasAward(/Player of the Season/)&&(S.me.awards||[]).some(a=>/Player of the Season/.test(a.name)&&!/Young/.test(a.name))],
+ ['caps50','g','National hero','50 senior caps.',()=>(S.me.intl&&S.me.intl.caps>=50)],
+ ['ucl','g','Champions of Europe','Win the Champions League.',()=>hasTrophy(/Champions League/)],
+ ['wonderkid','g','Wonderkid','Score 20 senior goals before turning 21.',()=>S.me.age<21&&careerTot(SENIOR).g>=20||(S.me.bc||{}).wk],
+ ['journeyman','g','Journeyman','Play for 6 different clubs.',()=>clubsPlayed()>=6],
+ ['loyal','g','One-club man','10 seasons at the same club.',()=>seasonsAt()>=10],
+ ['millionaire','g','Millionaire','Have €1M in the bank.',()=>S.me.bank>=1e6],
+ ['followers1m','g','Global icon','Reach 1 million followers.',()=>S.me.followers>=1e6],
+ ['ballon','l','Ballon d\'Or','Win the Ballon d\'Or.',()=>hasAward(/Ballon d'Or · 1st/)],
+ ['goals300','l','Goal machine','300 senior goals.',()=>careerTot(SENIOR).g>=300],
+ ['world_cup','l','World champion','Win the World Cup.',()=>hasTrophy(/World Cup/)],
+ ['caps100','l','Centurion of the nation','100 senior caps.',()=>(S.me.intl&&S.me.intl.caps>=100)],
+ ['treble','l','Treble','Win the league, a cup and the Champions League in one season.',()=>{ const by={}; (S.me.trophies||[]).forEach(t=>{ (by[t.s]=by[t.s]||[]).push(t.name); }); return Object.values(by).some(n=>n.some(x=>LEAGUES.some(l=>l.name===x))&&n.some(x=>/Champions League/.test(x))&&n.some(x=>/Cup|Copa|Coupe|Pokal|Coppa|Taça|Beker/.test(x)&&!/Champions|Europa|Conference/.test(x))); }]];
+// per-match counters used by badges
+function badgeMatch(L){ const m=S.me; if(!L||L.youth||L.intl||!L.mins) return; const b=m.bc=m.bc||{subGoals:0,winners:0,streak:0,bestStreak:0,brace:0,hat:0};
+  if(L.g>=2) b.brace++; if(L.g>=3) b.hat++; if(L.sel==='bench'&&L.g) b.subGoals+=L.g; if(L.res==='W'&&L.us-L.them===1&&L.g>=1) b.winners++;
+  if((L.rating||0)>=7) { b.streak++; b.bestStreak=Math.max(b.bestStreak,b.streak); } else b.streak=0; if(m.age<21&&careerTot(SENIOR).g>=20) b.wk=1; }
+function badgeCheck(){ const m=S.me; if(!m) return; m.badges=m.badges||{}; const got=[];
+  for(const [id,t,name,desc,fn] of BADGES){ if(m.badges[id]) continue; let ok=false; try{ ok=!!fn(); }catch(e){} if(!ok) continue; m.badges[id]={y:S.year,s:S.season,when:fmtDate(gameDate())}; const T=TIER[t]; m.sp+=T.sp; m.followers+=t==='l'?50000:t==='g'?10000:t==='s'?2000:300; got.push([id,t,name,desc]);
+    news('good',`Badge unlocked: ${name}`,`${T.n} badge. ${desc} +${T.sp} skill points.`); }
+  if(got.length&&S.queue) S.queue.push({kind:'badge',list:got}); return got; }
 
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
@@ -2995,7 +3251,7 @@ const SECTIONS=[
  ['home','Home',['Overview','Profile']],['inbox','Inbox',['Messages']],['schedule','Schedule',['This week','Fixtures & results']],
  ['training','Training',['Weekly plan','Progress','Traits']],['dev','Development',['Attributes','Skill stars']],['squad','Squad',['Hierarchy','Teammates','Youth team']],
  ['manager','Manager',['Talk','Promises']],['contract','Contract',['My contract','Agent']],['transfers','Transfers',['Offers','Transfer centre']],
- ['comps','Competitions',['League tables','Stats leaders','Cups & Europe','Youth league']],['career','Career',['Stats','Trophies & awards','Season review']],['intl','International',['Overview','Match history']],
+ ['comps','Competitions',['League tables','Stats leaders','Cups & Europe','Youth league']],['career','Career',['Stats','Badges','Trophies & awards','Season review']],['intl','International',['Overview','Match history']],
  ['media','Media',['Press conferences','Headlines','Social']],['world','World',['News','Ballon d\'Or']],['fin','Finances',['Overview','Sponsors']],['saves','Saves',['Save slots']]];
 let NAVCTX=null; let SEC='home', SUB=0, INBOX_SEL=0, VSEASON=null, VLEAGUE=null, CSEASON='all';
 function crest(c,lg){ if(!c) return ''; return `<div class="crest${lg?' lg':''}" style="--c1:${c.c1};--c2:${c.c2}">${esc(c.short)}</div>`; }
@@ -3019,9 +3275,11 @@ function navBar(secs,badge,primary){ const inMore=!primary.includes(SEC); const 
   return secs.map(([k,l])=>`<button class="${primary.includes(k)?'pri':'np'}" data-act="sec" data-arg="${k}" aria-current="${SEC===k}" title="${l}"><svg viewBox="0 0 24 24">${IC[k]||IC.home}</svg><span class="lbt">${l}</span>${badge(k)}</button>`).join('')
    +`<button class="more" data-act="moreNav" aria-current="${inMore}"><svg viewBox="0 0 24 24">${IC.more}</svg><span class="lbt">${inMore?esc((secs.find(s=>s[0]===SEC)||['','More'])[1]):'More'}</span>${moreBadge?'<span class="cnt">•</span>':''}</button>`; }
 function moreSheet(secs,badge){ modal(`<div class="label">Go to</div><div class="moregrid">${secs.map(([k,l])=>`<button class="mg ${SEC===k?'on':''}" data-act="secClose" data-arg="${k}"><svg viewBox="0 0 24 24">${IC[k]||IC.home}</svg><span>${l}</span>${badge(k)}</button>`).join('')}</div><button class="btn sec" data-act="closeModal">Close</button>`); }
+function daysToMatch(){ if(!S||!S.days) return null; for(let i=S.day;i<7;i++){ const d=S.days[i]; if(d&&(d.type==='match'&&d.fx||d.type==='intlmatch')){ if(S.mode==='mgr'&&d.fx&&S.myDone&&S.myDone[mgrKey(d.fx)]) continue; return i-S.day; } }
+  try{ const w0=S.week; S.week=w0+1; const fx=myClubId()!=null?myFixturesThisWeek():[]; S.week=w0; if(!fx.length) return null; const mid=fx.some(f=>f.comp!=='L')||fx.filter(f=>f.comp==='L').length>1; return (7-S.day)+(mid?2:5); }catch(e){ return null; } }
 let _lastChip='';
 function dateChip(dt){ const key=dt.toISOString().slice(0,10); const flip=_lastChip&&_lastChip!==key; _lastChip=key;
-  return `<div class="dchip${flip?' flip':''}" title="${fmtDate(dt,true)}"><span class="dm">${MON[dt.getUTCMonth()]}</span><b>${dt.getUTCDate()}</b><span class="dy2">${WD[dt.getUTCDay()]} ${dt.getUTCFullYear()}</span></div>`; }
+  return `<div class="dchip${flip?' flip':''}" title="${fmtDate(dt,true)}"><span class="dm">${MON[dt.getUTCMonth()]}</span><b>${dt.getUTCDate()}</b><span class="dy2">${(()=>{ const n=daysToMatch(); return n==null?WD[dt.getUTCDay()]+' '+dt.getUTCFullYear():n===0?'MATCH TODAY':n===1?'Match tmrw':'Match in '+n+'d'; })()}</span></div>`; }
 // ---------- shell ----------
 function renderShell(){
   const m=S.me, c=myClubObj(), unread=inboxItems().filter(n=>!n.read).length, need=xpNeed(), dt=gameDate();
@@ -3109,11 +3367,16 @@ function wStatus(){ const m=S.me; return W('Player status',`<div class="stack"><
   ${meter('Energy',m.energy)}${meter('Sharpness',m.sharp)}${meter('Morale',m.morale)}${meter('Manager',m.rel.manager)}
   ${m.injury?`<span class="eff down" style="align-self:flex-start">${esc(m.injury.type)} · ${m.injury.days} days</span>`:''}<div class="row"><span class="pill b">${esc(m.status||'Newcomer')}</span>${m.captain?`<span class="pill y">${m.captain==='C'?'Captain':'Vice-captain'}</span>`:''}${m.transferReq?'<span class="pill r">Transfer listed</span>':''}</div></div>`,'home:1'); }
 function myFixtureList(){ const cid=myClubId(); if(cid==null) return []; const c=club(cid); const out=[]; if(c.league&&S.leagues[c.league]){ const R=leagueRounds(c.league); const n=LEAGUE_WEEKS.length;
-  R.forEach((rd,r)=>{ const pr=rd.find(p=>p.includes(cid)); if(!pr) return; const w=LEAGUE_WEEKS[Math.floor(r*n/R.length)]; out.push({w,comp:LMETA(c.league).name,opp:pr[0]===cid?pr[1]:pr[0],home:pr[0]===cid,lg:true}); }); }
+  R.forEach((rd,r)=>{ const pr=rd.find(p=>p.includes(cid)); if(!pr) return; const {w,d}=leagueRoundWhen(c.league,r); out.push({w,d,comp:LMETA(c.league).name,opp:pr[0]===cid?pr[1]:pr[0],home:pr[0]===cid,lg:true}); });
+   // this week's actual plan wins (midweek cup ties, rescheduled league games)
+   (S.days||[]).forEach((dd,i)=>{ if(dd.type!=='match'||!dd.fx) return; const det=fxDetails(dd.fx); if(!det) return; const ex=out.find(o=>o.w===S.week&&o.opp===det.opp&&o.lg&&dd.fx.comp==='L'); if(ex){ ex.d=i; return; } if(dd.fx.comp!=='L') out.push({w:S.week,d:i,comp:det.name,opp:det.opp,home:det.home}); });
+   if(S.youth&&S.me&&S.me.age<=21&&youthLikely()){ for(const w of LEAGUE_WEEKS){ if(w>37) continue; const yf=youthFixture(w); if(!yf) continue; out.push({w,d:5,comp:S.youth.name,opp:yf.opp,home:yf.home,youth:true}); } }
+   out.sort((a,b)=>a.w-b.w||a.d-b.d||(a.youth?1:0)-(b.youth?1:0)); }
+function youthLikely(){ const m=S.me; if(m.contract&&m.contract.youth&&m.age<17) return true; const better=rivals().filter(p=>p.o>selScore()).length; return better>=SEL_SLOTS[m.pos]+2; }
   const res=(S.me.results||[]).filter(x=>x.s===S.season&&!x.youth); return {out,res}; }
 function wFixtures(){ const {out,res}=myFixtureList(); if(!out) return W('Fixtures','<p class="empty">No club.</p>');
   const played=res.slice(-4).map(r=>`<tr><td class="l" style="color:var(--mute);width:54px">W${r.w}</td><td class="l t">${r.home?'':'@ '}${cname(r.opp)}</td><td><span class="res ${r.res}">${r.res}</span> ${r.us}-${r.them}</td><td>${r.mins?rt(r.rating):''}</td></tr>`).join('');
-  const up=out.filter(f=>f.w>=S.week&&!res.some(r=>r.w===f.w&&r.opp===f.opp)).slice(0,5).map(f=>`<tr><td class="l" style="color:var(--mute)">W${f.w}</td><td class="l t">${f.home?'':'@ '}${cname(f.opp)}</td><td style="color:var(--dim)">${f.home?'H':'A'}</td><td></td></tr>`).join('');
+  const up=out.filter(f=>f.w>=S.week&&!(f.w===S.week&&f.d!=null&&f.d<S.day)&&!res.some(r=>r.w===f.w&&r.opp===f.opp)).slice(0,5).map(f=>`<tr><td class="l" style="color:var(--mute)">W${f.w}</td><td class="l t">${f.home?'':'@ '}${cname(f.opp)}${f.youth?` <span class="pill b">${S.youth.label}</span>`:''}</td><td style="color:var(--dim)">${f.home?'H':'A'}</td><td></td></tr>`).join('');
   return W('Fixtures',`<table><tbody>${played}${up}</tbody></table>`,'schedule:1','w-tbl'); }
 function tableHTML(lid,rows,compact,hl){ const T=rows; const L=LMETA(lid); const n=T.length;
   return `<table><thead><tr><th>Pos</th><th class="l">Team</th><th>P</th>${compact?'':'<th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th>'}<th>GD</th><th>Pts</th>${compact?'':'<th class="l">Form</th>'}</tr></thead><tbody>${T.map((r,i)=>{ const [id,p,w,d,l,gf,ga,pts,fm]=r; const zone=i<(L.tier===1?0:L.up)?'g':i>=n-L.down&&L.down?'r':'';
@@ -3129,7 +3392,7 @@ function wTargets(){ const yth=['Youth','Prospect'].includes(S.me.contract&&S.me
 const VIEWS={};
 VIEWS['home:0']=()=>`<div class="dash home">${wNext()}${wStatus()}${wFixtures()}${wInbox()}${wTable()}${wTargets()}</div>`;
 VIEWS['home:1']=()=>{ const m=S.me; const lo=Math.max(ovr()+1,m.pot-5), hi=Math.min(99,m.pot+3);
-  return `<div class="dash c2">${W('Player details',`<div class="stack"><div class="ovrline"><span class="ovr num">${ovr()}</span><div class="meta"><b>${esc(m.first)} ${esc(m.last)}</b><br>${POS_NAME[m.pos]} · ${esc(NAT_NAMES[m.nat]||m.nat)}${m.nat2?' / '+esc(NAT_NAMES[m.nat2]||m.nat2):''}</div></div>
+  return `<div class="dash c2">${W('Player details',`<div class="stack"><div class="ovrline"><span class="ovr num">${ovr()}</span><div class="meta"><b>${esc(m.first)} ${esc(m.last)}</b><br>${POS_NAME[m.pos]} · ${esc(NAT_NAMES[m.nat]||m.nat)}${m.nat2?' / '+esc(NAT_NAMES[m.nat2]||m.nat2):''}</div></div>${pinnedBadges()}
    <div class="face">${['PAC','SHO','PAS','DRI','DEF','PHY'].map(k=>`<div><b class="${cv(face(k))}">${face(k)}</b><span>${k}</span></div>`).join('')}</div>
    <div class="kv"><span>Age</span><b>${m.age}</b><span>Height</span><b>${htStr(m.height)}${m.growth>0?' · growing':''}</b><span>Weight</span><b>${m.weight} kg (${Math.round(m.weight*2.2046)} lbs)</b><span>Preferred foot</span><b>${m.foot}</b><span>Weak foot</span><b>${stars(m.wf)}</b><span>Skill moves</span><b>${stars(m.sm)}</b><span>PlayStyles</span><b>${m.traits.map(esc).join(', ')}</b><span>Scout potential</span><b>${lo}–${hi}</b><span>Reputation</span><b>${Math.round(m.rep)}/100</b><span>Followers</span><b>${m.followers.toLocaleString()}</b><span>Level</span><b>${m.level} · ${m.xp}/${xpNeed()} XP</b></div></div>`)}
    ${W('Best attributes',`<table><tbody>${Object.entries(m.attrs).sort((a,b)=>b[1]-a[1]).slice(0,14).map(([k,v])=>`<tr><td class="l">${ANAME[k]}</td><td><b class="${cv(v)}">${v}</b></td></tr>`).join('')}</tbody></table>`,'dev:0','w-tbl')}</div>`; };
@@ -3141,7 +3404,7 @@ VIEWS['schedule:0']=()=>{ return `<div class="dash c1">${W(`Week ${S.week} of ${
   <p class="note">Change attendance and personal sessions in Training → Weekly plan.</p></div>`)}</div>`; };
 VIEWS['schedule:1']=()=>{ const {out,res}=myFixtureList(); if(!out) return '<p class="empty">No club.</p>';
   const rows=res.map(r=>`<tr><td class="l">W${r.w}</td><td class="l">${esc(r.comp)}</td><td class="l t">${r.home?'':'@ '}${cname(r.opp)}</td><td><span class="res ${r.res}">${r.res}</span> ${r.us}-${r.them}${r.pens!=null?' (p)':''}</td><td>${r.mins?r.mins+"'":'–'}</td><td>${r.g||''}</td><td>${r.a||''}</td><td>${r.mins?rt(r.rating):''}</td></tr>`).join('');
-  const up=out.filter(f=>f.w>=S.week).filter(f=>!res.some(r=>r.w===f.w&&r.opp===f.opp)).map(f=>`<tr><td class="l">W${f.w}</td><td class="l">${esc(f.comp)}</td><td class="l t">${f.home?'':'@ '}${cname(f.opp)}</td><td colspan="5" style="color:var(--dim);text-align:left">${fmtDate(gameDate(f.w,5))}</td></tr>`).join('');
+  const up=out.filter(f=>f.w>=S.week&&!(f.w===S.week&&f.d!=null&&f.d<S.day)).filter(f=>!res.some(r=>r.w===f.w&&r.opp===f.opp)).map(f=>`<tr><td class="l">W${f.w}</td><td class="l">${esc(f.comp)}</td><td class="l t">${f.home?'':'@ '}${cname(f.opp)}${f.youth?` <span class="pill b">${S.youth.label}</span>`:''}</td><td colspan="5" style="color:var(--dim);text-align:left">${fmtDate(gameDate(f.w,f.d!=null?f.d:5))}</td></tr>`).join('');
   return `<div class="dash c1">${W('Fixtures & results',`<table><thead><tr><th class="l">Wk</th><th class="l">Competition</th><th class="l">Opponent</th><th>Result</th><th>Mins</th><th>G</th><th>A</th><th>Rating</th></tr></thead><tbody>${rows}${up}</tbody></table><p class="note">Cup and European opponents are drawn the week of the match.</p>`,null,'w-tbl')}</div>`; };
 VIEWS['training:0']=()=>{ const m=S.me; const PO=Object.entries(PERSONAL);
   const grid=`<div class="daygrid"><span></span>${S.days.map((d,i)=>`<span class="h">${WD[gameDate(S.week,i).getUTCDay()]}</span>`).join('')}
@@ -3210,18 +3473,39 @@ VIEWS['comps:2']=()=>{ const pk=`<div class="split"><select data-ch="vseason" ar
   const euro=Object.values(S.euro).map(E=>{ const rows=Object.keys(E.table).map(Number).sort((x,y)=>{ const a=E.table[x],b=E.table[y]; return b[6]-a[6]||(b[4]-b[5])-(a[4]-a[5]); });
     return W(`${E.name}${E.winner!=null?' · won by '+cname(E.winner):E.ko?' · '+({po:'Knockout play-offs',r16:'Round of 16',qf:'Quarter-finals',sf:'Semi-finals',f:'Final'}[E.stage]||'Knockouts'):' · League phase'}`,`<table><thead><tr><th>#</th><th class="l">Team</th><th>P</th><th>GD</th><th>Pts</th><th class="l"></th></tr></thead><tbody>${rows.map((id,i)=>`<tr class="${id===cid?'me':''}"><td>${i<8?`<span class="pill g">${i+1}</span>`:i<24?`<span class="pill y">${i+1}</span>`:i+1}</td><td class="l t">${cname(id)}</td><td>${E.table[id][0]}</td><td>${E.table[id][4]-E.table[id][5]}</td><td><b>${E.table[id][6]}</b></td><td class="l">${E.ko?(E.ko.alive.includes(id)||E.winner===id?'<span class="pill g">In</span>':'<span class="pill">Out</span>'):''}</td></tr>`).join('')}</tbody></table>`,null,'w-tbl'); }).join('');
   return `<div class="stack" style="height:100%">${pk}<div class="dash c2" style="flex:1;min-height:0;grid-template-rows:minmax(0,1fr) minmax(0,1fr)">${W('Domestic cups',`<table><thead><tr><th class="l">Cup</th><th class="l">Stage</th><th>Teams left</th><th class="l">You</th></tr></thead><tbody>${cups}</tbody></table>`,null,'w-tbl')}${euro}</div></div>`; };
-VIEWS['career:0']=()=>{ const m=S.me; const cur={s:S.season,y:S.year,club:myClubId(),ss:m.ss,current:true}; const all=m.career.concat([cur]);
+let CSCOPE='club';
+function medal(id,t,earned){ const T=TIER[t]; const b=BADGES.find(x=>x[0]===id); const ini=(b?b[2]:'?').replace(/[^A-Za-z ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(); return `<span class="medal ${earned?'':'lock'}" style="--t:${T.c}"><b>${ini}</b></span>`; }
+function pinnedBadges(){ const m=S.me; const pins=(m.pins||[]).filter(id=>m.badges&&m.badges[id]); if(!pins.length) return ''; return `<div class="pins">${pins.map(id=>{ const b=BADGES.find(x=>x[0]===id); return `<div class="pin">${medal(id,b[1],true)}<span>${esc(b[2])}</span></div>`; }).join('')}</div>`; }
+VIEWS['career:1']=()=>{ const m=S.me; m.badges=m.badges||{}; const n=Object.keys(m.badges).length;
+  const sec=t=>{ const list=BADGES.filter(b=>b[1]===t).sort((x,y)=>(m.badges[y[0]]?1:0)-(m.badges[x[0]]?1:0)); return `<div class="lbl" style="color:${TIER[t].c}">${TIER[t].n} · ${list.filter(b=>m.badges[b[0]]).length}/${list.length}</div><div class="bgrid">${list.map(([id,tt,name,desc])=>{ const got=m.badges[id]; const pinned=(m.pins||[]).includes(id); return `<div class="bcard ${got?'got':''}">${medal(id,tt,!!got)}<div><b>${esc(name)}</b><p>${esc(desc)}</p>${got?`<span class="note">${got.y}/${String(got.y+1).slice(2)}</span> <button class="chip" aria-pressed="${pinned}" data-act="pinBadge" data-arg="${id}">${pinned?'Pinned':'Pin'}</button>`:`<span class="note">+${TIER[tt].sp} skill points</span>`}</div></div>`; }).join('')}</div>`; };
+  return `<div class="dash c1">${W(`Badges · ${n}/${BADGES.length}`,`<div class="stack"><p class="note">Pin up to 3 badges to show on your profile.</p>${pinnedBadges()}${['b','s','g','l'].map(sec).join('')}</div>`)}</div>`; };
+const SCOPES={club:{n:'Club',f:k=>!k.startsWith('I:')&&!k.startsWith('U:')},intl:{n:'International',f:k=>k.startsWith('I:')&&!/ U\d\d$/.test(k)},youth:{n:'Youth',f:k=>k.startsWith('U:')||(k.startsWith('I:')&&/ U\d\d$/.test(k))}};
+function sumSS(list){ const t={apps:0,starts:0,mins:0,g:0,a:0,motm:0,rat:[],cs:0,yc:0,sh:0,sot:0,kp:0,xg:0,drib:0,tk:0}; for(const x of list){ for(const k in t){ if(k==='rat') t.rat=t.rat.concat(x.rat||[]); else t[k]+=x[k]||0; } } t.xg=Math.round(t.xg*10)/10; return t; }
+function statTiles(t){ const ar=avg(t.rat); const p90=t.mins?((t.g+t.a)/t.mins*90).toFixed(2):'0.00'; const tile=(l,v,sub)=>`<div class="stile"><span>${l}</span><b class="num">${v}</b>${sub?`<i>${sub}</i>`:''}</div>`;
+  return `<div class="stiles">${tile('Appearances',t.apps,`${t.starts} starts · ${t.mins}'`)}${tile('Goals',t.g,`xG ${t.xg.toFixed(1)}`)}${tile('Assists',t.a,`${t.kp} key passes`)}${tile('Avg rating',ar?ar.toFixed(2):'–',`${t.motm} Player of the Match`)}${tile('G+A per 90',p90)}${tile('Shots',t.sh,t.sh?`${Math.round(t.sot/t.sh*100)}% on target`:'')}${tile('Dribbles',t.drib)}${tile('Discipline',t.yc,'yellow cards')}</div>`; }
+function ratingTrend(rs){ rs=rs.slice(-24); if(rs.length<2) return '<p class="note">Your rating trend appears after a couple of games.</p>'; const W0=320,H0=74,mn=5,mx=9.5; const x=i=>i/(rs.length-1)*W0, y=r=>H0-(clamp(r,mn,mx)-mn)/(mx-mn)*H0;
+  const pts=rs.map((r,i)=>`${x(i).toFixed(1)},${y(r).toFixed(1)}`).join(' '); const a=avg(rs);
+  return `<svg class="trend" viewBox="-4 -6 ${W0+8} ${H0+12}" preserveAspectRatio="none"><line x1="0" x2="${W0}" y1="${y(7)}" y2="${y(7)}" class="ref"/><line x1="0" x2="${W0}" y1="${y(a)}" y2="${y(a)}" class="avg"/><polyline points="${pts}"/>${rs.map((r,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(r).toFixed(1)}" r="2.6" class="${r>=7.5?'g':r<6?'r':''}"/>`).join('')}</svg><p class="note">Last ${rs.length} games · dashed line is a 7.0 · solid line is your average (${a.toFixed(2)}).</p>`; }
+VIEWS['career:0']=()=>{ const m=S.me; const cur={s:S.season,y:S.year,club:myClubId(),ss:m.ss,current:true}; const all=m.career.concat([cur]); const F=SCOPES[CSCOPE].f;
   CSEASON=CSEASON||'all';
-  const pick=`<div class="split"><select data-ch="cseason" aria-label="Season"><option value="all" ${CSEASON==='all'?'selected':''}>All seasons</option>${all.slice().reverse().map(c=>`<option value="${c.s}" ${String(CSEASON)===String(c.s)?'selected':''}>${c.y}/${String(c.y+1).slice(2)}${c.current?' (current)':''}</option>`).join('')}</select></div>`;
-  const row=(l,t,extra)=>{ const ar=avg(t.rat); return `<tr ${extra||''}><td class="l t">${l}</td><td>${t.apps}</td><td>${t.starts}</td><td>${t.mins}</td><td>${t.g}</td><td>${t.a}</td><td>${t.motm}</td><td>${t.cs}</td><td>${ar?rt(ar):'–'}</td></tr>`; };
-  const head=`<thead><tr><th class="l">${CSEASON==='all'?'Season':'Competition'}</th><th>Apps</th><th>Starts</th><th>Mins</th><th>G</th><th>A</th><th>POTM</th><th>CS</th><th>Avg</th></tr></thead>`;
+  const tabs=`<div class="seg">${Object.entries(SCOPES).map(([k,v])=>`<button class="chip" aria-pressed="${CSCOPE===k}" data-act="cscope" data-arg="${k}">${v.n}</button>`).join('')}</div>`;
+  const pick=`<select data-ch="cseason" aria-label="Season"><option value="all" ${CSEASON==='all'?'selected':''}>All seasons</option>${all.slice().reverse().map(c=>`<option value="${c.s}" ${String(CSEASON)===String(c.s)?'selected':''}>${c.y}/${String(c.y+1).slice(2)}${c.current?' (current)':''}</option>`).join('')}</select>`;
+  const scopeSS=c=>Object.entries(c.ss||{}).filter(([k])=>F(k));
+  const seasons=CSEASON==='all'?all:all.filter(x=>String(x.s)===String(CSEASON));
+  const tot=sumSS(seasons.flatMap(c=>scopeSS(c).map(([,v])=>v)));
+  const row=(l,t,cls)=>{ const ar=avg(t.rat||[]); return `<tr class="${cls||''}"><td class="l t">${l}</td><td>${t.apps}<span class="sub">${t.starts}</span></td><td>${t.g}</td><td>${t.a}</td><td>${(t.xg||0).toFixed(1)}</td><td>${t.sh||0}</td><td>${t.kp||0}</td><td>${t.motm}</td><td>${ar?rt(ar):'–'}</td></tr>`; };
+  const head=`<thead><tr><th class="l">${CSEASON==='all'?'Season':'Competition'}</th><th>Apps</th><th>G</th><th>A</th><th>xG</th><th>Sh</th><th>KP</th><th>POTM</th><th>Avg</th></tr></thead>`;
   let body;
-  if(CSEASON==='all'){ body=all.map(c=>row(`${c.y}/${String(c.y+1).slice(2)} · ${c.club!=null?cname(c.club):'Free agent'}${c.loan?' (loan)':''}`,seasonTotals(c.ss,isClubComp))).join('')+row('<b>Career total (club)</b>',seasonTotals(Object.assign({},...all.map((c,i)=>{ const o={}; for(const k in c.ss) if(isClubComp(k)) o[i+':'+k]=c.ss[k]; return o; }))),'class="me"'); }
-  else { const c=all.find(x=>String(x.s)===String(CSEASON)); body=Object.entries(c.ss).map(([k,v])=>row(esc(compName(k)),v)).join('')+row('<b>Total</b>',seasonTotals(c.ss),'class="me"'); }
-  return `<div class="dash c1">${W('Career stats',`<div class="stack">${pick}<table>${head}<tbody>${body}</tbody></table></div>`,null,'w-tbl')}</div>`; };
-VIEWS['career:1']=()=>{ const m=S.me; return `<div class="dash c2">${W(`Trophies · ${m.trophies.length}`,m.trophies.length?`<table><tbody>${m.trophies.slice().reverse().map(t=>`<tr><td class="l">${t.y}/${String(t.y+1).slice(2)}</td><td class="l"><b>${esc(t.name)}</b></td><td class="l t">${t.club!=null?cname(t.club):esc(t.nation||'')}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">The cabinet is empty. For now.</p>',null,'w-tbl')}
+  if(CSEASON==='all') body=all.map(c=>{ const l=scopeSS(c); if(!l.length) return ''; return row(`${c.y}/${String(c.y+1).slice(2)} · ${CSCOPE==='intl'?'':c.club!=null?cname(c.club):'Free agent'}${c.loan?' (loan)':''}`,sumSS(l.map(([,v])=>v))); }).join('');
+  else body=seasons.flatMap(c=>scopeSS(c)).map(([k,v])=>row(esc(compName(k)),sumSS([v]))).join('');
+  body=body?body+row('<b>Total</b>',tot,'me'):'';
+  let rs; if(CSCOPE==='intl') rs=(m.intl.history||[]).filter(h=>h.level==='Senior').map(h=>h.rating).reverse(); else rs=(m.results||[]).filter(r=>(CSCOPE==='youth')===!!r.youth&&r.rating!=null&&(CSEASON==='all'||String(r.s)===String(CSEASON))).map(r=>r.rating);
+  const empty={club:'No club appearances yet.',intl:'No senior caps yet. Keep performing and the call will come.',youth:'No youth games recorded.'}[CSCOPE];
+  return `<div class="dash c1">${W('Career stats',`<div class="stack"><div class="split">${tabs}<span class="grow"></span>${pick}</div>${tot.apps?statTiles(tot):`<p class="empty">${empty}</p>`}
+    ${tot.apps?`<div class="lbl">Rating trend</div>${ratingTrend(rs)}<div class="lbl">${CSEASON==='all'?'By season':'By competition'}</div><div class="tscroll"><table class="stbl">${head}<tbody>${body}</tbody></table></div>`:''}</div>`)}</div>`; };
+VIEWS['career:2']=()=>{ const m=S.me; return `<div class="dash c2">${W(`Trophies · ${m.trophies.length}`,m.trophies.length?`<table><tbody>${m.trophies.slice().reverse().map(t=>`<tr><td class="l">${t.y}/${String(t.y+1).slice(2)}</td><td class="l"><b>${esc(t.name)}</b></td><td class="l t">${t.club!=null?cname(t.club):esc(t.nation||'')}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">The cabinet is empty. For now.</p>',null,'w-tbl')}
   ${W(`Individual awards · ${m.awards.length}`,m.awards.length?`<table><tbody>${m.awards.slice().reverse().map(a=>`<tr><td class="l">${a.y}/${String(a.y+1).slice(2)}</td><td class="l"><b>${esc(a.name)}</b></td></tr>`).join('')}</tbody></table>`:'<p class="empty">No awards yet. Player of the Month, Team of the Season and the Ballon d\'Or are all up for grabs.</p>',null,'w-tbl')}</div>`; };
-VIEWS['career:2']=()=>{ const m=S.me; return `<div class="dash c1">${W('Season by season',m.career.length?`<table><thead><tr><th class="l">Season</th><th class="l">Club</th><th class="l">League</th><th>Pos</th><th>Age</th><th>OVR</th><th class="l">Highlights</th></tr></thead><tbody>${m.career.slice().reverse().map(c=>`<tr><td class="l">${c.y}/${String(c.y+1).slice(2)}</td><td class="l t">${c.club!=null?cname(c.club):'–'}${c.loan?' (loan)':''}</td><td class="l">${c.lid?LMETA(c.lid).name:'–'}</td><td>${c.pos?ordinal(c.pos):'–'}</td><td>${c.age}</td><td>${c.ovr}</td><td class="l">${(c.awards||[]).map(esc).join(', ')||'–'}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">Your first season review arrives in May.</p>',null,'w-tbl')}</div>`; };
+VIEWS['career:3']=()=>{ const m=S.me; return `<div class="dash c1">${W('Season by season',m.career.length?`<table><thead><tr><th class="l">Season</th><th class="l">Club</th><th class="l">League</th><th>Pos</th><th>Age</th><th>OVR</th><th class="l">Highlights</th></tr></thead><tbody>${m.career.slice().reverse().map(c=>`<tr><td class="l">${c.y}/${String(c.y+1).slice(2)}</td><td class="l t">${c.club!=null?cname(c.club):'–'}${c.loan?' (loan)':''}</td><td class="l">${c.lid?LMETA(c.lid).name:'–'}</td><td>${c.pos?ordinal(c.pos):'–'}</td><td>${c.age}</td><td>${c.ovr}</td><td class="l">${(c.awards||[]).map(esc).join(', ')||'–'}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">Your first season review arrives in May.</p>',null,'w-tbl')}</div>`; };
 VIEWS['intl:0']=()=>{ const m=S.me, n=nationRow(m.intlNat); const lvl=intlLevelFor(m.age); const thr={U17:n[2]-27,U19:n[2]-21,U21:n[2]-14,Senior:n[2]-5}[lvl];
   return `<div class="dash c2">${W(esc(n[1]),`<div class="kv"><span>Manager</span><b>${esc(n[4])}</b><span>Confederation</span><b>${n[3]}</b><span>Your age group</span><b>${lvl}</b><span>Level needed for a call-up</span><b>about ${thr} OVR</b><span>Your overall</span><b class="${ovr()>=thr?'c-hi':'c-lo'}">${ovr()}</b><span>Senior caps</span><b>${m.intl.caps}</b><span>Senior goals</span><b>${m.intl.goals}</b>${Object.entries(m.intl.youth).map(([k,v])=>`<span>${k} caps</span><b>${v}</b>`).join('')}${m.nat2?`<span>Second nationality</span><b>${esc(NAT_NAMES[m.nat2]||m.nat2)}${m.intl.locked?' (decided)':' (open)'}</b>`:''}</div><p class="note">International breaks fall in weeks ${INTL_WEEKS.join(', ')}. Tournaments are played in the summer.</p>`)}
   ${W('Upcoming tournaments',`<table><tbody>${[2027,2028,2029,2030,2031,2032].map(y=>{ const c=n[3]; const t=y%4===2?'FIFA World Cup':c==='UEFA'&&y%4===0?'UEFA European Championship':c==='CONMEBOL'&&y%4===0?'Copa América':c==='CAF'&&y%2===1?'Africa Cup of Nations':c==='CONCACAF'&&y%2===1?'Gold Cup':c==='AFC'&&y%4===3?'AFC Asian Cup':null; return t?`<tr><td class="l">Summer ${y}</td><td class="l">${t}</td></tr>`:''; }).join('')}</tbody></table>`,null,'w-tbl')}</div>`; };
@@ -3268,7 +3552,10 @@ function showPending(){ const p=S.pending; if(!p) return; const m=S.me;
      ${rx.arts.map(a=>`<div class="art"><span class="lbl">${esc(a.src)}</span><b>${esc(a.h)}</b><p class="note" style="margin:0">${esc(a.b)}</p></div>`).join('')}
      <div class="posts">${rx.posts.map(p=>`<div class="post ${p.kind}"><div class="split"><b>${esc(p.h)}</b>${p.ver?'<span class="pill b">Verified</span>':''}</div><p>${esc(p.txt)}</p><span class="note">♥ ${p.l}</span></div>`).join('')}</div>
      <button class="btn" data-act="afterResult">${p.post?'Post-match press conference':'Continue'}</button>`); return; }
-  if(p.kind==='pressDone'){ modal(`<div class="label">Headline</div><h2 class="disp">${esc(p.head)}</h2>${p.txt?`<p style="margin:0;font-style:italic">"${esc(p.txt)}"</p>`:''}<div class="effects">${p.eff.map(([l,v])=>`<span class="eff ${v>0?'up':'down'}">${l} ${v>0?'+':''}${l==='Fine'?money(v):v}</span>`).join('')}</div><p class="label" style="margin:0">Read as: ${p.tone}</p><button class="btn" data-act="next">Continue</button>`); return; }
+  if(p.kind==='badge'){ modal(`<div class="label">Badge unlocked</div><div class="stack">${p.list.map(([id,t,name,desc])=>`<div class="bunlock">${medal(id,t,true)}<div><b style="color:${TIER[t].c}">${TIER[t].n}</b><h2 class="disp" style="font-size:22px">${esc(name)}</h2><p class="note">${esc(desc)} +${TIER[t].sp} skill points.</p></div></div>`).join('')}</div><button class="btn" data-act="next">Continue</button>`); return; }
+  if(p.kind==='event'){ modal(`<div class="label">Off the pitch</div><h2 class="disp">${esc(p.title)}</h2><p style="margin:0;font-size:14.5px;line-height:1.5">${esc(p.txt)}</p><div class="answers">${p.opts.map((o,i)=>`<button class="ans evans" data-act="evPick" data-arg="${i}"><span>${esc(o)}</span></button>`).join('')}</div>`); return; }
+  if(p.kind==='eventDone'){ modal(`<div class="label">${esc(p.title)}</div><p class="disp" style="font-size:19px">${esc(p.choice)}</p><p style="margin:0;font-size:14.5px;line-height:1.5">${esc(p.txt)}</p>${p.eff.length?`<div class="effects">${p.eff.map(([l,v])=>`<span class="eff ${typeof v==='number'&&v<0?'down':'up'}">${esc(l)} ${typeof v==='number'?(['Cash','Cost'].includes(l)?money(v):(v>0?'+':'')+(l==='Followers'?v.toLocaleString():v)):v}</span>`).join('')}</div>`:''}<button class="btn" data-act="next">Continue</button>`); return; }
+  if(p.kind==='pressDone'){ modal(`<div class="label">Headline</div><h2 class="disp">${esc(p.head)}</h2>${p.txt?`<p style="margin:0;font-style:italic">"${esc(p.txt)}"</p>`:''}<div class="effects">${p.eff.map(([l,v])=>`<span class="eff ${v>0?'up':'down'}">${l} ${v>0?'+':''}${l==='Fine'?money(v):v}</span>`).join('')}</div><p class="label" style="margin:0">Read as: ${({hostile:"hostile to the press",blame:"blaming others",sarcastic:"sarcastic",fiery:"fiery",arrogant:"arrogant",humble:"humble",confident:"confident",deflect:"giving nothing away",decline:"no comment"})[p.tone]||p.tone}</p><button class="btn" data-act="next">Continue</button>`); return; }
   if(p.kind==='rehab'){ modal(`<div class="label">Medical</div><h2 class="disp">${esc(p.type)}</h2><p style="margin:0">The physio says around ${Math.round(p.days/7)} weeks out. How do you want to handle it?</p><div class="answers"><button class="ans" data-act="rehab" data-arg="0"><em>Full rehab</em><span>Come back when fully fit. No extra risk.</span></button><button class="ans" data-act="rehab" data-arg="1"><em>Fast-track</em><span>Back about a third sooner. The manager likes it, but you're more likely to break down again.</span></button></div>`); return; }
   if(p.kind==='nation'){ modal(`<div class="label">International future</div><h2 class="disp">Two countries want you</h2><p style="margin:0">You're eligible for ${esc(NAT_NAMES[p.a]||p.a)} and ${esc(NAT_NAMES[p.b]||p.b)}. Once you play a senior game, the choice is final.</p><div class="answers">${[p.a,p.b].map(c=>{ const n=nationRow(c); return n?`<button class="ans" data-act="nation" data-arg="${c}"><em>${esc(n[1])}</em><span>Manager ${esc(n[4])} · team strength ${n[2]}</span></button>`:''; }).join('')}</div>`); return; }
   if(p.kind==='intl'){ const r=p.r; modal(`<div class="label">${esc(r.nation)}${r.level!=='Senior'?' '+r.level:''} · international</div><div class="scoreline"><div class="tm">${esc(r.nation)}</div><div class="sc num">${r.us}–${r.th}</div><div class="tm">${esc(r.opp)}</div></div><div class="row sb"><span>${r.start?'Started':'Off the bench'} · ${r.mins}' · ${r.g} goal${r.g===1?'':'s'}</span><div class="rating ${r.rating>=7?'g':r.rating<6?'r':''}">${r.rating.toFixed(1)}</div></div><button class="btn" data-act="next">Continue</button>`); return; }
@@ -3297,6 +3584,9 @@ function showNego(){ const N=S.nego; if(!N) return; const c=club(N.cid); const t
 function readNego(){ return {wage:Math.max(50,+$('#ngW').value||0),years:+$('#ngY').value,role:$('#ngR').value,release:$('#ngC').value,signOn:Math.max(0,+$('#ngS').value||0),bonus:$('#ngB').value}; }
 const ACT={
   sec:k=>{ SEC=k; SUB=0; render(); $('#view').scrollTop=0; }, sub:i=>{ SUB=+i; render(); $('#view').scrollTop=0; },
+  cscope:k=>{ CSCOPE=k; render(); },
+  pinBadge:id=>{ const m=S.me; m.pins=m.pins||[]; if(m.pins.includes(id)) m.pins=m.pins.filter(x=>x!==id); else { if(m.pins.length>=3) m.pins.shift(); m.pins.push(id); } saveSoon(); render(); },
+  evPick:i=>{ const r=evChoose(+i); S.pending=Object.assign({kind:'eventDone'},r||{title:'',choice:'',txt:'',eff:[]}); render(); },
   moreNav:()=>{ if(NAVCTX) moreSheet(NAVCTX.secs,NAVCTX.badge); }, secClose:k=>{ closeModal(); ACT.sec(k); },
   go:a=>{ const [s,i]=a.split(':'); SEC=s; SUB=+i; render(); },
   advance:()=>{ if(S.pending){ showPending(); return; } const wasSeason=S.season; continueDay(); render(); },
