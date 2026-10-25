@@ -4283,8 +4283,8 @@ function normClub(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'
 }
 function logoDB(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open('bw-logos',1); r.onupgradeneeded=()=>r.result.createObjectStore('l'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }catch(e){ rej(e); } }); }
 async function logoLoad(){ try{ const db=await logoDB(); const tx=db.transaction('l','readonly'); const st=tx.objectStore('l'); const req=st.openCursor(); const map={};
-  await new Promise(r=>{ req.onsuccess=()=>{ const c=req.result; if(c){ map[c.key]=URL.createObjectURL(c.value); c.continue(); } else r(); }; req.onerror=()=>r(); });
-  for(const k in LOGOS.map) try{ URL.revokeObjectURL(LOGOS.map[k]); }catch(e){} LOGOS.map=map; LOGOS.count=Object.keys(map).length; LOGOS.ready=true; if(LOGOS.count&&typeof render==='function'&&S) render(); }catch(e){ LOGOS.ready=true; } }
+  await new Promise(r=>{ req.onsuccess=()=>{ const c=req.result; if(c){ map[c.key]=typeof c.value==='string'?c.value:URL.createObjectURL(c.value); c.continue(); } else r(); }; req.onerror=()=>r(); });
+  for(const k in LOGOS.map) try{ if(LOGOS.map[k].startsWith('blob:')) URL.revokeObjectURL(LOGOS.map[k]); }catch(e){} LOGOS.map=map; LOGOS.count=Object.keys(map).length; LOGOS.ready=true; if(LOGOS.count&&typeof render==='function'&&S) render(); }catch(e){ LOGOS.ready=true; } }
 async function logoPut(entries){ const db=await logoDB(); const tx=db.transaction('l','readwrite'); const st=tx.objectStore('l'); for(const [k,b] of entries) st.put(b,k); await new Promise((r,j)=>{ tx.oncomplete=r; tx.onerror=()=>j(tx.error); }); }
 async function logoClear(){ const db=await logoDB(); const tx=db.transaction('l','readwrite'); tx.objectStore('l').clear(); await new Promise(r=>{ tx.oncomplete=r; tx.onerror=r; }); for(const k in LOGOS.map) try{ URL.revokeObjectURL(LOGOS.map[k]); }catch(e){} LOGOS.map={}; LOGOS.count=0; }
 // tiny zip reader (stored + deflate) using the browser's DecompressionStream
@@ -4307,12 +4307,39 @@ function crest(c,lg){ if(!c) return ''; const u=LOGOS.count?LOGOS.map[normClub(c
   return `<div class="crest gen${lg?' lg':''}">${crestSVG(c)}</div>`; }
 function clubListCSV(){ const rows=[['id','club','short','league','suggested file name']].concat(S.clubs.filter(c=>c.name).map(c=>[c.id,c.name,c.short||'',c.league||'',c.name+'.png'])); return rows.map(r=>r.map(x=>/[",]/.test(String(x))?`"${String(x).replace(/"/g,'""')}"`:x).join(',')).join('\n'); }
 let LGL=null;
+const BADGE_API='https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t=';
+const BADGE_ALIAS={'Manchester United':'Man United','Brighton & Hove Albion':'Brighton','Wolverhampton Wanderers':'Wolves','Inter':'Inter Milan','Paris Saint-Germain':'Paris SG','Sporting CP':'Sporting Lisbon','Athletic Club':'Athletic Bilbao','FC Bayern München':'Bayern Munich','Bayern München':'Bayern Munich','Borussia Mönchengladbach':'Borussia Monchengladbach','1. FC Köln':'FC Koln','Olympique de Marseille':'Marseille','Olympique Lyonnais':'Lyon','Atlético de Madrid':'Atletico Madrid','AFC Ajax':'Ajax','FC Copenhagen':'FC Kobenhavn','FCSB':'Steaua Bucharest','Bodø/Glimt':'Bodo Glimt','Tottenham Hotspur':'Tottenham'};
+const BDL={run:false,done:0,total:0,got:0,miss:[],cur:''};
+function bnorm(x){ return String(x||'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/&/g,' and ').replace(/\b(fc|afc|cf|sc|ac|club|football|soccer|calcio|sd|ud|fk|sv|bc|cd|ssc|1)\b/g,' ').replace(/[^a-z0-9]+/g,' ').trim(); }
+function bsim(a,b){ a=bnorm(a); b=bnorm(b); if(!a||!b) return 0; if(a===b) return 1; if((a.includes(b)||b.includes(a))&&Math.min(a.length,b.length)>=5) return .9;
+  const m=a.length,n=b.length; let prev=Array.from({length:n+1},(_,j)=>j); for(let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); prev=cur; } return 1-prev[n]/Math.max(m,n); }
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function badgeFetch(c){ const q=BADGE_ALIAS[c.name]||c.name; let r; for(let k=0;k<5;k++){ r=await fetch(BADGE_API+encodeURIComponent(q)); if(r.status===429){ await sleep(10000*(k+1)); continue; } break; } if(!r.ok) throw new Error('HTTP '+r.status);
+  const j=await r.json(); const teams=(j.teams||[]).filter(t=>!t.strSport||t.strSport==='Soccer'); let best=null,bs=0;
+  for(const t of teams){ const cands=[t.strTeam,t.strTeamShort].concat(String(t.strAlternate||'').split(',')).filter(Boolean); const sc=Math.max(...cands.map(x=>Math.max(bsim(c.name,x),bsim(q,x)))); const ctry=COUNTRY_SDB[c.country]; const bonus=ctry&&t.strCountry===ctry?.03:0; if(sc+bonus>bs){ bs=sc+bonus; best=t; } }
+  if(!best||bs<.86) return null; const url=best.strBadge||best.strTeamBadge; if(!url) return null;
+  try{ const im=await fetch(url+'/small'); if(im.ok){ const b=await im.blob(); if(b.size>200&&/^image\//.test(b.type)) return b; } }catch(e){}
+  try{ const im=await fetch(url); if(im.ok){ const b=await im.blob(); if(/^image\//.test(b.type)) return b; } }catch(e){}
+  return url; }
+const COUNTRY_SDB={ENG:'England',ESP:'Spain',ITA:'Italy',GER:'Germany',FRA:'France',POR:'Portugal',NED:'Netherlands',IRL:'Ireland'};
+async function badgeRun(clubs){ if(BDL.run) return; Object.assign(BDL,{run:true,done:0,total:clubs.length,got:0,miss:[],cur:''}); render();
+  for(const c of clubs){ if(!BDL.run) break; BDL.cur=c.name; try{ const v=await badgeFetch(c); if(v){ await logoPut([[normClub(c.name),v]]); BDL.got++; LOGOS.map[normClub(c.name)]=typeof v==='string'?v:URL.createObjectURL(v); LOGOS.count=Object.keys(LOGOS.map).length; } else BDL.miss.push(c.name); }
+    catch(e){ if(BDL.done===0){ BDL.run=false; BDL.err=true; toast('Couldn’t reach the badge site. Use the home-screen app with internet.'); render(); return; } BDL.miss.push(c.name); }
+    BDL.done++; if(SEC==='saves') render(); await sleep(2100); }
+  BDL.run=false; BDL.cur=''; await logoLoad(); toast(`${BDL.got} badges added`); render(); }
+ACT.badgeDl=k=>{ const mine=typeof myClubId==='function'?myClubId():null; let clubs;
+  if(k==='league') clubs=LGL==='EUR'?S.clubs.filter(c=>c.name&&(!c.league||!S.leagues[c.league])):S.clubs.filter(c=>c.league===LGL);
+  else clubs=S.clubs.filter(c=>c.name).sort((a,b)=>(b.id===mine)-(a.id===mine)||(b.rep||0)-(a.rep||0));
+  clubs=clubs.filter(c=>!LOGOS.map[normClub(c.name)]); if(!clubs.length){ toast('Those clubs already have badges'); return; } badgeRun(clubs); };
+ACT.badgeStop=()=>{ BDL.run=false; render(); };
 async function logoDel(key){ const db=await logoDB(); const tx=db.transaction('l','readwrite'); tx.objectStore('l').delete(key); await new Promise(r=>{ tx.oncomplete=r; tx.onerror=r; }); }
 VIEWS['saves:1']=()=>{ const n=LOGOS.count; LGL=LGL||(typeof myLeague==='function'&&myLeague())||'ENG1'; const mine=typeof myClubId==='function'?myClubId():null;
   const opts=Object.keys(S.leagues).filter(l=>l!=='EUR').map(l=>`<option value="${l}" ${l===LGL?'selected':''}>${esc(LMETA(l).name)}</option>`).join('')+`<option value="EUR" ${LGL==='EUR'?'selected':''}>Other clubs</option>`;
   const clubs=(LGL==='EUR'?S.clubs.filter(c=>c.name&&(!c.league||!S.leagues[c.league])):S.clubs.filter(c=>c.league===LGL)).slice().sort((a,b)=>(b.id===mine)-(a.id===mine)||a.name.localeCompare(b.name));
   const rows=clubs.map(c=>{ const has=!!LOGOS.map[normClub(c.name)]; return `<div class="lgrow">${crest(c,true)}<b>${esc(c.name)}${c.id===mine?' <span class="pill b">Yours</span>':''}</b><label class="btn ${has?'sec':''}">${has?'Change':'Set logo'}<input type="file" accept="image/*" data-logo-club="${esc(c.name)}" hidden></label>${has?`<button class="btn sec" data-act="logoDel" data-arg="${esc(c.name)}" aria-label="Remove">✕</button>`:''}</div>`; }).join('');
-  return `<div class="dash c1">${W('Club logos',`<div class="stack"><p class="note" style="margin:0">Tap <b>Set logo</b> and pick a badge image from your photos. Do as many or as few clubs as you like. The rest keep their generated crest. Logos stay on this device.</p>
+  const dl=BDL.run?`<div class="stack"><div class="meter"><span>Downloading</span><div class="bar"><i style="width:${BDL.total?Math.round(BDL.done/BDL.total*100):0}%"></i></div><b class="num">${BDL.done}/${BDL.total}</b></div><p class="note" style="margin:0">${esc(BDL.cur)} · ${BDL.got} found. Keep the app open. You can keep browsing other screens.</p><div class="row"><button class="btn sec" data-act="badgeStop">Stop</button></div></div>`
+   :`<div class="stack"><p class="note" style="margin:0">Grab real badges automatically from TheSportsDB (needs internet; works in the home-screen app). About 2 seconds per club: one league takes under a minute, everything about 16 minutes.</p><div class="row"><button class="btn" data-act="badgeDl" data-arg="league">Download this league</button><button class="btn sec" data-act="badgeDl" data-arg="all">Download all clubs</button></div>${BDL.total&&!BDL.run?`<p class="note">Last run: ${BDL.got} of ${BDL.total} found.${BDL.miss.length?` Not found: ${esc(BDL.miss.slice(0,10).join(', '))}${BDL.miss.length>10?'…':''}. Set those by hand below.`:''}</p>`:''}</div>`;
+  return `<div class="dash c1">${W('Auto-download badges',dl)}${W('Club logos',`<div class="stack"><p class="note" style="margin:0">Tap <b>Set logo</b> and pick a badge image from your photos. Do as many or as few clubs as you like. The rest keep their generated crest. Logos stay on this device.</p>
    <div class="row sb"><select data-lgl="1" aria-label="League">${opts}</select><span class="note">${n} set</span></div><div class="lglist">${rows}</div></div>`)}
    ${W('Bulk import',`<div class="stack"><p class="note" style="margin:0">Got a folder of badges already? Name each file after the club (e.g. <b>Arsenal.png</b>) and import them all at once, or as a .zip.</p><div class="row"><label class="btn sec">Import images or .zip<input type="file" data-logos="1" accept=".zip,image/*" multiple hidden></label><button class="btn sec" data-act="logoList">Download club list</button>${n?'<button class="btn sec" data-act="logoClear">Remove all logos</button>':''}</div>
    ${LOGOS.last?`<p class="note">${LOGOS.last.matched} of ${LOGOS.last.found} images matched a club.${LOGOS.last.miss.length?` Not matched: ${esc(LOGOS.last.miss.slice(0,12).join(', '))}${LOGOS.last.miss.length>12?'…':''}`:''}</p>`:''}</div>`)}</div>`; };
