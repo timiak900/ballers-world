@@ -920,6 +920,15 @@ tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .pact b{font-size:13.5px}.pact span{font-size:12px;color:var(--mute);line-height:1.35}.pact:disabled{opacity:.45}.pact.neg{border-color:rgba(239,68,68,.35)}.pact.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 .pres{padding:12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--accent)}.pres b{display:block;font-size:15px;margin-bottom:3px}.pres p{margin:0;font-size:13.5px;line-height:1.5;color:var(--mute)}.pres .effects{margin-top:8px}
 .mb.h2h p{font-size:14px}
+/* v17: coach, bank */
+.stars{color:var(--gold);letter-spacing:1px;font-size:14px;white-space:nowrap}.stars i{font-style:normal;color:var(--line-2)}
+.coachr{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.coachr:last-of-type{border-bottom:0}.coachr>div:first-child{display:flex;flex-direction:column;min-width:0}.coachr .btn{padding:8px 12px}
+.cfee{display:flex;flex-direction:column;align-items:flex-end}.cfee b{font-size:14px}
+@media (max-width:520px){.coachr{grid-template-columns:minmax(0,1fr) auto;row-gap:4px}.coachr .cfee{align-items:flex-start}}
+.bkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.bkc{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.bkc span{font-size:12px;color:var(--mute)}.bkc b{font-family:var(--cond);font-size:24px;font-weight:800}.bkc i{font-style:normal;font-size:11.5px;color:var(--dim)}
+.bamt{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--text);font-size:16px}
+.tgl{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mute)}
 </style>
 
 <div class="app" id="app" hidden>
@@ -2005,9 +2014,9 @@ function teamSession(i,d){
 function personalSession(i,light){
   const m=S.me, k=m.pers[i]; if(!k||k==='none') return; const T=PERSONAL[k]; if(!T) return;
   if(T.rec){ m.energy=clamp(m.energy+12,0,100); m.bank-=150; return; }
-  let mult=growthMult()*(light?.6:1); if(T.coach&&m.coachFocus==='off') return; if(T.coach){ const cost=roundWage(Math.max(300,m.contract?m.contract.wage*.15:300)); if(m.bank<cost){ return; } m.bank-=cost; mult*=1.9; }
+  let mult=growthMult()*(light?.6:1); if(T.coach){ const cm=typeof coachSession==='function'?coachSession():0; if(!cm) return; mult*=cm; }
   const ups=[];
-  const attrs=T.coach?(PERSONAL[m.coachFocus||'finishing'].a||['fin']):T.a;
+  const attrs=T.coach?((PERSONAL[m.coachFocus]&&PERSONAL[m.coachFocus].a)||PERSONAL[(m.coach&&m.coach.spec)||'finishing'].a):T.a;
   if(attrs) attrs.forEach(a=>{ if(addTXP(a,7*mult*rnd(.7,1.1)/Math.max(1,attrs.length/2.5))) ups.push(`${ANAME[a]} +1`); });
   if(m.talent==='Grafter'&&Math.random()<.05){ m.pot=Math.min(95,m.pot+1); }
   if(T.wf){ m.wfx=(m.wfx||0)+8*mult; const need=70+m.wf*55; if(m.wfx>=need&&m.wf<5){ m.wfx-=need; m.wf++; ups.push(`Weak foot ${m.wf}★`); } }
@@ -3734,7 +3743,7 @@ function backfillLedger(){ const m=S.me; if(!m||m.club==null||!m.contract||S.wee
     const back=S.week-1-w; const bank=hist.length>back?hist[hist.length-1-back]:null; const tax=weeklyTax(k.wage+sp);
     rows.push({s:S.season,w,wage:k.wage,spons:sp,bonus,tax,agent:ag?Math.round(k.wage*ag[2]):0,life,fines:0,other:0,bank:bank!=null?Math.round(bank):null,est:1}); earn+=k.wage+sp+bonus; }
   m.ledger=m.ledger.concat(rows).sort((a,b)=>a.s-b.s||a.w-b.w); if(m.ledger.length>80) m.ledger=m.ledger.slice(-80); m.earn=(m.earn||0)+earn; }
-function migrate20(){ try{ if(!S||!S.me) return; backfillLedger(); stampLog(); if(typeof lsBackfill==='function') lsBackfill(); if(typeof soc==='function'){ soc(); socDaily(); } }catch(e){ console.warn('migrate20',e); } }
+function migrate20(){ try{ if(!S||!S.me) return; backfillLedger(); stampLog(); if(typeof lsBackfill==='function') lsBackfill(); if(typeof coachMigrate==='function') coachMigrate(); if(typeof soc==='function'){ soc(); socDaily(); } }catch(e){ console.warn('migrate20',e); } }
 if(typeof loadSlot==='function'){ const _ls20=loadSlot; loadSlot=function(){ const r=_ls20.apply(this,arguments); if(r) migrate20(); return r; }; }
 if(typeof finishDay==='function'){ const _fd20=finishDay; finishDay=function(){ const r=_fd20.apply(this,arguments); try{ stampLog(); }catch(e){} return r; }; }
 // a schoolboy's parents cover most one-off costs; and no lending thousands at 16
@@ -4127,6 +4136,41 @@ function lsBackfill(){ if(!S||!S.leagues||S.lsFill===S.season) return; S.lsFill=
     // Player of the Match: about half the games, to whoever played best
     const missTeam=Math.max(0,...add.map(x=>x[1])); let potm=Math.round(missTeam*.5); const wsum=add.reduce((s,x)=>s+Math.pow(x[2],6)*x[1],0);
     if(wsum>0) for(const [p,miss,r] of add){ const share=Math.pow(r,6)*miss/wsum; const v=Math.floor(potm*share+Math.random()); p.mo=(p.mo||0)+v; } } } }
+
+// ---------- v17: private coaches you hire, and a proper bank ----------
+const COACH_SPEC=['finishing','shooting','passing','dribbling','gym','pace','heading','defending','setpieces'];
+const COACH_BASE={1:40,2:80,3:200,4:550,5:1500}, COACH_MULT={1:1.25,2:1.45,3:1.7,4:1.95,5:2.25}, COACH_REP={4:25,5:45};
+function coachMkt(){ const m=S.me, w=absWk(); if(S.coachMkt&&w-S.coachMkt.w<4&&w>=S.coachMkt.w) return S.coachMkt.list; const c=myClubObj(); const k=c?(COST_IDX[c.country]||1):1; const cc=c&&c.country&&NAMES[c.country]?c.country:'ENG';
+  const list=[1,2,2,3,3,4,5].map(st=>({id:Math.random().toString(36).slice(2,8),name:nameFor(cc),stars:st,spec:pick(COACH_SPEC),fee:roundWage(COACH_BASE[st]*k*rnd(.8,1.3)*(1+m.rep/250))}));
+  S.coachMkt={w,list}; return list; }
+function hireCoach(id){ const m=S.me, c=coachMkt().find(x=>x.id===id); if(!c) return {ok:false,txt:'That coach is no longer available.'}; if(m.rep<(COACH_REP[c.stars]||0)) return {ok:false,txt:`${c.name} only works with established players. Build your name first.`};
+  m.coach={...c,since:absWk(),n:0}; m.coachFocus=c.spec; S.coachMkt.list=S.coachMkt.list.filter(x=>x.id!==id); news('you',`${c.name} is your private coach`,`${c.stars}-star ${PERSONAL[c.spec].name.toLowerCase()} specialist. ${money(c.fee)} a session. Add "Private coach" sessions to your weekly plan.`,true); return {ok:true}; }
+function fireCoach(){ const m=S.me; if(m.coach){ news('you','Private coach let go',`You part ways with ${m.coach.name}.`,true); m.coach=null; } }
+// called from a private session: returns the gains multiplier, or 0 if no session happens
+function coachSession(){ const m=S.me, c=m.coach; if(!c) return 0; if(m.bank<c.fee){ news('bad','Couldn\'t pay your coach',`${c.name} costs ${money(c.fee)} a session and your current account can't cover it.`,true); return 0; }
+  m.bank-=c.fee; m.coachWk=(m.coachWk||0)+c.fee; c.n=(c.n||0)+1; m.coachSpend=(m.coachSpend||0)+c.fee; return COACH_MULT[c.stars]*(m.coachFocus===c.spec?1:.8); }
+function coachWeek(){ const m=S.me, c=m&&m.coach; if(!c) return; if((absWk()-c.since)%8===7&&Math.random()<.35){ const nf=roundWage(c.fee*rnd(1.1,1.2)); news('you',`${c.name} puts his rates up`,`From now on he charges ${money(nf)} a session (was ${money(c.fee)}). Demand for good coaches is high.`,true); c.fee=nf; } }
+function coachMigrate(){ const m=S.me; if(!m||m.coach!==undefined) return; const used=(m.plan&&m.plan.extra==='coach')||(m.pers||[]).includes('coach');
+  m.coach=used?{id:'old',name:nameFor('ENG'),stars:3,spec:PERSONAL[m.coachFocus]&&PERSONAL[m.coachFocus].a?m.coachFocus:'finishing',fee:roundWage(Math.max(300,m.contract?m.contract.wage*.15:300)),since:absWk(),n:0}:null; }
+
+// ---------- bank: current account, savings, fixed term ----------
+const SAV_RATE=.02, FIXED={26:.03,52:.035}, INT_TAX={IRL:.33,ENG:0,ESP:.19,ITA:.26,GER:.264,FRA:.3,POR:.28,NED:0};
+function bk(){ const m=S.me; if(m.sav==null){ m.sav=0; m.fixed=[]; m.intS=0; m.autoCover=true; } return m; }
+function bankMove(dir,amt){ const m=bk(); amt=Math.round(+amt||0); if(amt<=0) return {ok:false,txt:'Enter an amount.'};
+  if(dir==='save'){ amt=Math.min(amt,Math.floor(Math.max(0,m.bank))); if(!amt) return {ok:false,txt:'Nothing in your current account to move.'}; m.bank-=amt; m.sav+=amt; m.xferWk=(m.xferWk||0)+amt; }
+  else { amt=Math.min(amt,Math.floor(m.sav)); if(!amt) return {ok:false,txt:'Nothing in savings to move.'}; m.sav-=amt; m.bank+=amt; m.xferWk=(m.xferWk||0)-amt; }
+  return {ok:true,txt:`${money(amt)} moved ${dir==='save'?'to savings':'to your current account'}.`}; }
+function fixOpen(wks,amt){ const m=bk(); amt=Math.round(+amt||0); if(!FIXED[wks]) return {ok:false,txt:'Pick a term.'}; amt=Math.min(amt,Math.floor(m.sav)); if(amt<1000) return {ok:false,txt:'Fixed-term deposits start at €1,000, taken from your savings.'};
+  m.sav-=amt; m.fixed.push({amt,rate:FIXED[wks],wks,start:absWk(),until:absWk()+wks}); return {ok:true,txt:`${money(amt)} locked away for ${wks===26?'six months':'a year'} at ${(FIXED[wks]*100).toFixed(1)}%.`}; }
+function fixBreak(i){ const m=bk(); const f=m.fixed[i]; if(!f) return; m.fixed.splice(i,1); m.sav+=f.amt; news('you','Fixed-term deposit broken',`You take ${money(f.amt)} out early and lose the interest.`,true); }
+function bankWeek(){ const m=bk(); const c=myClubObj(); const tx=INT_TAX[c&&c.country]||0; let int=0;
+  if(m.sav>0){ const g=m.sav*SAV_RATE/52; const net=g*(1-tx); m.sav+=net; int+=net; }
+  m.fixed=m.fixed.filter(f=>{ if(absWk()<f.until) return true; const g=f.amt*f.rate*f.wks/52; const net=g*(1-tx); m.sav+=f.amt+net; int+=net; news('good','Fixed-term deposit matured',`${money(f.amt)} plus ${money(Math.round(net))} interest is back in your savings.`,true); return false; });
+  m.intS=(m.intS||0)+int; m.intWk=int;
+  if(m.bank<0){ if(m.autoCover&&m.sav>0){ const x=Math.min(m.sav,-m.bank); m.sav-=x; m.bank+=x; } if(m.bank<0){ const fee=Math.round(-m.bank*.12/52); m.bank-=fee; m.odFee=(m.odFee||0)+fee; } } }
+if(typeof financeWeek==='function'){ const _fw25=financeWeek; financeWeek=function(){ const m=S.me; if(!m) return; bk(); const x=m.xferWk||0; if(m.bankF!=null) m.bankF-=x; const r=_fw25.apply(this,arguments); try{ const row=(m.ledger||[])[m.ledger.length-1]; if(row){ row.sav=x; row.coach=m.coachWk||0; row.other=Math.round((row.other||0)+row.coach); } m.coachWk=0; m.xferWk=0; bankWeek(); if(row) row.int=Math.round(m.intWk||0); m.bankF=m.bank; coachWeek(); }catch(e){ console.warn('bank',e); } return r; }; }
+{ const _ss25=startSeason; startSeason=function(){ const r=_ss25.apply(this,arguments); try{ if(S.me){ S.me.intS=0; S.me.coachSpend=0; } }catch(e){} return r; }; }
+function netWorth(){ const m=bk(); return m.bank+m.sav+m.fixed.reduce((s,f)=>s+f.amt,0); }
 
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
@@ -5452,7 +5496,7 @@ function dayCard(d,i,fc,edit){ const m=S.me, dt=gameDate(S.week,i), info=dayDeta
   else body+=`<p class="note">${info.note}</p>`;
   if(edit&&!past&&!m.injury){
     if(d.type==='team') body+=`<div class="seg">${ATT_OPTS.map(([k,l])=>`<button class="chip ${k==='skip'?'warnc':''}" aria-pressed="${m.att[i]===k}" data-act="att" data-arg="${i}:${k}">${l}</button>`).join('')}</div>`;
-    if(['team','recovery'].includes(d.type)||(m.club==null&&!m.loan)) body+=`<label class="dcl" for="pers${i}">Extra session</label><select id="pers${i}" data-ch="pers" data-i="${i}">${Object.entries(PERSONAL).filter(([k])=>!(k==='coach'&&m.coachFocus==='off'&&m.pers[i]!=='coach')).map(([k,v])=>`<option value="${k}" ${m.pers[i]===k?'selected':''}>${v.name}${v.e&&v.e>0?` (−${v.e} energy)`:v.rec?' (+12 energy)':''}</option>`).join('')}</select>`;
+    if(['team','recovery'].includes(d.type)||(m.club==null&&!m.loan)) body+=`<label class="dcl" for="pers${i}">Extra session</label><select id="pers${i}" data-ch="pers" data-i="${i}">${Object.entries(PERSONAL).filter(([k])=>!(k==='coach'&&!m.coach&&m.pers[i]!=='coach')).map(([k,v])=>`<option value="${k}" ${m.pers[i]===k?'selected':''}>${v.name}${v.e&&v.e>0?` (−${v.e} energy)`:v.rec?' (+12 energy)':''}</option>`).join('')}</select>`;
     if(d.type==='off') body+=`<select data-ch="offPlan" aria-label="Day off plan">${OFF_OPTS.map(([k,l])=>`<option value="${k}" ${m.offPlan===k?'selected':''}>${l}</option>`).join('')}</select>`;
   } else if(!past&&(['team','recovery'].includes(d.type))){ const extra=PERSONAL[m.pers[i]||'none']; body+=`<p class="note" style="color:var(--text)">${d.type==='team'?({early:'Arriving early',on:'On time',late:'Arriving late',skip:'Skipping'}[m.att[i]]):''}${extra&&extra.name!=='None'?`${d.type==='team'?' · ':''}Extra: ${extra.name}`:''}</p>`; }
   if(m.injury&&!past&&d.type!=='match') body+=`<p class="note" style="color:var(--neg)">Rehab: ${esc(m.injury.type)}</p>`;
@@ -5477,7 +5521,7 @@ VIEWS['training:0']=()=>{ const m=S.me; m.plan=m.plan||defaultPlan(); const fc=e
     <button class="preset ${m.plan&&m.plan.preset==='fresh'?'on':''}" data-act="preset" data-arg="fresh"><b>Stay fresh</b><span>On time, spa on recovery days, no extras. Best when tired or before big games.</span></button></div>
     <div class="grid3 planf" style="margin-top:8px">
      <div class="fld"><label for="pl_att">Attendance</label><select id="pl_att" data-ch="plan" data-k="att">${ATT_OPTS.map(([k,l])=>`<option value="${k}" ${m.plan.att===k?'selected':''}>${l}</option>`).join('')}</select></div>
-     <div class="fld"><label for="pl_ex">Extra session</label><select id="pl_ex" data-ch="plan" data-k="extra">${Object.entries(PERSONAL).filter(([k,v])=>!v.rec&&!(k==='coach'&&S.me.coachFocus==='off')).map(([k,v])=>`<option value="${k}" ${m.plan.extra===k?'selected':''}>${v.name}</option>`).join('')}</select></div>
+     <div class="fld"><label for="pl_ex">Extra session</label><select id="pl_ex" data-ch="plan" data-k="extra">${Object.entries(PERSONAL).filter(([k,v])=>!v.rec&&!(k==='coach'&&!S.me.coach)).map(([k,v])=>`<option value="${k}" ${m.plan.extra===k?'selected':''}>${v.name}</option>`).join('')}</select></div>
      <div class="fld"><label for="pl_n">Extras per week</label><select id="pl_n" data-ch="plan" data-k="count">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${+m.plan.count===n?'selected':''}>${n}</option>`).join('')}</select></div>
      <div class="fld"><label for="pl_r">Recovery days</label><select id="pl_r" data-ch="plan" data-k="rec">${[['none','Club recovery only'],['recovery','Spa & recovery'],['gym','Gym'],['pace','Sprint work']].map(([k,l])=>`<option value="${k}" ${m.plan.rec===k?'selected':''}>${l}</option>`).join('')}</select></div>
      <div class="fld"><label for="pl_o">Day off</label><select id="pl_o" data-ch="plan" data-k="off">${OFF_OPTS.map(([k,l])=>`<option value="${k}" ${m.plan.off===k?'selected':''}>${l}</option>`).join('')}</select></div></div>
@@ -5486,8 +5530,8 @@ VIEWS['training:0']=()=>{ const m=S.me; m.plan=m.plan||defaultPlan(); const fc=e
     ${work.length?`<div class="lbl" style="margin-top:8px">This week you'll work on</div><div class="chips">${work.slice(0,10).map(([k,v])=>`<span class="pill b">${ANAME[k]} ×${Math.round(v)}</span>`).join(' ')}</div>`:''}</div></section>
    <div class="days">${S.days.map((d,i)=>dayCard(d,i,fc[i],true)).join('')}</div>
    <section class="w"><div class="wh"><span>Extras</span></div><div class="wb"><div class="grid2"><div class="fld"><label for="trt">PlayStyle to develop</label><select id="trt" data-ch="traitTarget"><option value="">None</option>${TRAITS.filter(t=>!m.traits.includes(t[0])).map(t=>`<option ${m.traitTarget===t[0]?'selected':''}>${esc(t[0])}</option>`).join('')}</select></div>
-    <div class="fld"><label for="cch">Private coach works on</label><select id="cch" data-ch="coachFocus"><option value="off" ${m.coachFocus==='off'?'selected':''}>No private coach</option>${Object.entries(PERSONAL).filter(([k,v])=>v.a).map(([k,v])=>`<option value="${k}" ${(m.coachFocus||'finishing')===k?'selected':''}>${v.name}</option>`).join('')}</select></div></div>
-    <p class="note" style="margin-top:6px">Early: +18% gains and the manager notices. Late: −20% and a fine. Skip: no gains, a big fine and you'll probably be dropped. Private coach doubles gains for ${money(roundWage(Math.max(300,m.contract?m.contract.wage*.15:300)))} a session.</p></div></section></div>`; };
+    ${m.coach?`<div class="fld"><label for="cch">${esc(m.coach.name)} (${m.coach.stars}★) works on</label><select id="cch" data-ch="coachFocus">${Object.entries(PERSONAL).filter(([k,v])=>v.a).map(([k,v])=>`<option value="${k}" ${m.coachFocus===k?'selected':''}>${v.name}${k===m.coach.spec?' (his speciality)':''}</option>`).join('')}</select></div>`:`<div class="fld"><label>Private coach</label><button class="btn sec" data-act="go" data-arg="training:3">No coach · find one</button></div>`}</div>
+    <p class="note" style="margin-top:6px">Early: +18% gains and the manager notices. Late: −20% and a fine. Skip: no gains, a big fine and you'll probably be dropped. ${m.coach?`Your coach costs ${money(m.coach.fee)} a session, only on days you book him.`:'Hire a private coach in Training, Private coach.'}</p></div></section></div>`; };
 VIEWS['training:2']=()=>{ const m=S.me; const groups={}; TRAITS.forEach(t=>(groups[t[1]]=groups[t[1]]||[]).push(t));
   return `<div class="stack">${Object.entries(groups).map(([g,list])=>`<section class="w"><div class="wh"><span>${g}</span></div><div class="wb">${list.map(t=>{ const has=m.traits.includes(t[0]); const met=traitReqMet(t); const pr=m.traitProg[t[0]]||0;
     const req=Object.entries(t[2]).map(([k,v])=>`<span class="${m.attrs[k]>=v?'c-hi':'c-lo'}">${ANAME[k]} ${m.attrs[k]}/${v}</span>`).join(' · ');
@@ -5888,16 +5932,16 @@ VIEWS['comps:1']=()=>{ const pk=compPickers(); const lid=VLEAGUE; const L=LMETA(
 ACT.lstab=k=>{ LSTAB=k; render(); };
 
 // ---------- finances & lifestyle ----------
-function ledgerSum(rows){ const t={wage:0,spons:0,bonus:0,tax:0,agent:0,life:0,fines:0,other:0}; rows.forEach(r=>{ for(const k in t) t[k]+=r[k]||0; }); return t; }
+function ledgerSum(rows){ const t={wage:0,spons:0,bonus:0,tax:0,agent:0,life:0,coach:0,fines:0,other:0}; rows.forEach(r=>{ for(const k in t) t[k]+=r[k]||0; }); return t; }
 VIEWS['fin:0']=()=>{ const m=S.me; const L=m.ledger||[]; const last=L[L.length-1]; const season=ledgerSum(L.filter(r=>r.s===S.season)); const hist=(m.bankHist||[]).filter(isFinite);
-  const inc=last?last.wage+last.spons+last.bonus:0, out=last?last.tax+last.agent+last.life+last.fines:0;
+  const inc=last?last.wage+last.spons+last.bonus:0, out=last?last.tax+last.agent+last.life+(last.coach||0)+last.fines:0;
   const line=(l,v,neg,sub)=>`<span>${l}${sub?`<i class="fsub">${sub}</i>`:''}</span><b class="${neg&&v?'c-lo':''}">${neg&&v?'−':''}${money(Math.abs(v))}</b>`;
   const lf=(()=>{ try{ const Lf=lifeGet(); return ['home','car','spend'].map(c=>(LIFE[c].find(x=>x[0]===Lf[c])||[])[1]).join(' · '); }catch(e){ return ''; } })();
   const pts=hist.length>1?(()=>{ const mx=Math.max(...hist), mn=Math.min(...hist,0); return hist.map((v,i)=>`${(i/(hist.length-1)*320).toFixed(1)},${(84-(v-mn)/((mx-mn)||1)*80).toFixed(1)}`).join(' '); })():'';
   return `<div class="dash sqhub">${W('Money',`<div class="stack"><div class="sbig" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><b class="num" style="font-size:22px">${money(m.bank)}</b><span>In the bank</span></div><div><b class="num" style="font-size:22px">${money(inc-out)}</b><span>Last week, after costs</span></div><div><b class="num" style="font-size:22px">${money(m.earn||0)}</b><span>Career earnings</span></div></div>
     ${pts?`<div class="trend2" style="margin-left:0;height:90px"><svg viewBox="0 0 320 88" preserveAspectRatio="none"><polyline points="${pts}"/></svg></div>`:''}</div>`)}
-   ${W('Last week',last?`<div class="kv skv">${line('Wages',last.wage)}${line('Sponsors',last.spons)}${line('Match bonuses',last.bonus)}${line('Tax',last.tax,true)}${line('Agent',last.agent,true)}${line('Lifestyle',last.life,true,lf)}${line('Fines',last.fines,true)}${last.other?line('Other (events, deals)',last.other,last.other<0):''}</div>`:'<p class="empty">Your first weekly statement arrives after this week.</p>')}
-   ${W(`This season · ${S.year}/${String(S.year+1).slice(2)}`,`<div class="kv skv">${line('Wages',season.wage)}${line('Sponsors',season.spons)}${line('Match bonuses',season.bonus)}${line('Tax',season.tax,true)}${line('Agent',season.agent,true)}${line('Lifestyle',season.life,true)}${line('Fines',season.fines,true)}${line('Other',season.other,season.other<0)}</div>${L.some(r=>r.s===S.season&&r.est)?'<p class="note" style="margin-top:8px">Weeks before your last update are worked out from your contract and match bonuses.</p>':''}`)}
+   ${W('Last week',last?`<div class="kv skv">${line('Wages',last.wage)}${line('Sponsors',last.spons)}${line('Match bonuses',last.bonus)}${line('Tax',last.tax,true)}${line('Agent',last.agent,true)}${line('Lifestyle',last.life,true,lf)}${last.coach?line('Private coach',last.coach,true):''}${line('Fines',last.fines,true)}${last.other?line('Other (events, deals)',last.other,last.other<0):''}</div>`:'<p class="empty">Your first weekly statement arrives after this week.</p>')}
+   ${W(`This season · ${S.year}/${String(S.year+1).slice(2)}`,`<div class="kv skv">${line('Wages',season.wage)}${line('Sponsors',season.spons)}${line('Match bonuses',season.bonus)}${line('Tax',season.tax,true)}${line('Agent',season.agent,true)}${line('Lifestyle',season.life,true)}${season.coach?line('Private coach',season.coach,true):''}${line('Fines',season.fines,true)}${line('Other',season.other,season.other<0)}</div>${L.some(r=>r.s===S.season&&r.est)?'<p class="note" style="margin-top:8px">Weeks before your last update are worked out from your contract and match bonuses.</p>':''}`)}
    ${W('Contract money',m.contract&&m.club!=null?`<div class="kv skv">${line('Weekly wage',m.contract.wage)}${line('Appearance bonus',m.contract.appBonus||0)}${line('Goal bonus',m.contract.goalBonus||0)}${line('Assist bonus',m.contract.assistBonus||0)}<span>Years left</span><b>${m.contract.years}</b></div>`:'<p class="empty">No contract.</p>','contract:0')}</div>`; };
 VIEWS['fin:2']=()=>{ const m=S.me; const Lf=lifeGet(); const c=myClubObj(); const k=c?(COST_IDX[c.country]||1):1;
   const sec=(cat,title)=>{ const ok=lifeOpts(cat); return `<div class="lbl">${title}</div><div class="lfgrid">${ok.map(o=>`<button class="lfo ${Lf[cat]===o[0]?'on':''}" data-act="life" data-arg="${cat}:${o[0]}"><b>${esc(o[1])}</b><span>${o[2]?money(Math.round(o[2]*k))+'/wk':'Free'}</span><i>${esc(o[4])}</i></button>`).join('')}</div>`; };
@@ -6122,6 +6166,33 @@ VIEWS['career:5']=()=>{ const rows=h2hRows(); const k=H2HSORT; rows.sort((a,b)=>
 { const _rtt=renderTeamTalk; renderTeamTalk=function(){ const r=_rtt.apply(this,arguments); try{ const c=S.mctx; if(c&&!c.youth&&!c.intl&&c.oppCid!=null&&club(c.oppCid)){ const el=mv().querySelector('.mb'); if(el) el.insertAdjacentHTML('beforebegin',`<section class="mb h2h"><div class="lbl">Head-to-head</div><p style="margin:0">${h2hLine(c.oppCid)}</p></section>`); } }catch(e){} return r; }; }
 
 { const _sq0=VIEWS['squad:0']; VIEWS['squad:0']=()=>{ const m=S.me; let h=_sq0(); h=h.replace("<span class=\"pill r\">Transfer listed</span>",m.listed?'<span class="pill r">Transfer listed</span>':'<span class="pill r">Transfer request in</span>'); if(m.frozen&&m.frozen.until>=absWk()) h=h.replace('<div class="row" style="gap:6px">','<div class="row" style="gap:6px"><span class="pill r">Frozen out</span>'); if(m.mentor){ const p=P(m.mentor.pid); if(p) h=h.replace('<div class="row" style="gap:6px">',`<div class="row" style="gap:6px"><span class="pill b">Mentor: ${esc(p.n.split(' ').slice(-1)[0])}</span>`); } return h; }; }
+
+// ---------- v17: private coach market, bank ----------
+{ const t=SECTIONS.find(s=>s[0]==='training'); if(t&&!t[2].includes('Private coach')) t[2].push('Private coach'); const f=SECTIONS.find(s=>s[0]==='fin'); if(f&&!f[2].includes('Bank')) f[2].push('Bank'); }
+const coachStars=n=>`<span class="stars">${'★'.repeat(n)}<i>${'★'.repeat(5-n)}</i></span>`;
+VIEWS['training:3']=()=>{ const m=S.me; const c=m.coach; const mk=coachMkt();
+  const cur=c?W('Your private coach',`<div class="stack"><div class="row sb"><div><b style="font-size:16px">${esc(c.name)}</b><div class="note">${esc(PERSONAL[c.spec].name)} specialist</div></div>${coachStars(c.stars)}</div><div class="kv skv"><span>Per session</span><b>${money(c.fee)}</b><span>Sessions with him</span><b>${c.n||0}</b><span>Spent on coaching this season</span><b>${money(m.coachSpend||0)}</b><span>Gains per session</span><b>×${COACH_MULT[c.stars].toFixed(2)}${m.coachFocus!==c.spec?' (less outside his speciality)':''}</b></div><p class="note" style="margin:0">You only pay on days you book a "Private coach" session in your weekly plan.</p><button class="btn sec" data-act="coachFire">Let him go</button></div>`)
+    :W('Private coach',`<p class="note" style="margin:0">You don't have a coach. Hire one below, then add "Private coach" sessions to your weekly plan. You only pay for the sessions you book.</p>`);
+  const list=W('Available coaches',`<div class="stack"><p class="note" style="margin:0">Prices move with demand and the country you play in. New coaches come on the market every few weeks. The best ones only work with established players.</p>${mk.map(x=>{ const lock=m.rep<(COACH_REP[x.stars]||0); return `<div class="coachr"><div><b>${esc(x.name)}</b><span class="note">${esc(PERSONAL[x.spec].name)} · ×${COACH_MULT[x.stars].toFixed(2)} gains</span></div>${coachStars(x.stars)}<div class="cfee"><b>${money(x.fee)}</b><span class="note">a session</span></div><button class="btn${lock?' sec':''}" data-act="coachHire" data-arg="${x.id}" ${c?'disabled':''}>${lock?'Too big':'Hire'}</button></div>`; }).join('')}${c?'<p class="note" style="margin:0">Let your current coach go to hire someone else.</p>':''}</div>`);
+  return `<div class="dash c1">${cur}${list}</div>`; };
+ACT.coachHire=id=>{ const r=hireCoach(id); if(!r.ok) toast(r.txt); render(); };
+ACT.coachFire=()=>{ fireCoach(); render(); };
+let BAMT='';
+VIEWS['fin:3']=(()=>{ return ()=>{ const m=bk(); const c=myClubObj(); const tx=INT_TAX[c&&c.country]||0;
+  const L=(m.ledger||[]).slice(-10).reverse();
+  const top=W('Your bank',`<div class="stack"><div class="bkgrid"><div class="bkc"><span>Current account</span><b class="num ${m.bank<0?'c-lo':''}">${money(Math.round(m.bank))}</b><i>Wages in, bills, fines and spending out</i></div><div class="bkc"><span>Savings</span><b class="num">${money(Math.round(m.sav))}</b><i>${(SAV_RATE*100).toFixed(1)}% a year${tx?` · ${Math.round(tx*100)}% tax on interest`:''}</i></div>${m.fixed.length?`<div class="bkc"><span>Fixed term</span><b class="num">${money(m.fixed.reduce((s,f)=>s+f.amt,0))}</b><i>Locked away, higher rate</i></div>`:''}</div>
+    <div class="kv skv"><span>Net worth</span><b>${money(Math.round(netWorth()))}</b><span>Interest earned this season</span><b>${money(Math.round(m.intS||0))}</b></div>
+    ${m.bank<0?'<p class="note c-lo" style="margin:0">You\'re overdrawn. The bank charges about 12% a year on what you owe.</p>':''}</div>`);
+  const mv=W('Move money',`<div class="stack"><input class="bamt" type="number" inputmode="numeric" min="0" placeholder="Amount in €" value="${esc(BAMT)}" data-ch="bamt"><div class="chips">${[100,1000,10000].map(v=>`<button class="chip" data-act="bamtSet" data-arg="${v}">${money(v)}</button>`).join('')}<button class="chip" data-act="bamtSet" data-arg="halfcur">Half of current</button><button class="chip" data-act="bamtSet" data-arg="allsav">All savings</button></div><div class="row" style="gap:8px"><button class="btn" data-act="bmove" data-arg="save">To savings</button><button class="btn sec" data-act="bmove" data-arg="cur">To current</button></div>
+    <label class="tgl"><input type="checkbox" data-ch="autoCover" ${m.autoCover?'checked':''}> Cover overdrafts from savings automatically</label></div>`);
+  const fx=W('Fixed-term deposits',`<div class="stack"><p class="note" style="margin:0">Lock money away from your savings for a better rate. Break it early and you lose the interest.</p><div class="row" style="gap:8px"><button class="btn sec" data-act="bfix" data-arg="26">6 months · ${(FIXED[26]*100).toFixed(1)}%</button><button class="btn sec" data-act="bfix" data-arg="52">1 year · ${(FIXED[52]*100).toFixed(1)}%</button></div>${m.fixed.map((f,i)=>`<div class="row sb"><span>${money(f.amt)} at ${(f.rate*100).toFixed(1)}% · ${Math.max(0,f.until-absWk())} weeks left</span><button class="chip" data-act="bfixBreak" data-arg="${i}">Break</button></div>`).join('')}</div>`);
+  const st=W('Statement',L.length?`<div class="tscroll"><table class="ltab m-full"><thead><tr><th class="l">Week</th><th>In</th><th>Out</th><th>Saved</th><th>Interest</th><th>Balance</th></tr></thead><tbody>${L.map(r=>{ const inn=r.wage+r.spons+r.bonus+Math.max(0,r.other||0), out=r.tax+r.agent+r.life+(r.coach||0)+r.fines+Math.max(0,-(r.other||0)); return `<tr><td class="l">${absDateStr(r.s,r.w,6).split(' ').slice(1,3).join(' ')}</td><td class="c-hi">${money(Math.round(inn))}</td><td class="c-lo">−${money(Math.round(out))}</td><td>${r.sav?money(Math.round(r.sav)):'–'}</td><td>${r.int?money(r.int):'–'}</td><td><b>${r.bank!=null?money(Math.round(r.bank)):'–'}</b></td></tr>`; }).join('')}</tbody></table></div>`:'<p class="empty">Your first statement arrives after this week.</p>','fin:0','w-tbl');
+  return `<div class="dash c1">${top}${mv}${fx}${st}</div>`; }; })();
+document.addEventListener('change',e=>{ const el=e.target.closest('[data-ch]'); if(!el) return; const k=el.dataset.ch; if(k==='bamt'){ BAMT=el.value; e.stopImmediatePropagation(); } else if(k==='autoCover'){ bk().autoCover=el.checked; e.stopImmediatePropagation(); if(typeof saveSoon==='function') saveSoon(); } },true);
+ACT.bamtSet=v=>{ const m=bk(); BAMT=v==='halfcur'?String(Math.max(0,Math.floor(m.bank/2))):v==='allsav'?String(Math.floor(m.sav)):String(v); render(); };
+ACT.bmove=d=>{ const el=document.querySelector('.bamt'); const r=bankMove(d,el?el.value:BAMT); toast(r.txt); if(r.ok) BAMT=''; render(); };
+ACT.bfix=w=>{ const el=document.querySelector('.bamt'); const r=fixOpen(+w,el&&el.value?el.value:bk().sav); toast(r.txt); render(); };
+ACT.bfixBreak=i=>{ fixBreak(+i); render(); };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
