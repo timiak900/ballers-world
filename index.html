@@ -963,6 +963,15 @@ p.dl.narr{align-self:center;max-width:94%;margin:2px 0;font-style:italic;color:v
 .answers .ans.one{display:block;text-align:left}.answers .ans.one span{display:block;font-size:14.5px;line-height:1.4}
 .hero .ht .crest.flag,.hvs .crest.flag{width:76px;height:64px;font-size:58px;line-height:64px;display:grid;place-items:center}.mhead .crest.flag.lg,.scoreline .crest.flag{font-size:46px;width:58px;height:56px}
 .crest.flag .fl{font-size:inherit;line-height:1;font-style:normal}
+.nwtabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-bottom:4px;margin-bottom:8px;scrollbar-width:none}.nwtabs .chip{flex:none;white-space:nowrap}
+.nwlist{display:flex;flex-direction:column}.nwrow{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.nwrow:last-child{border-bottom:0}
+.nwrow b{display:block;font-size:14.5px;line-height:1.3}.nwrow p{margin:3px 0 4px;font-size:13.5px;line-height:1.45;color:var(--mute)}.nwc{display:grid;place-items:center;width:32px;height:34px}.nwc .crest{transform:scale(1.05)}.nwi i{width:20px;height:20px}
+.nwhero{background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(220,38,38,.12));border-color:rgba(96,165,250,.35)}.nwlead{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start}.nwlead .nwc{width:52px;height:56px}.nwlead .nwc .crest{transform:scale(1.6)}
+.nwlead h3{margin:6px 0 4px;font-size:21px;line-height:1.2;font-family:var(--cond);letter-spacing:.01em}.nwlead p{margin:0 0 6px;line-height:1.5}
+.tcday{margin:10px 0 2px;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mute)}.tcev{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.tcev p{margin:2px 0;font-size:13.5px;line-height:1.4}.tcev .big{font-family:var(--cond);font-weight:700;font-size:16px;white-space:nowrap}.tcev.trm{grid-template-columns:32px 1fr}.tcev.loan .big{color:var(--mute)}.tcic{display:grid;place-items:center}
+.rstage{display:flex;align-items:center;gap:4px;margin:6px 0}.rstage i{flex:1;max-width:34px;height:5px;border-radius:3px;background:var(--line)}.rstage i.on{background:var(--acc,#2563eb)}.rstage.cold i.on{background:#6b7280}.rstage span{margin-left:6px;font-size:12px;font-weight:700;color:var(--mute);white-space:nowrap}
+.rhist{display:flex;flex-direction:column;gap:4px;margin:6px 0;padding-left:10px;border-left:2px solid var(--line);font-size:13px;line-height:1.4}
 </style>
 
 <div class="app" id="app" hidden>
@@ -1938,7 +1947,7 @@ function agentObj(){ return S.me.agent==null?null:AGENCIES[S.me.agent]; }
 function gameDate(w,d){ const dt=new Date(Date.UTC(S.year,7,3)); dt.setUTCDate(dt.getUTCDate()+((w==null?S.week:w)-1)*7+(d==null?S.day:d)); return dt; }
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function fmtDate(dt,long){ return `${WD[dt.getUTCDay()]} ${dt.getUTCDate()} ${MON[dt.getUTCMonth()]}${long?' '+dt.getUTCFullYear():''}`; }
-function news(kind,title,body,quiet){ (S.news=S.news||[]).unshift({kind,title,body,read:kind==='world'||!!quiet,when:fmtDate(gameDate()),s:S.season}); if(S.news.length>240) S.news.length=240; }
+function news(kind,title,body,quiet){ (S.news=S.news||[]).unshift({kind,title,body,read:kind==='world'||!!quiet,when:fmtDate(gameDate()),s:S.season}); if(S.news.length>360) S.news.length=360; }
 function outlet(){ const c=myClubObj(); const cc=c&&c.country?c.country:'ENG'; return pick(COUNTRIES[cc].outlets); }
 function compName(key){ const [t,k]=key.split(':'); if(t==='U'&&S.youth&&S.youth.label===k) return S.youth.name; if(t==='L') return LMETA(k).name; if(t==='C') return S.cups&&S.cups[k]?S.cups[k].name:(k==='EFL'?'EFL Cup':COUNTRIES[k]?COUNTRIES[k].cup:k); if(t==='E') return EURO_NAME[k]; if(t==='U') return k==='U18'?'U18 Academy League':'U21 League'; if(t==='I') return k; return key; }
 
@@ -5122,6 +5131,59 @@ function lifeDetail(){ try{ const L=lifeGet(), c=myClubObj(); const k=c?(COST_ID
 // the statement shows each part of the lifestyle bill as its own line
 { const _fw36=financeWeek; financeWeek=function(){ const r=_fw36.apply(this,arguments); try{ const m=S.me, L=m&&m.tx; if(L){ for(let i=L.length-1;i>=0&&i>=L.length-80;i--){ const x=L[i]; if(x.l==='Lifestyle costs'&&x.s===S.season&&!x.split){ const items=lifeDetail(); if(items.length&&items.reduce((t,y)=>t+y.a,0)===-x.a){ let b=x.b-x.a; const rows=items.map(y=>{ b-=y.a; return {s:x.s,w:x.w,d:x.d,a:-y.a,l:y.l,b:Math.round(b),split:1}; }); rows[rows.length-1].b=x.b; L.splice(i,1,...rows); } break; } } } }catch(e){ console.warn('fw36',e); } return r; }; }
 
+// ===================== v37: news that knows who it's about, a transfer market that never sleeps =====================
+// ---------- tagging every story with the clubs, leagues and type it belongs to ----------
+let CLUB_RX=null, CLUB_BY=null;
+function clubRx(){ if(CLUB_RX&&CLUB_RX._n===S.clubs.length) return CLUB_RX; const names=S.clubs.filter(c=>c.name&&c.name.length>=4).map(c=>c.name).sort((a,b)=>b.length-a.length); CLUB_BY={}; S.clubs.forEach(c=>{ if(c.name&&CLUB_BY[c.name]==null) CLUB_BY[c.name]=c.id; });
+  const e2=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); CLUB_RX=new RegExp('(^|[^A-Za-zÀ-ÿ])('+names.map(e2).join('|')+')(?![A-Za-zÀ-ÿ])','g'); CLUB_RX._n=S.clubs.length; return CLUB_RX; }
+const NEWS_CAT=[['intl',/World Cup|European Championship|\bEuros?\b|Nations League|qualif|international|U-?17|U-?19|U-?21|Africa Cup|Copa América|national team|\bcaps?\b|Golden Ball|tournament/i],['tr',/\b(sign|signs|signed|joins|join|bid|bids|transfer|loan|loaned|fee|rumou?r|talks|medical|deal|pre-contract|release clause|here we go|window|swoop|target|deadline)\b/i],['mgr',/sacked|appoint|manager|head coach|interim|parted company/i],['inj',/injur|ruled out|\bout for\b|ligament|hamstring|surgery|knee/i],['off',/scandal|fined|banned|charged|arrest|party|controversy|takeover|protest|points deduction|VAR row/i],['race',/title|relegat|top four|champions|promot|unbeaten|winless|streak|Golden Boot/i]];
+function newsTag(n){ if(!n||n.nc) return n; const t=`${n.title||''} ${n.body||''}`; const rx=clubRx(); rx.lastIndex=0; const ids=[]; let mm; while((mm=rx.exec(t))&&ids.length<5){ const id=CLUB_BY[mm[2]]; if(id!=null&&!ids.includes(id)) ids.push(id); }
+  n.cl=ids; n.lg=[...new Set(ids.map(id=>club(id)&&club(id).league).filter(x=>x&&x!=='EUR'&&S.leagues[x]))]; n.nc=(NEWS_CAT.find(([k,r])=>r.test(n.title||''))||NEWS_CAT.find(([k,r])=>r.test(n.body||''))||['gen'])[0]; return n; }
+{ const _n37=news; news=function(kind,title,body,quiet){ const r=_n37.apply(this,arguments); try{ const n=S.news&&S.news[0]; if(n&&n.title===title&&n.w==null){ n.w=S.week; n.d=S.day||0; newsTag(n); } }catch(e){} return r; }; }
+function bigClubs(){ return S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&c.rep>=84).map(c=>c.id); }
+
+// ---------- rumours that develop week by week ----------
+const RSTAGE=['link','interest','talks','bid','agreed','medical','done'];
+const RSTAGE_NM={link:'Linked',interest:'Interest',talks:'Talks',bid:'Bid',agreed:'Fee agreed',medical:'Medical',done:'Done deal',cold:'Collapsed',pre:'Pre-contract'};
+function rHist(r,t){ (r.hist=r.hist||[]).push({s:S.season,w:S.week,d:ri(0,6),t}); r.w=S.week; r.s=S.season; if(r.hist.length>10) r.hist.shift(); }
+{ const _rf37=rumourFor; rumourFor=function(p,to,src){ const r=_rf37.apply(this,arguments); r.stg=Math.random()<.5?'link':'interest'; r.w0=S.week; r.fee0=r.fee0||roundFee(marketValue(p)*rnd(1,1.3)); rHist(r,r.txt); return r; }; }
+{ const _rd37=rumourDeal; rumourDeal=function(r){ if(!r||!r._go) return; return _rd37.apply(this,arguments); }; }
+function rumourAdvance(){ const inWin=windowOpen(); const winter=S.week>=WINDOW_WINTER[0]&&S.week<=WEEKS; const lastWk=S.week===WINDOW_SUMMER[1]||S.week===WINDOW_WINTER[1];
+  for(const r of (S.rumours||[])){ if(r.st!=='open'||r.me||r.s!==S.season) continue; const p=P(r.pid); const from=club(r.from), to=club(r.to); if(!p||!from||!to||p.c!==r.from){ continue; } const nm=p.n, sur=nm.split(' ').slice(-1)[0];
+    if(!r.stg) r.stg='interest'; if(!r.fee0) r.fee0=roundFee(marketValue(p)*(p.ct<=1?rnd(.5,.75):rnd(1,1.3)));
+    const cap=inWin?6:(p.ct<=1&&winter?4:2); const ix=RSTAGE.indexOf(r.stg); const p0=r.rel*(inWin?(lastWk?.8:.5):.22);
+    if(Math.random()<(1-r.rel)*.1+(ix>=3&&!inWin?.0:0)){ r.st='dead'; r.stg='cold'; rHist(r,pick([`Talks between ${to.name} and ${from.name} over ${nm} have broken down.`,`${to.name} have cooled their interest in ${nm}.`,`${from.name} say ${nm} is not for sale. ${to.name} move on.`,`${nm} has told ${to.name} he wants to stay at ${from.name}.`])); continue; }
+    if(ix>=cap||Math.random()>=p0) continue; let next=RSTAGE[ix+1];
+    if(next==='bid'){ if(Math.random()<.4&&!r.rej){ r.rej=1; rHist(r,`${from.name} reject a ${money(roundFee(r.fee0*.8))} bid from ${to.name} for ${nm}. They want closer to ${money(r.fee0)}.`); continue; } r.stg='bid'; rHist(r,`${to.name} submit ${r.rej?'an improved':'a'} ${money(r.fee0)} bid for ${nm}.`); continue; }
+    if(next==='agreed'&&!inWin&&p.ct<=1&&winter){ r.stg='pre'; r.pre=1; rHist(r,`${nm} has agreed a pre-contract with ${to.name}. He'll join on a free in the summer when his ${from.name} deal runs out.`); continue; }
+    if(next==='agreed'){ r.stg='agreed'; rHist(r,`Fee agreed: ${from.name} accept ${money(r.fee0)} for ${nm}. Personal terms next.`); continue; }
+    if(next==='medical'){ r.stg='medical'; rHist(r,pick([`${nm} is having his medical at ${to.name} today.`,`${nm} has been spotted at ${to.name}'s training ground for his medical.`])); continue; }
+    if(next==='done'){ r._go=1; const before=(S.transfers||[]).length; try{ rumourDeal(r); }catch(e){} r._go=0; if(r.st==='done'){ r.stg='done'; rHist(r,`Here we go: ${nm} to ${to.name} is done. ${money(r.fee||r.fee0)}.`); const t=S.transfers[0]; if(t&&(S.transfers||[]).length>before) t.d=r.hist[r.hist.length-1].d; } else { r.st='dead'; r.stg='cold'; rHist(r,`The ${nm} deal has collapsed at the last minute. ${to.name} couldn't agree terms.`); } continue; }
+    r.stg=next; rHist(r,next==='interest'?pick([`${to.name} have made enquiries about ${nm}.`,`${to.name} scouts were at ${from.name} again to watch ${sur}.`]):next==='talks'?pick([`${to.name} and ${from.name} are in talks over ${nm}. The fee is the sticking point.`,`Talks are under way between ${to.name} and ${nm}'s representatives.`]):r.txt); }
+  // pre-contracts complete at the start of the summer window
+  if(S.week===WINDOW_SUMMER[0]) for(const r of (S.rumours||[])){ if(!r.pre||r.preDone) continue; r.preDone=1; const p=P(r.pid), from=club(r.from), to=club(r.to); if(!p||!to||p.c!==r.from) continue; const back=to.squad.map(P).filter(x=>x&&grp(x.p)===grp(p.p)).sort((x,y)=>x.o-y.o)[0]; if(!back) continue;
+    from.squad=from.squad.filter(x=>x!==p.id); to.squad.push(p.id); p.c=to.id; p.sn=0; p.ct=ri(3,5); p.mv=S.season; to.squad=to.squad.filter(x=>x!==back.id); from.squad.push(back.id); back.c=from.id; back.mv=S.season;
+    (S.transfers=S.transfers||[]).unshift({s:S.season,w:S.week,d:0,n:p.n,pos:p.p,o:p.o,a:p.a,from:from.id,to:to.id,fee:0,main:1,free:1}); r.st='done'; r.stg='done'; rHist(r,`${p.n} officially joins ${to.name} on a free.`); news('world',`${p.n} completes free move to ${to.name}`,`His contract at ${from.name} has ended and the pre-contract he signed in the winter kicks in.`); } }
+// contract rebels and January-to-May pre-contract talk
+function contractStories(){ if(S.week<WINDOW_WINTER[0]||S.week>WEEKS) return; const cands=S.players.filter(p=>p.ct<=1&&p.o>=76&&p.a<=31&&club(p.c)&&club(p.c).league&&club(p.c).league!=='EUR'&&!(S.rumours||[]).some(r=>r.pid===p.id&&r.st==='open')); if(!cands.length||Math.random()>.45) return; const p=pick(cands), from=club(p.c);
+  const to=pick(S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&S.leagues[c.league]&&c.id!==from.id&&c.rep>=from.rep-4&&clubLevel(c)>=p.o-4)); if(!to) return; const src=pick(RUMOUR_SRC.slice(0,5));
+  const r={s:S.season,w:S.week,pid:p.id,n:p.n,pos:p.p,o:p.o,from:from.id,to:to.id,src:src[0],rel:src[1],txt:`${p.n} is out of contract at ${from.name} in the summer and has not signed a new deal. ${to.name} are monitoring the situation.`,st:'open',stg:'interest',w0:S.week,fee0:0}; rHist(r,r.txt); (S.rumours=S.rumours||[]).unshift(r);
+  if(p.o>=82) news('world',`${p.n} stalling on new ${from.name} deal`,`${src[0]}: talks over an extension have stalled and clubs across Europe are circling.`,true); }
+// winter loans: young players out for game time, back in the summer
+function winterLoans(){ if(!(S.week>=WINDOW_WINTER[0]&&S.week<=WINDOW_WINTER[1])) return; const myc=myClubId(); const n=ri(2,5);
+  for(let i=0;i<n;i++){ const big=pick(S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&c.rep>=72&&!(S.mode==='mgr'&&c.id===myc))); if(!big) continue; const kid=big.squad.map(P).filter(p=>p&&p.a<=21&&!p.loanFrom&&p.mv!==S.season&&!(S.me&&p.id===S.me.id)).sort((a,b)=>a.o-b.o)[0]; if(!kid) continue;
+    const dest=pick(S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&S.leagues[c.league]&&c.id!==big.id&&clubLevel(c)<=kid.o+3&&clubLevel(c)>=kid.o-8&&!(S.mode==='mgr'&&c.id===myc))); if(!dest) continue;
+    big.squad=big.squad.filter(x=>x!==kid.id); dest.squad.push(kid.id); kid.c=dest.id; kid.loanFrom=big.id; kid.mv=S.season;
+    (S.transfers=S.transfers||[]).unshift({s:S.season,w:S.week,d:ri(0,6),n:kid.n,pos:kid.p,o:kid.o,a:kid.a,from:big.id,to:dest.id,fee:0,main:1,loan:1}); if(S.me&&dest.id===myc) news('you',`${dest.name} sign ${kid.n} on loan`,`The ${kid.a}-year-old ${POS_NAME[kid.p].toLowerCase()} arrives from ${big.name} until the end of the season.`); } }
+{ const _ss37=startSeason; startSeason=function(){ try{ S.players.forEach(p=>{ if(p.loanFrom!=null){ const now=club(p.c), home=club(p.loanFrom); if(now&&home){ now.squad=now.squad.filter(x=>x!==p.id); home.squad.push(p.id); p.c=home.id; } p.loanFrom=null; } }); }catch(e){ console.warn('loans',e); } return _ss37.apply(this,arguments); }; }
+// dates on every deal, deadline day, and the weekly turn of the market
+{ const _wt37=worldTransfers; worldTransfers=function(){ const n0=(S.transfers||[]).length; const r=_wt37.apply(this,arguments); try{ const L=S.transfers||[]; const fresh=L.slice(0,Math.max(0,L.length-n0)); fresh.forEach(t=>{ if(t.d==null) t.d=ri(0,6); });
+    const dl=S.week===WINDOW_SUMMER[1]||S.week===WINDOW_WINTER[1]; if(dl&&fresh.length){ fresh.forEach(t=>t.dl=1); const top=fresh.filter(t=>t.fee>0).sort((a,b)=>b.fee-a.fee).slice(0,3); news('world',`Deadline day: ${fresh.length} deals done`,top.length?`The big ones: ${top.map(t=>`${t.n} to ${club(t.to).name} (${money(t.fee)})`).join(', ')}.`:'A frantic final day of the window.'); }
+    const winter=S.week>=WINDOW_WINTER[0]; if(winter){ fresh.filter(t=>t.fee>0&&club(t.to)&&club(t.to).league&&S.leagues[club(t.to).league]).forEach(t=>{ const c=club(t.to); const pos=leaguePos(c.id), n=S.leagues[c.league].clubs.length; if(pos>=n-2&&Math.random()<.5) news('world',`${c.name} splash out in the relegation fight`,`${t.n} arrives from ${club(t.from).name} for ${money(t.fee)} as ${c.name} try to beat the drop.`,true); }); } }catch(e){ console.warn('wt37',e); } return r; }; }
+{ const _mw37=marketWeek; marketWeek=function(){ const r=_mw37.apply(this,arguments); try{ if(S.mode!=='mgr'||true){ rumourAdvance(); contractStories(); winterLoans(); rumourSettle(); } }catch(e){ console.warn('mw37',e); } return r; }; }
+// the old death rule killed rumours eight weeks after they started; now it's eight weeks without news
+function tWhen(x){ try{ return absDateStr(x.s,x.w,x.d||0).replace(/ \d{4}$/,''); }catch(e){ return 'W'+x.w; } }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -7397,6 +7459,77 @@ VIEWS['fin:4']=(()=>{ const _f4=VIEWS['fin:4']; return ()=>{ const h=_f4(); try{
   const groups=[['home',`Home · ${nm('home')}`],['car',`Car · ${nm('car')}`],['spend',`Everyday spending · ${nm('spend')}`],['other','Other']].map(([k,t])=>{ const xs=items.filter(x=>x.cat===k); if(!xs.length) return ''; return `<div class="lbl" style="margin-top:6px">${esc(t)}</div><div class="kv">${xs.map(x=>`<span>${esc(x.l)}</span><b class="c-lo">${money(x.a)}</b>`).join('')}</div>`; }).join('');
   const card=W(`Your weekly lifestyle bill · ${money(tot)}`,items.length?`<div class="stack">${groups}<p class="note" style="margin:4px 0 0">Prices include the cost of living in ${esc((myClubObj()&&COUNTRIES[myClubObj().country]?COUNTRIES[myClubObj().country].name:'')||'your country')}. ${L.home==='family'?'Living at home means no rent or bills. ':''}Change any of it in Lifestyle.</p><button class="btn sec" data-act="go" data-arg="fin:2">Change lifestyle</button></div>`:'<p class="empty">Nothing. You live at home and spend nothing.</p>');
   return h.replace(/<section class="w[^"]*"><div class="wh"><span>Your weekly lifestyle bill<\/span>[\s\S]*?<\/section>/,card); }catch(e){ return h; } }; })();
+
+// ---------- v37 UI: the news hub and the transfer centre ----------
+let WNT='front', WNL=null, WNN=40;
+const CAT_NM={tr:['Transfers','b'],intl:['International','g'],mgr:['Managers','y'],inj:['Injuries','r'],off:['Off the pitch','r'],race:['Title & relegation','y'],gen:['News','']};
+function nwDate(n){ return n.w!=null?tWhen({s:n.s,w:n.w,d:n.d}):(n.when||''); }
+function nwCrest(n){ const id=(n.cl||[])[0]; return id!=null?`<span class="nwc">${tcrest(id)}</span>`:`<span class="nwc nwi"><i class="world"></i></span>`; }
+function nwCard(n,lead){ const c=CAT_NM[n.nc]||CAT_NM.gen; return lead?`<div class="nwlead">${nwCrest(n)}<div><span class="pill ${c[1]}">${c[0]}</span><h3>${esc(n.title)}</h3><p>${esc(n.body||'')}</p><span class="note">${esc(nwDate(n))}</span></div></div>`
+  :`<div class="nwrow">${nwCrest(n)}<div><b>${esc(n.title)}</b><p>${esc(n.body||'')}</p><span class="note"><span class="pill ${c[1]}">${c[0]}</span> ${esc(nwDate(n))}</span></div></div>`; }
+function nwAll(){ (S.news||[]).forEach(n=>{ if(!n.nc) try{ newsTag(n); }catch(e){} }); return S.news||[]; }
+function nwScore(n){ const big=bigClubs(); return ({tr:3,mgr:3,intl:2,off:2,race:2,inj:1,gen:0}[n.nc]||0)+((n.cl||[]).some(id=>big.includes(id))?2:0)+(/\b€?\d{2,3}(\.\d)?M\b|record|sacked|champions|win the/i.test(n.title)?2:0); }
+function myClubFeed(){ const cid=myClubId(); if(cid==null) return []; const out=[]; const T=(S.transfers||[]).filter(t=>(t.to===cid||t.from===cid)&&t.s>=S.season-1).slice(0,30);
+  T.forEach(t=>out.push({s:t.s,w:t.w,d:t.d||0,nc:'tr',cl:[t.to===cid?t.from:t.to],title:t.to===cid?`${t.loan?'On loan: ':'Signed: '}${t.n}`:`${t.loan?'Loaned out: ':'Sold: '}${t.n}`,body:`${t.pos}, ${t.a||'?'}, ${t.o} OVR · ${t.to===cid?'from '+cname(t.from):'to '+cname(t.to)} · ${t.loan?'loan':t.fee?money(t.fee):'free transfer'}`}));
+  nwAll().filter(n=>(n.cl||[]).includes(cid)&&n.kind==='world').forEach(n=>out.push(n));
+  (S.rumours||[]).filter(r=>r.st==='open'&&(r.to===cid||r.from===cid)&&!r.me).slice(0,8).forEach(r=>out.push({s:r.s,w:r.w,d:(r.hist&&r.hist.length?r.hist[r.hist.length-1].d:0),nc:'tr',cl:[r.to===cid?r.from:r.to],title:`${r.to===cid?'Target':'Wanted'}: ${r.n}`,body:`${(r.hist&&r.hist.length?r.hist[r.hist.length-1].t:r.txt)} (${r.src})`}));
+  const key=x=>x.w==null?-1:(x.s*100+x.w)*10+(x.d||0); return out.map((x,i)=>({x,i})).sort((a,b)=>(key(b.x)-key(a.x))||(a.i-b.i)).map(z=>z.x); }
+VIEWS['world:0']=()=>{ const m=S.me; const all=nwAll(); const world=all.filter(n=>n.kind==='world'); const cid=myClubId(); const myL=cid!=null?club(cid).league:null; const big=bigClubs();
+  const tabs=[['front','Front page'],['breaking','Breaking'],['club','My club'],['league','My league'],['big','Big clubs'],['leagues','Leagues'],['intl','International'],['tr','Transfers']].filter(([k])=>!(k==='club'&&cid==null)&&!(k==='league'&&!myL));
+  const seg=`<div class="seg nwtabs">${tabs.map(([k,l])=>`<button class="chip" aria-pressed="${WNT===k}" data-act="wnt" data-arg="${k}">${l}</button>`).join('')}</div>`;
+  const list=(xs,empty)=>xs.length?`<div class="nwlist">${xs.slice(0,WNN).map(n=>nwCard(n)).join('')}</div>${xs.length>WNN?'<button class="chip" data-act="wnmore">More stories</button>':''}`:`<p class="empty">${empty}</p>`;
+  let body='';
+  if(WNT==='front'){ const recent=world.slice(0,60); const lead=recent.slice().sort((a,b)=>nwScore(b)-nwScore(a)||0)[0]; const rest=recent.filter(n=>n!==lead);
+    const byCat=k=>rest.filter(n=>n.nc===k).slice(0,3); const blocks=[['tr','Transfer talk'],['race','Title races'],['mgr','Dugouts'],['off','Off the pitch'],['intl','International'],['inj','Treatment room']].map(([k,t])=>{ const xs=byCat(k); return xs.length?W(t,`<div class="nwlist">${xs.map(n=>nwCard(n)).join('')}</div>`):''; }).join('');
+    body=(lead?`<section class="w nwhero"><div class="wb">${nwCard(lead,true)}</div></section>`:'')+(blocks||W('Latest',list(rest,'Quiet so far.')))+(cid!=null?W('At your club',list(myClubFeed().slice(0,4),'Nothing new at the club.'),'world:0'):''); }
+  else if(WNT==='breaking') body=W('Breaking news',list(world,'Quiet so far.'));
+  else if(WNT==='club') body=W(`${esc(club(cid).name)}`,list(myClubFeed(),'Nothing new at the club yet. Signings, departures, injuries and boardroom news show up here.'));
+  else if(WNT==='league') body=W(esc(LMETA(myL).name),list(world.filter(n=>(n.lg||[]).includes(myL)),'Nothing from your league yet.'));
+  else if(WNT==='big') body=W('Europe\'s big clubs',list(world.filter(n=>(n.cl||[]).some(id=>big.includes(id))),'Nothing yet.'));
+  else if(WNT==='intl') body=W('International',list(all.filter(n=>n.nc==='intl'),'No international news yet.'));
+  else if(WNT==='tr') body=W('Transfer news',list(world.filter(n=>n.nc==='tr'),'No transfer news yet.'));
+  else { const lgs=LEAGUES.filter(l=>S.leagues[l.id]&&l.tier<=2).sort((a,b)=>a.c.localeCompare(b.c)||a.tier-b.tier); const sel=WNL&&lgs.some(l=>l.id===WNL)?WNL:(myL||lgs[0].id); WNL=sel;
+    body=`<div class="seg nwtabs">${lgs.map(l=>`<button class="chip" aria-pressed="${sel===l.id}" data-act="wnl" data-arg="${l.id}">${flagOf(l.c)||''} ${esc(l.name)}</button>`).join('')}</div>`+W(esc(LMETA(sel).name),list(world.filter(n=>(n.lg||[]).includes(sel)),'Nothing from this league yet.')); }
+  return `<div class="dash c1">${seg}${body}</div>`; };
+Object.assign(ACT,{ wnt:k=>{ WNT=k; WNN=40; render(); }, wnl:k=>{ WNL=k; WNN=40; render(); }, wnmore:()=>{ WNN+=40; render(); } });
+
+// ---------- the transfer centre ----------
+TCV='latest';
+function tcWhenD(t){ return `${tWhen(t)}${t.s!==S.season?` ${S.year-(S.season-t.s)}`:''}`; }
+tcWhen=function(t){ return tcWhenD(t); };
+function rumStage(r){ const order=['link','interest','talks','bid','agreed','medical','done']; const st=r.stg==='pre'?'agreed':r.stg==='cold'?null:(r.stg||'interest'); const ix=order.indexOf(st);
+  return `<div class="rstage${r.stg==='cold'?' cold':''}">${order.map((s,i)=>`<i class="${i<=ix?'on':''}" title="${RSTAGE_NM[s]}"></i>`).join('')}<span>${esc(RSTAGE_NM[r.stg||'interest']||'')}</span></div>`; }
+let TCF='all', TCL='all', TCX={};
+{ const _tc21=VIEWS['transfers:1']; VIEWS['transfers:1']=()=>{ const mgr=S.mode==='mgr'; const cid=myClubId();
+  const modes=[['latest','Latest'],['rum','Rumours'],['club','My club'],['top','Top deals'],['list','Transfer list'],['all','All moves']].filter(([k])=>!(k==='club'&&cid==null));
+  const tabs=`<div class="seg">${modes.map(([k,n])=>`<button class="chip" aria-pressed="${TCV===k}" data-act="tcv" data-arg="${k}">${n}</button>`).join('')}</div>`;
+  if(TCV==='top'||TCV==='list'){ const h=_tc21(); return h.replace(/<div class="seg">[\s\S]*?<\/div>/,tabs); }
+  const winter=S.week>=WINDOW_WINTER[0]&&S.week<=WEEKS; const open=windowOpen(); const nextOpen=S.week<WINDOW_SUMMER[0]?WINDOW_SUMMER[0]:S.week<WINDOW_WINTER[0]?WINDOW_WINTER[0]:null;
+  const state=W(open?(winter?'January window: open':'Summer window: open'):'Window closed',`<p class="note" style="margin:0">${open?(winter?`Closes ${tWhen({s:S.season,w:WINDOW_WINTER[1],d:6})}. January is about loans, short-term fixes and clubs fighting relegation paying over the odds.`:`Closes ${tWhen({s:S.season,w:WINDOW_SUMMER[1],d:6})}. Summer is when the big money moves: record fees, release clauses and squad rebuilds.`):`${nextOpen?`The ${nextOpen===WINDOW_WINTER[0]?'January':'summer'} window opens ${tWhen({s:S.season,w:nextOpen,d:0})}. `:''}No deals can be registered, but the talk never stops: interest, talks and, from January, players running down their contracts agreeing pre-contracts.`}</p>`);
+  const lgOpts=`<select data-ch="tcl" aria-label="League">${[['all','All leagues']].concat(LEAGUES.filter(l=>S.leagues[l.id]).map(l=>[l.id,l.name])).map(([k,l])=>`<option value="${k}" ${TCL===k?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+  const inLg=t=>TCL==='all'||[t.from,t.to].some(id=>club(id)&&club(id).league===TCL);
+  let body='';
+  if(TCV==='latest'){ const ev=[]; (S.transfers||[]).filter(t=>t.s===S.season&&inLg(t)).slice(0,120).forEach(t=>ev.push({s:t.s,w:t.w,d:t.d||0,k:t.loan?'loan':'deal',t})); (S.rumours||[]).filter(r=>r.s===S.season&&inLg(r)).forEach(r=>(r.hist||[]).forEach(h=>ev.push({s:h.s,w:h.w,d:h.d,k:'rum',r,h})));
+    const f=ev.filter(e=>TCF==='all'||(TCF==='deal'&&e.k==='deal')||(TCF==='loan'&&e.k==='loan')||(TCF==='rum'&&e.k==='rum')).sort((a,b)=>(b.w-a.w)||(b.d-a.d)).slice(0,80);
+    const chips=`<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:6px">${[['all','Everything'],['deal','Done deals'],['loan','Loans'],['rum','Rumour updates']].map(([k,l])=>`<button class="chip" aria-pressed="${TCF===k}" data-act="tcf" data-arg="${k}">${l}</button>`).join('')}${lgOpts}</div>`;
+    let last=null; const rows=f.map(e=>{ const day=tWhen(e); const hd=day!==last?`<div class="tcday">${esc(day)}</div>`:''; last=day;
+      if(e.k==='rum') return hd+`<div class="tcev trm"><span class="tcic">${tcrest(e.r.to)}</span><div><b>${esc(e.r.n)}</b> <span class="note">${esc(e.r.pos)} · ${e.r.o} · ${esc(cname(e.r.from))}</span><p>${esc(e.h.t)}</p><span class="note">${esc(e.r.src)}</span></div></div>`;
+      const t=e.t; return hd+`<div class="tcev ${t.loan?'loan':'deal'}"><span class="tcic">${tcrest(t.to)}</span><div><b>${esc(t.n)}</b> <span class="note">${esc(t.pos)} · ${t.a||''} · ${t.o} OVR</span><p>${esc(cname(t.from))} → <b>${esc(cname(t.to))}</b>${t.dl?' · deadline day':''}</p></div><span class="big">${t.loan?'Loan':t.fee?money(t.fee):'Free'}</span></div>`; }).join('');
+    body=state+W('The market, day by day',chips+(rows||'<p class="empty">Nothing yet. Stories build up through the season.</p>')); }
+  else if(TCV==='rum'){ const rel=r=>r>=.75?['Very reliable','g']:r>=.55?['Reliable','b']:r>=.3?['Speculative','y']:['Gossip','r'];
+    const rs=(S.rumours||[]).filter(r=>r.s===S.season&&inLg(r)).sort((a,b)=>(a.st==='open'?0:1)-(b.st==='open'?0:1)||RSTAGE.indexOf(b.stg)-RSTAGE.indexOf(a.stg)||b.w-a.w).slice(0,50);
+    body=state+W('Rumour tracker',`<div class="row" style="margin-bottom:6px">${lgOpts}</div>`+(rs.length?`<div class="stack">${rs.map((r,i)=>{ const [rl,rc]=rel(r.rel); const H=r.hist||[]; const open=TCX[r.pid+':'+r.to]; const lastH=H.length?H[H.length-1].t:r.txt;
+      return `<div class="rum${r.me?' me':''}"${mgr&&r.pid>=0?` data-act="mPl" data-arg="${r.pid}"`:''}><div class="row sb"><b>${esc(r.n)} <span class="note">${r.pos} · ${r.o} OVR</span></b><span class="pill ${rc}">${rl}</span></div><p class="note" style="margin:2px 0">${esc(cname(r.from))} → <b style="color:var(--text)">${esc(cname(r.to))}</b>${r.fee0?` · around ${money(r.fee0)}`:''}</p>${rumStage(r)}<p style="margin:4px 0">${esc(lastH)}</p>
+       ${H.length>1?`<button class="chip" data-act="tcx" data-arg="${r.pid}:${r.to}">${open?'Hide the story so far':`The story so far (${H.length})`}</button>${open?`<div class="rhist">${H.map(h=>`<div><span class="note">${esc(tWhen(h))}</span> ${esc(h.t)}</div>`).join('')}</div>`:''}`:''}<span class="note">${esc(r.src)} · updated ${esc(tWhen({s:r.s,w:r.w,d:H.length?H[H.length-1].d:0}))}</span></div>`; }).join('')}</div>`:'<p class="empty">No whispers yet.</p>')); }
+  else if(TCV==='club'){ const ins=(S.transfers||[]).filter(t=>t.to===cid&&t.s===S.season), outs=(S.transfers||[]).filter(t=>t.from===cid&&t.s===S.season); const spent=ins.reduce((s,t)=>s+(t.fee||0),0), got=outs.reduce((s,t)=>s+(t.fee||0),0);
+    const row=(t,inn)=>`<tr><td class="l" style="white-space:nowrap">${esc(tcWhenD(t))}</td><td class="l t">${esc(t.n)}</td><td class="l">${t.pos}</td><td>${t.o}</td><td class="l t">${esc(cname(inn?t.from:t.to))}</td><td>${t.loan?'Loan':t.fee?money(t.fee):'Free'}</td></tr>`;
+    const tbl=(xs,inn)=>xs.length?`<table><thead><tr><th class="l">Date</th><th class="l">Player</th><th class="l">Pos</th><th>OVR</th><th class="l">${inn?'From':'To'}</th><th>Fee</th></tr></thead><tbody>${xs.map(t=>row(t,inn)).join('')}</tbody></table>`:'<p class="empty">None yet.</p>';
+    const rum=(S.rumours||[]).filter(r=>r.st==='open'&&(r.to===cid||r.from===cid)&&r.s===S.season);
+    body=W(`${esc(club(cid).name)} this season`,`<div class="kv"><span>Signed</span><b>${ins.length}</b><span>Spent</span><b class="c-lo">${money(spent)}</b><span>Sold</span><b>${outs.length}</b><span>Received</span><b class="c-hi">${money(got)}</b><span>Net spend</span><b>${money(spent-got)}</b></div>`)+W('Ins',tbl(ins,true),null,'w-tbl')+W('Outs',tbl(outs,false),null,'w-tbl')+W('Linked',rum.length?`<div class="stack">${rum.map(r=>`<div class="rum"><b>${esc(r.n)}</b> <span class="note">${r.to===cid?'to us from '+esc(cname(r.from)):'from us to '+esc(cname(r.to))}</span>${rumStage(r)}<span class="note">${esc(r.src)}</span></div>`).join('')}</div>`:'<p class="empty">No links right now.</p>'); }
+  else { const tr=(S.transfers||[]).filter(inLg).slice(0,120); body=W('All moves',`<div class="row" style="margin-bottom:6px">${lgOpts}</div>`+(tr.length?`<table><thead><tr><th class="l">Date</th><th class="l">Player</th><th class="l">Pos</th><th>OVR</th><th class="l">From</th><th class="l">To</th><th>Fee</th></tr></thead><tbody>${tr.map(t=>`<tr><td class="l" style="white-space:nowrap">${esc(tcWhenD(t))}</td><td class="l t">${esc(t.n)}</td><td class="l">${t.pos}</td><td>${t.o}</td><td class="l t">${esc(cname(t.from))}</td><td class="l t">${esc(cname(t.to))}</td><td>${t.loan?'Loan':t.fee?money(t.fee):'Free'}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">No deals yet.</p>'),null,'w-tbl'); }
+  return `<div class="dash c1">${tabs}${body}</div>`; }; }
+Object.assign(ACT,{ tcf:k=>{ TCF=k; render(); }, tcx:k=>{ TCX[k]=!TCX[k]; render(); } });
+document.addEventListener('change',e=>{ const el=e.target.closest&&e.target.closest('[data-ch]'); if(!el||el.dataset.ch!=='tcl') return; TCL=el.value; e.stopImmediatePropagation(); render(); },true);
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
