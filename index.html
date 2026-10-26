@@ -944,6 +944,7 @@ tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .pens{display:flex;flex-wrap:wrap;gap:6px}.sorow{display:flex;align-items:center;gap:6px;font-size:13px;margin-top:4px}.sorow span{min-width:110px;color:var(--mute)}.sorow i{font-style:normal;font-size:14px}.sorow i.ok{color:var(--pos)}.sorow i.no{color:var(--neg)}
 .trophy{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(232,185,49,.18),rgba(232,185,49,.04));border:1px solid rgba(232,185,49,.4);text-align:center;font-size:15px}.trophy span{font-size:12px;color:var(--mute)}
 .mdrep{padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}.ev.var b{color:var(--warn)}
+.spr{padding:6px 0;border-bottom:1px solid var(--line);gap:8px}.spr:last-of-type{border-bottom:0}
 </style>
 
 <div class="app" id="app" hidden>
@@ -4508,6 +4509,81 @@ function papersLater(c,L){ const sim=c.sim; const side=sim.meSide; if(!side) ret
   if(typeof evLater==='function') evLater(1,'papers',{title,body}); }
 { const _ed30=evDue; evDue=function(){ const m=S.me; if(m&&m.evLater&&m.evLater.length){ const now=evDayAbs(); const due=m.evLater.filter(x=>x.at<=now&&x.key==='papers'); if(due.length){ m.evLater=m.evLater.filter(x=>!due.includes(x)); due.forEach(d=>news('you',d.data.title,d.data.body,true)); } } return _ed30.apply(this,arguments); }; }
 
+// ---------- v18b: off-the-ball decisions, set-piece takers, the mixed zone ----------
+const FOLLOW3={near:{t:'{mate}\'s cross is coming to the near post, exactly where you are.',o:[['Flick it in','fin',60,'g','Precision Header'],['Glance it across goal','hea',62,'g','Precision Header'],['Lay it back for the runner','sho',55,'a']]},
+ back:{t:'The cross sails over everyone to the back post. It\'s yours.',o:[['Head it back across goal','hea',63,'g','Aerial'],['Volley it','vol',67,'g','Acrobatic'],['Nod it down for {mate}','hea',56,'a']]},
+ edge:{t:'It\'s cut back to you on the edge of the box.',o:[['Curl it','cur',64,'g','Finesse Shot'],['Drive it low','fin',62,'g','Low Driven Shot'],['Slip in {mate}','vis',57,'a']]},
+ high:{t:'You win it high up the pitch. Their back line is scrambling.',o:[['Shoot early','fin',62,'g'],['Run at the last man','dri',63,'c','Rapid',{next:'oneOnOne'}],['Square it to {mate}','sho',56,'a']]},
+ cross:{t:'You\'re free on the overlap with time to pick your cross.',o:[['Whip it to the near post','cro',60,'a','Whipped Pass'],['Cut it back','sho',57,'a'],['Go for goal from the angle','fin',70,'g']]}};
+function followFor(k){ return FOLLOW3[k]||(k==='behind'?FOLLOW.oneOnOne:k==='break'?FOLLOW2.counter:FOLLOW[k])||null; }
+// off-the-ball moments: where you run, when you press, who you track
+if(typeof MOM3!=='undefined'){ const O=(l,a,d,X,tr)=>[l,a,d,'o',tr||null,X];
+ MOM3.ATT.push(
+  {t:'{mate} gets down the line and looks up. Where do you go?',o:[O('Attack the near post','pos',60,{next:'near',fail:'The cross goes behind you, to the back post. Nobody there.'}),O('Hang at the back post','pos',62,{next:'back',fail:'It\'s cut out at the near post. Wrong guess.'}),O('Pull back to the edge of the box','pos',58,{next:'edge',fail:'The ball never reaches you.'})]},
+  {t:'{def} has the ball at the back. Gamble on the run in behind, or check short?',o:[O('Gamble on the run in behind','acc',64,{next:'behind',fail:'Flag up. Offside by a yard.'},'Rapid'),O('Stay level and check short','pos',56,{next:'edge',fail:'The pass goes elsewhere.'}),O('Press him on his first touch','sta',60,{next:'high',fail:'He plays round you calmly.'},'Press Proven')]},
+  {t:'{min}\'. You\'re ahead. Stay up as an outlet, or drop back and help?',w:x=>x.diff>0&&x.min>=78,o:[O('Stay up top','pos',60,{next:'break',fail:'The ball never comes up to you. They pile on the pressure.'}),O('Drop back and defend','def',56,{risk:true,ok:'You head one clear in your own box. Huge.',fail:'You\'re caught out of position in your own box.'})]});
+ MOM3.MID.push(
+  {t:'{opp} are playing out from the back. Press their centre-back, or hold your shape?',o:[O('Press now','sta',60,{next:'high',risk:true,fail:'He plays round you. There\'s a gap behind you.'},'Press Proven'),O('Hold your shape','pos',55,{ok:'They go long. Your shape holds.',fail:'They find a way through anyway.',safe:true}),O('Screen the pass into midfield','int',60,{next:'break',fail:'The pass goes round you.'},'Intercept')]},
+  {t:'{mate} has it in midfield. A third-man run beyond the striker is on.',o:[O('Burst beyond the striker','acc',62,{next:'behind',fail:'The pass is a fraction too late.'}),O('Offer short for the one-two','pos',56,{next:'edge',fail:'He goes the other way.'}),O('Stay back and cover','pos',50,{ok:'Sensible. You keep things tight.',safe:true})]});
+ MOM3.DEF.push(
+  {t:'Their winger {st} drifts inside. Follow him, or pass him on?',o:[O('Follow him','pos',60,{risk:true,ok:'You stick to him. Nothing doing.',fail:'He loses you. He\'s free in the box.'}),O('Pass him on to the midfielder','com',58,{risk:true,ok:'Clean handover. He\'s picked up.',fail:'Nobody picks him up.'}),O('Hold your position','pos',56,{risk:true,ok:'He runs into a crowd and loses it.',fail:'He finds the gap you left.'})]},
+  {t:'{min}\'. They\'re chasing it and throwing bodies forward. Hold the line, or drop deep?',w:x=>x.diff>0&&x.min>=75,o:[O('Hold a high line','pos',62,{risk:true,ok:'Their runner is caught offside again.',fail:'One ball over the top and he\'s through.'}),O('Drop deep and protect the box','def',58,{risk:true,ok:'You head everything away.',fail:'They win a second ball at the edge of the box.'}),O('Step up to win the second ball','int',62,{next:'break',fail:'You miss it and they\'re in.'})]},
+  {t:'Their full-back pushes on. Bomb forward on the overlap, or stay home?',w:x=>['LB','RB'].includes(S.me.pos),o:[O('Overlap','acc',60,{next:'cross',fail:'The pass never comes, and you\'re a long way from home.'}),O('Stay home','pos',54,{ok:'You keep their winger quiet.',safe:true})]}); }
+// set-piece takers at your club
+const SP_POS={pen:{ST:4,CF:4,CAM:3,LW:2,RW:2,CM:1},fk:{CAM:4,LW:3,RW:3,CM:2,LB:1,RB:1},crn:{LW:3,RW:3,CM:3,CAM:3,LB:2,RB:2}};
+const SP_ATTR={pen:'pen',fk:'fk',crn:'cro'}, SP_NAME={pen:'Penalties',fk:'Direct free kicks',crn:'Corners'};
+function spBest(type){ const c=myClubObj(); if(!c) return null; let b=null,bs=-1; for(const id of c.squad){ const p=P(id); if(!p||pInj&&pInj(p)) continue; const s=p.o+(SP_POS[type][p.p]||0)+(c.cap===id?2:0); if(s>bs){ bs=s; b=p; } } return b?{p:b,s:bs}:null; }
+function spMine(type){ const m=S.me; return m.attrs[SP_ATTR[type]]*.6+ovr()*.4+({'Team leader':3,'Highly influential':1,Newcomer:-3}[m.status]||0); }
+function spTakers(){ const m=S.me, c=myClubObj(); if(!c) return null; const k=m.spk; if(k&&k.club===c.id&&k.s===S.season) return k; const out={club:c.id,s:S.season};
+  for(const t of ['pen','fk','crn']){ const b=spBest(t); out[t]=b&&b.s>spMine(t)?b.p.id:'me'; if(k&&k.club===c.id&&k[t]==='me'&&(!b||spMine(t)>=b.s-3)) out[t]='me'; } m.spk=out; return out; }
+function spTakerName(t){ const k=spTakers(); if(!k) return '—'; return k[t]==='me'?'You':(P(k[t])||{n:'—'}).n; }
+function spAsk(t){ const m=S.me, k=spTakers(); if(!k||k[t]==='me') return {title:'Already yours',txt:'You\'re already on them.',fx:[]}; const now=absWk(); if((m.spAskCd||0)>now) return {title:'Not again yet',txt:'You asked recently. Show him in training first.',fx:[]};
+  m.spAskCd=now+6; const b=spBest(t), mine=spMine(t); const prev=P(k[t]); const lead=['Team leader','Highly influential'].includes(m.status)||m.rel.manager>=60; const ok=mine>=b.s+3||(mine>=b.s-1&&lead);
+  const mg=(myClubObj().mgr||'The manager').split(' ').slice(-1)[0]; const fx=[];
+  if(ok){ k[t]='me'; if(prev){ const big=myClubObj().cap===prev.id||prev.sn>=4; fx.push([prev.n,setRel(prev.id,big?-5:-3)]); if(big) fx.push(...evApply({mates:-1})); } return {title:`${SP_NAME[t]} are yours`,txt:`${mg}: "Fine. You've earned it. Don't make me regret it."${prev?` ${prev.n.split(' ')[0]} doesn't look thrilled.`:''}`,fx}; }
+  fx.push(...evApply({manager:-1})); return {title:'Not yet',txt:`${mg}: "${prev?prev.n.split(' ')[0]+' takes them':'We have a taker'}, and he's earned that. Keep practising."`,fx}; }
+// extra set-piece moments when you're the taker
+function spMoment(type){ if(type==='pen'){ const m=penChain(); return m; } if(type==='fk'){ const n=ri(18,30), d=Math.round(60+(n-18)*.8); return {id:'fk',t:`Free kick, ${n} yards out. It's yours to take.`,o:[['Curl it over the wall','fk',d,'g','Dead Ball'],['Power it at goal','pow',d+2,'g','Power Shot'],['Float it to the back post','cro',58,'a','Whipped Pass']]}; }
+  return {id:'crn',t:'Corner. You\'re over the ball, with {stM} and {mate} in the box.',o:[['Inswinger to the near post','cro',60,'a','Whipped Pass'],['Float it to the back post','cro',58,'a'],['Short corner and work it','sho',50,'k']]}; }
+{ const _smd31=setupMatchDay; setupMatchDay=function(){ const r=_smd31.apply(this,arguments); try{ const c=S.mctx; if(!c||!c.sim||!c.sim.meSide||c.youth||c.intl) return r; const k=spTakers(); if(!k) return r; c.spk={...k}; const mine=['pen','fk','crn'].filter(t=>k[t]==='me'); if(!mine.length||Math.random()>.45) return r;
+  const type=Math.random()<.12&&mine.includes('pen')?'pen':pick(mine.filter(t=>t!=='pen').length?mine.filter(t=>t!=='pen'):mine); const sim=c.sim; const start=sim.meOn?sim.meOn+sim.st1+1:8; const ts=sim.events.filter(e=>e.type==='moment').map(e=>e.t); let t,g=0; do{ t=rnd(start,sim.T-3); g++; }while(ts.some(u=>Math.abs(u-t)<5)&&g<25); if(g>=25) return r;
+  const hm=tToHalfMin(t,sim); sim.events.push({t,half:hm.half,min:hm.min,type:'moment',mo:spMoment(type),mi:30,chain:true,sp:type}); sim.events.sort((a,b)=>a.t-b.t||(a.type==='ko'?-1:0)); }catch(e){ console.warn('sp',e); } return r; }; }
+// penalties: the designated taker might not be you
+{ const _pc31=penChain; penChain=function(){ const mo=_pc31.apply(this,arguments); mo.id='pen'; try{ const c=S.mctx; const k=c&&(c.spk||(!c.youth&&!c.intl?spTakers():null)); if(k&&k.pen!=='me'){ const tk=P(k.pen); if(tk){ mo.t+=` ${tk.n.split(' ')[0]} is the designated taker.`; mo.o.unshift([`Give it to ${tk.n.split(' ')[0]}`,'com',0,'n']); } } }catch(e){} return mo; }; }
+// the momentPick wrapper for off-ball choices and set-piece consequences
+{ const _mp31=momentPick; momentPick=function(ix,ev){ if(typeof dressMoment==='function') dressMoment(ev); const c=S.mctx, sim=c.sim, M=ev.mo; let i=ix; if(i==null||i==='auto'){ let bi=0,bv=-1; M.o.forEach((o,j)=>{ const ch=momentChance(o); if(ch!=null&&ch>bv){ bv=ch; bi=j; } }); i=bi; } i=+i; const o=M.o[i]||M.o[0];
+  if(o&&o[3]==='o'){ const X=o[5]||{}; const side=sim.meSide, other=side==='h'?'a':'h'; const p=momentChance(o); const ok=Math.random()<p; const res={txt:'',kind:null};
+    if(ok){ c.keyOk++; c.conf=Math.min(3,(c.conf||0)+.2); if(c.duel) c.duel.won++; res.txt=X.ok||pick(['You read it perfectly.','Good decision.','Exactly the right call.']); const nx=X.next&&followFor(X.next); if(nx){ res.txt=X.ok||pick(['You read it perfectly.','Right place, right time.']); insertChain(ev,nx); } }
+    else { c.conf=Math.max(-3,(c.conf||0)-.2); if(c.duel) c.duel.lost++; res.txt=X.fail||'Nothing comes of it.'; if(X.risk&&Math.random()<.32){ c.keyFail++; const sc=scorerName(other); sim.events.push({t:ev.t+.01,half:ev.half,min:ev.min,type:'goal',side:other,who:sc,ast:null,fromMoment:true}); sim.events.sort((a,b)=>a.t-b.t); res.txt+=` ${sc} scores.`; res.kind='conceded'; } }
+    ev.done=true; ev.choice=o[0]; ev.result=res.txt; c.momentLog=(c.momentLog||[]).concat({min:dispMin(ev),choice:o[0],txt:res.txt}); return res; }
+  const res=_mp31.call(this,i,ev);
+  try{ const m=S.me; m.spSt=m.spSt||{pt:0,ps:0,fkg:0}; const k=c.spk; const o2=(M.o||[]).find(z=>z[0]===ev.choice);
+    if(M.id==='pen'&&o2&&o2[3]==='g'){ m.spSt.pt++; if(res.kind==='goal') m.spSt.ps++; else c.penMissed=true; if(k&&k.pen!=='me'){ const tk=P(k.pen); if(tk){ if(res.kind==='goal') setRel(tk.id,-2); else { setRel(tk.id,-5); m.rel.manager=clamp(m.rel.manager-3,0,100); c.penRow=tk.n; } } } }
+    if(M.id==='fk'&&res.kind==='goal') m.spSt.fkg++; }catch(e){} return res; }; }
+// the mixed zone: a microphone in your face on the way out
+function mzQuestions(c,L){ const m=S.me, qs=[]; const opp=L.us!=null?(L.hT&&L.aT?(c.home?L.aT.name:L.hT.name):''):''; const P0=L.mday||{tags:[]}; const T=P0.tags||[];
+  const add=(q,a)=>qs.push({q,a});
+  if(T.includes('final')&&L.cupWin) add(`You've just won the final. Describe this feeling.`,[['humble','"I can\'t. This is for everyone at the club."'],['bold','"We deserved it. Nobody gave us a chance."'],['deflect','"Ask me tomorrow. I\'m going to enjoy tonight."']]);
+  if(c.penMissed||(L.so&&L.so.mine===false)) add('The penalty. What went through your head?',[['humble','"I\'ll take that on the chin. I\'ll be back."'],['bold','"I\'d step up and take the next one too."'],['deflect','"I\'m not talking about that tonight."']]);
+  if(c.penRow) add(`You took that penalty off ${c.penRow}. Was that agreed?`,[['humble','"My mistake. I\'ll speak to him."'],['bold','"I felt confident. That\'s football."'],['deflect','"That stays in the dressing room."']]);
+  if(L.varHits) add('VAR took a goal off you tonight. Your view?',[['humble','"It\'s the rules. Fine margins."'],['bold','"It\'s killing the game. Everyone saw that was a goal."'],['deflect','"I\'ll leave that to the pundits."']]);
+  if(L.g>=2) add(`${L.g} goals tonight. Is this the best you\'ve played?`,[['humble','"The lads made it easy for me."'],['bold','"Give me the ball and I\'ll score. Simple."'],['deflect','"Three points is all that matters."']]);
+  if(T.includes('derby')) add(L.res==='W'?'Derby win. What does it mean?':'A derby defeat. What do you say to the fans?',L.res==='W'?[['humble','"It means everything to our fans."'],['bold','"This city is ours."'],['deflect','"Big win. Next game."']]:[['humble','"Sorry. We\'ll put it right."'],['bold','"We\'ll have our day. Remember that."'],['deflect','"Nothing to say right now."']]);
+  if(T.includes('debut')) add('Your first senior appearance. How was it?',[['humble','"A dream. I want a lot more of these."'],['bold','"I belong here. I knew it."'],['deflect','"Just happy to help the team."']]);
+  if(!qs.length&&L.rating!=null&&L.rating<=5.6) add('A tough night for you personally. What went wrong?',[['humble','"Not good enough from me. I\'ll work harder."'],['bold','"One bad game. Judge me over the season."'],['deflect','"I\'ll look at it with the coaches."']]);
+  if(!qs.length&&L.rating>=8.2) add('A man-of-the-match display. Happy?',[['humble','"Credit to the team."'],['bold','"That\'s my level. Get used to it."'],['deflect','"There\'s more to come."']]);
+  const rum=(S.rumours||[]).find(r=>r.me&&r.st==='open'&&r.s===S.season&&S.week-r.w<=4); if(rum&&qs.length<2) add(`There's talk of interest from ${club(rum.to)?club(rum.to).name:'abroad'}. Anything to it?`,[['humble','"I\'m happy here. My focus is this club."'],['bold','"Big clubs watch good players. That\'s normal."'],['deflect','"That\'s for my agent."']]);
+  if(m.contract&&m.contract.years<=1&&qs.length<2&&m.club!=null) add('Your contract is up in the summer. Will you sign?',[['humble','"I\'d love to stay. Let\'s see."'],['bold','"The club know what I\'m worth."'],['deflect','"Not talking contracts tonight."']]);
+  return qs.slice(0,2); }
+function mzChance(c,L){ const P0=L.mday||{lvl:1,tags:[]}; if(c.youth||P0.lvl===0||!L.mins) return 0; const notable=L.g>=2||c.penMissed||c.penRow||L.varHits||(L.rating!=null&&(L.rating>=8.2||L.rating<=5.6))||(P0.tags||[]).some(t=>['derby','final','debut','decider'].includes(t))||(L.so&&L.so.mine===false);
+  let p=P0.lvl>=3?.85:P0.lvl===2?.6:notable?.35:.05; if((myClubObj()||{}).country==='IRL') p*=.6; if(c.intl) p*=.8; return p; }
+{ const _fm31=finishMyMatch; finishMyMatch=function(){ const c=S.mctx; const r=_fm31.apply(this,arguments); try{ const L=S.lastMatch; if(!L||!S.pending||S.pending.kind!=='result') return r; if(Math.random()<mzChance(c,L)){ const qs=mzQuestions(c,L); if(qs.length){ S.pending.post=false; S.queue=S.queue||[]; S.queue.unshift({kind:'mixed',qs,i:0,outlet:outlet()}); } } }catch(e){ console.warn('mz',e); } return r; }; }
+function mzAnswer(k){ const m=S.me, p=S.pending; if(!p||p.kind!=='mixed') return; const q=p.qs[p.i]; const fx=[];
+  if(k==='walk'){ m.mzWalk=(m.mzWalk||0)+1; fx.push(...evApply({media:-2})); if(m.mzWalk===4) news('bad','"Difficult with the media"',`${outlet()} say you've walked past reporters four times this season.`); p.done=true; p.out='Headphones on, hood up. You walk straight past.'; return fx; }
+  if(k==='humble') fx.push(...evApply({fans:1,media:1})); else if(k==='bold'){ fx.push(...evApply({fans:2,media:1})); if(/VAR|killing the game/.test(q.q)&&Math.random()<.3) news('bad','Warning over VAR comments','The governing body remind you of your responsibilities after your comments.',true); if(/agent|interest/.test(q.q)) fx.push(...evApply({manager:-2})); if(/worth/.test((q.a.find(a=>a[0]==='bold')||[])[1]||'')) fx.push(...evApply({manager:-1})); }
+  const said=(q.a.find(a=>a[0]===k)||[,''])[1]; if(k==='bold') news('you',`${S.me.last}: ${said.replace(/^"|"$/g,'').slice(0,60)}`,`${p.outlet}: the ${S.me.age<21?'youngster':'player'} didn't hold back in the mixed zone.`,true);
+  p.i++; if(p.i>=p.qs.length) p.done=true; return fx; }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -6621,6 +6697,18 @@ Object.assign(ACT,{ htResp:k=>{ const c=S.mctx, m=S.me; if(c.htR) return; if(k==
   const bits=[]; if(L.duel) bits.push(`Your battle with ${esc(L.duel.n)}: won ${L.duel.won}, lost ${L.duel.lost}.`); if(L.varHits) bits.push(`VAR took a goal off you today.`); if(L.ftTxt) bits.push(esc(L.ftTxt));
   const html=`${top}<div class="mdrep"><div class="lbl">After the game</div><p style="margin:0">${esc(dr)}</p>${bits.length?`<p class="note" style="margin:4px 0 0">${bits.join(' ')}</p>`:''}</div>`;
   const sh=document.querySelector('#sheet'); if(sh){ const first=sh.querySelector('.scoreline'); if(first) first.insertAdjacentHTML('afterend',html); else sh.insertAdjacentHTML('afterbegin',html); } }catch(e){ console.warn('rep16',e); } return r; }; }
+
+// ---------- v18b: mixed zone, set pieces ----------
+{ const _sp17=showPending; showPending=function(){ const p=S.pending; if(p&&p.kind==='mixed'){ const q=p.qs[p.i];
+    if(p.done||!q){ modal(`<div class="label">Mixed zone</div><h2 class="disp">${p.out?'No comment':'That\'s a wrap'}</h2><p style="margin:0;line-height:1.55">${esc(p.out||'The reporters thank you and move on to the next player.')}</p>${p.fx&&p.fx.length?`<div class="effects">${p.fx.map(([l,v])=>effPill(l,v)).join('')}</div>`:''}<button class="btn" data-act="mzDone">Continue</button>`); return; }
+    modal(`<div class="label">Mixed zone · ${esc(p.outlet)}</div><h2 class="disp">"${esc(q.q)}"</h2><p class="note" style="margin:0">On your way out of the stadium, a microphone is pushed towards you.</p><div class="answers">${q.a.map(([k,l])=>`<button class="ans evans" data-act="mzA" data-arg="${k}"><span>${esc(l)}</span></button>`).join('')}${p.i===0?`<button class="ans evans" data-act="mzA" data-arg="walk"><span>Headphones on. Walk past.</span></button>`:''}</div>`); return; }
+  return _sp17.apply(this,arguments); }; }
+ACT.mzA=k=>{ const p=S.pending; const fx=mzAnswer(k)||[]; p.fx=(p.fx||[]).concat(fx); showPending(); };
+ACT.mzDone=()=>{ S.pending=null; resolveNext(); closeModal(); render(); };
+ACT.spAsk=t=>{ resModal('Set pieces',spAsk(t)); render(); };
+{ const _sq17=VIEWS['squad:0']; VIEWS['squad:0']=()=>{ let h=_sq17(); const m=S.me, c=myClubObj(); if(!c) return h; const k=spTakers(); if(!k) return h; const st=m.spSt||{pt:0,ps:0,fkg:0};
+  const card=W('Set pieces',`<div class="stack">${['pen','fk','crn'].map(t=>`<div class="row sb spr"><span><b>${SP_NAME[t]}</b><span class="note"> · ${esc(spTakerName(t))}</span></span>${k[t]==='me'?'<span class="pill g">Yours</span>':`<button class="chip" data-act="spAsk" data-arg="${t}">Ask to take</button>`}</div>`).join('')}<p class="note" style="margin:0">Your record: penalties ${st.ps}/${st.pt}${st.fkg?` · ${st.fkg} free-kick goal${st.fkg>1?'s':''}`:''}. Takers get extra set-piece moments in matches. Take one off the designated taker and miss, and you'll hear about it.</p></div>`);
+  return h.replace(/<\/div>\s*$/,card+'</div>'); }; }
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
