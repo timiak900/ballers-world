@@ -3934,7 +3934,7 @@ function doPost(k){ const m=S.me, s=soc(); if(s.acct==='none') return {ok:false,
 
 // ---------- v16: teammates, the captain, mentors, dressing-room groups, family, transfer requests ----------
 function absWk(){ return S.season*WEEKS+S.week; }
-function relName(v){ return v==null?'Don\'t know him yet':v>=85?'Best mates':v>=70?'Close':v>=55?'Good':v>=40?'Okay':v>=25?'Cold':'Can\'t stand each other'; }
+function relName(v){ return v==null?'Don\'t know him yet':v>=85?'Best mates':v>=70?'Good friends':v>=55?'Get on well':v>=40?'Okay':v>=25?'Cold':'Can\'t stand each other'; }
 function mateRel(pid){ const v=S.me.mates[pid]; return v==null?null:v; }
 function setRel(pid,d){ const m=S.me; m.mates[pid]=clamp((m.mates[pid]==null?45:m.mates[pid])+d,0,100); return Math.round(d); }
 function weeksTogether(pid){ const m=S.me, p=P(pid); if(!p) return 0; let start=m.joined*WEEKS+1; const t=(S.transfers||[]).find(x=>x.n===p.n&&x.to===p.c); if(t) start=Math.max(start,t.s*WEEKS+t.w); else if(!p.sn) start=Math.max(start,S.season*WEEKS+1); return Math.max(0,absWk()-start); }
