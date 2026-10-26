@@ -867,6 +867,25 @@ tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 :root[data-theme="light"] .pill.g{color:#15803d}:root[data-theme="light"] .pill.r{color:#b91c1c}:root[data-theme="light"] .pill.y{color:#a16207}:root[data-theme="light"] .pill.b{color:#1d4ed8}
 :root[data-theme="light"] .hsel.g{color:#15803d}:root[data-theme="light"] .hsel.y{color:#a16207}:root[data-theme="light"] .hsel.r{color:#b91c1c}
 :root[data-theme="light"] .iav .hi{color:#fff}
+/* v16: league tables */
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px;overscroll-behavior-x:contain}
+.ltab{min-width:100%}.ltab.m-full{min-width:560px}.ltab th,.ltab td{padding:8px 6px;white-space:nowrap}
+.ltab td.pos,.ltab th.pos{width:30px;text-align:center;position:sticky;left:0;z-index:1;padding-left:8px}
+.ltab td.tm,.ltab th.tm{position:sticky;left:30px;z-index:1;width:100%}
+.ltab.m-full td.tm,.ltab.m-full th.tm{width:auto;min-width:150px;max-width:170px;box-shadow:6px 0 8px -6px rgba(0,0,0,.45)}
+.ltab .stk{background:var(--panel-solid,var(--panel))}
+.ltab tr.me td.stk{background:linear-gradient(rgba(59,130,246,.13),rgba(59,130,246,.13)),var(--panel-solid,var(--panel))}
+.ltab tr.me td:first-child{box-shadow:none}
+.ltab .tcl{gap:8px}.ltab .tcl .crest,.ltab .tcl .crest.gen,.ltab .tcl .crest.img{width:18px;height:20px}
+.ltab .tnm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;display:block}
+.ltab.m-full .tnm{max-width:120px}
+.ltab td.pos{color:var(--mute);font-weight:600}.ltab tr.me td.pos{color:var(--text)}
+.zb{position:absolute;left:0;top:5px;bottom:5px;width:3px;border-radius:2px;display:block}
+.z-ucl{background:#3b82f6}.z-uel{background:#f59e0b}.z-uecl{background:#22c55e}.z-pro{background:#22c55e}.z-rel{background:#ef4444}
+.zkey{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--mute);padding:4px 2px 0}.zkey span{display:inline-flex;align-items:center;gap:6px}.zkey .zb{position:static;width:10px;height:10px;border-radius:3px}
+.frm{display:inline-flex;gap:3px}.frm .res{min-width:20px;padding:2px 4px;font-size:11px}
+.cupsx{height:auto!important;grid-template-rows:none!important}.cupsx .w{max-height:none}.cupsx .wb{overflow:visible}
+.tld b{display:block;font-size:12.5px;color:var(--mute);font-weight:600}.tld i{font-style:normal;font-size:11.5px;color:var(--dim)}
 </style>
 
 <div class="app" id="app" hidden>
@@ -2202,7 +2221,7 @@ const MONTH_END=[4,8,13,17,21,26,30,35,39];
 function endWeek(){
   const m=S.me; youthWeekTick();
   // weekly wage and agent fee
-  if(m.contract&&m.club!=null){ const ag=agentObj(); const gross=m.contract.wage+(m.sponsors||[]).reduce((s,x)=>s+x.weekly,0); const tax=m.contract.wage*.4; const fee=ag?m.contract.wage*ag[2]:0; m.bank+=gross-tax-fee; m.lastPay={gross,tax,fee,net:gross-tax-fee}; }
+  if(m.contract&&m.club!=null){ const ag=agentObj(); const gross=m.contract.wage+(m.sponsors||[]).reduce((s,x)=>s+x.weekly,0); const tax=typeof weeklyTax==='function'?weeklyTax(gross):m.contract.wage*.4; const fee=ag?m.contract.wage*ag[2]:0; m.bank+=gross-tax-fee; m.lastPay={gross,tax,fee,net:gross-tax-fee}; }
   m.bankHist=(m.bankHist||[]).concat(Math.round(m.bank)).slice(-60);
   if(MONTH_END.includes(S.week)) monthAwards();
   S.week++; S.day=0; S.myDone={};
@@ -3642,6 +3661,52 @@ function legacyScore(){ const m=S.me; const apps=(m.career||[]).reduce((s,c)=>s+
 function retireCheck(){ const m=S.me; if(m.retired) return; if(m.age>=39||(m.age>=34&&m.club==null&&ovr()<60)){ S.queue=S.queue||[]; S.queue.push({kind:'retireForce'}); return; } if(m.age>=33){ S.queue=S.queue||[]; S.queue.push({kind:'retireAsk'}); } }
 function doRetire(after){ const m=S.me; m.retired={y:S.year,age:m.age,after:after||null,leg:legacyScore()}; news('you','You retire from football',`After ${m.age-15} years in the game, you call time on your career. Legacy: ${m.retired.leg.tier}.`); }
 
+// ---------- v16: real tax bands, money log backfill, dated timeline ----------
+// income tax + employee social charges on a year's gross pay (2025 bands, simplified)
+function progTax(x,bands){ let t=0, lo=0; for(const [hi,r] of bands){ if(x<=lo) break; t+=(Math.min(x,hi)-lo)*r; lo=hi; } return t; }
+const TAXF={
+  IRL:x=>{ const it=Math.max(0,progTax(x,[[44000,.2],[Infinity,.4]])-4000); const usc=x>13000?progTax(x,[[12012,.005],[27382,.02],[70044,.03],[Infinity,.08]]):0; const prsi=x>18304?x*.042:0; return it+usc+prsi; },
+  ENG:x=>{ const pa=x>100000?Math.max(0,12570-(x-100000)/2):12570; const it=.2*Math.max(0,Math.min(x-pa,37700))+.4*Math.max(0,Math.min(x,125140)-pa-37700)+.45*Math.max(0,x-125140); const ni=.08*Math.max(0,Math.min(x,50270)-12570)+.02*Math.max(0,x-50270); return it+ni; },
+  ESP:x=>Math.max(0,progTax(x,[[12450,.19],[20200,.24],[35200,.3],[60000,.37],[300000,.45],[Infinity,.47]])-5550*.19)+Math.min(x*.065,4900),
+  ITA:x=>(x<8500?0:progTax(x,[[28000,.23],[50000,.35],[Infinity,.43]])+x*.025)+Math.min(x*.0919,11000),
+  GER:x=>{ const it=progTax(x,[[12096,0],[17443,.19],[68480,.33],[277826,.42],[Infinity,.45]]); return it*(it>19950?1.055:1)+Math.min(x*.2,19800); },
+  FRA:x=>{ const soc=x<100000?x*.22:22000+(x-100000)*.1; return soc+progTax((x-soc)*.9,[[11497,0],[29315,.11],[83823,.3],[180294,.41],[Infinity,.45]]); },
+  POR:x=>progTax(Math.max(0,x-4104),[[8059,.13],[12160,.165],[17233,.22],[22306,.25],[28400,.32],[41629,.355],[44987,.435],[83696,.45],[Infinity,.48]])+x*.11+(x>80000?(Math.min(x,250000)-80000)*.025:0)+(x>250000?(x-250000)*.05:0),
+  NED:x=>Math.max(0,progTax(x,[[38441,.3582],[76817,.3748],[Infinity,.495]])-Math.max(0,7000-Math.max(0,x-24800)*.13))
+};
+function weeklyTax(grossWk,cc){ const c=cc||(myClubObj()?myClubObj().country:'ENG'); const f=TAXF[c]||TAXF.ENG; const x=Math.max(0,grossWk)*52; return Math.round(Math.max(0,f(x))/52); }
+function taxRateStr(grossWk,cc){ const t=weeklyTax(grossWk,cc); return grossWk>0?Math.round(t/grossWk*100)+'%':'0%'; }
+
+// a sortable/printable date for anything that happened in season s, week w, day d
+function seasonYear(s){ const m=S.me; const c=m&&(m.career||[]).find(x=>x.s===s); return c&&c.y?c.y:S.year-(S.season-s); }
+function absKey(s,w,d){ return (s||0)*1000+(w||0)*7+(d||0); }
+function absDateStr(s,w,d){ const dt=new Date(Date.UTC(seasonYear(s),7,3)); dt.setUTCDate(dt.getUTCDate()+((w||1)-1)*7+(d||0)); return fmtDate(dt,true); }
+// "Thu 10 Sep" + season → week/day
+function whenToWD(when,s){ try{ const mm=String(when).match(/(\d+)\s+([A-Z][a-z]{2})/); if(!mm) return null; const mon=MON.indexOf(mm[2]); if(mon<0) return null; const y=seasonYear(s)+(mon<7?1:0); const dt=Date.UTC(y,mon,+mm[1]); const st=Date.UTC(seasonYear(s),7,3); const days=Math.round((dt-st)/864e5); if(days<0) return {w:1,d:0}; return {w:Math.floor(days/7)+1,d:days%7}; }catch(e){ return null; } }
+
+// stamp new career entries with the day they happened
+function stampLog(){ const m=S.me; if(!m) return; const now={s:S.season,w:S.week,d:S.day};
+  const st=(x,endOfSeason)=>{ if(!x||x.at) return; if(x.s!=null&&x.s!==S.season) x.at={s:x.s,w:endOfSeason?WEEKS:1,d:endOfSeason?6:0}; else x.at={...now}; };
+  (m.moves||[]).forEach(x=>st(x,false)); (m.trophies||[]).forEach(x=>st(x,true)); (m.awards||[]).forEach(x=>st(x,true)); (m.tourHist||[]).forEach(x=>{ if(!x.at) x.at={s:x.s!=null?x.s:x.y!=null?S.season-(S.year-x.y):S.season,w:WEEKS,d:6}; });
+  for(const b of Object.values(m.badges||{})) if(b&&!b.at) b.at=b.w!=null?{s:b.s,w:b.w,d:b.d||0}:{s:b.s,...(whenToWD(b.when,b.s)||{w:1,d:0})};
+  const h=m.intl&&m.intl.history; if(h&&h.length&&h.some(x=>x.s==null)){ let s=S.season, prev=null; for(const x of h){ if(x.s!=null){ s=x.s; prev=null; continue; } const mm=String(x.when||'').match(/[A-Z][a-z]{2}$/); const idx=mm?(MON.indexOf(mm[0])+5)%12:0; if(prev!=null&&idx>prev) s--; prev=idx; x.s=Math.max(1,s); } } }
+
+// old saves started their money log when they updated: fill in this season from the contract and results
+function backfillLedger(){ const m=S.me; if(!m||m.club==null||!m.contract||S.week<=1) return; m.ledger=m.ledger||[]; if(m.ledgerFill===S.season) return; m.ledgerFill=S.season;
+  const have=new Set(m.ledger.filter(r=>r.s===S.season).map(r=>r.w)); if(have.size>=S.week-1) return;
+  const ag=agentObj(), sp=(m.sponsors||[]).reduce((s,x)=>s+x.weekly,0), k=m.contract; const hist=(m.bankHist||[]).filter(isFinite); const life=typeof lifeCost==='function'?lifeCost():0; const rows=[]; let earn=0;
+  for(let w=1;w<S.week;w++){ if(have.has(w)) continue; const res=(m.results||[]).filter(r=>r.s===S.season&&r.w===w&&!r.youth&&r.mins>0); const bonus=res.reduce((s,r)=>s+(k.appBonus||0)+(r.g||0)*(k.goalBonus||0)+(r.a||0)*(k.assistBonus||0),0);
+    const back=S.week-1-w; const bank=hist.length>back?hist[hist.length-1-back]:null; const tax=weeklyTax(k.wage+sp);
+    rows.push({s:S.season,w,wage:k.wage,spons:sp,bonus,tax,agent:ag?Math.round(k.wage*ag[2]):0,life,fines:0,other:0,bank:bank!=null?Math.round(bank):null,est:1}); earn+=k.wage+sp+bonus; }
+  m.ledger=m.ledger.concat(rows).sort((a,b)=>a.s-b.s||a.w-b.w); if(m.ledger.length>80) m.ledger=m.ledger.slice(-80); m.earn=(m.earn||0)+earn; }
+function migrate20(){ try{ if(!S||!S.me) return; backfillLedger(); stampLog(); }catch(e){ console.warn('migrate20',e); } }
+if(typeof loadSlot==='function'){ const _ls20=loadSlot; loadSlot=function(){ const r=_ls20.apply(this,arguments); if(r) migrate20(); return r; }; }
+if(typeof finishDay==='function'){ const _fd20=finishDay; finishDay=function(){ const r=_fd20.apply(this,arguments); try{ stampLog(); }catch(e){} return r; }; }
+// a schoolboy's parents cover most one-off costs; and no lending thousands at 16
+if(typeof evApply==='function'){ const _ea20=evApply; evApply=function(fx){ try{ const m=S.me; if(fx&&fx.bank<0&&m&&m.age<18){ const w=m.contract&&m.club!=null?m.contract.wage:0; fx={...fx,bank:-Math.min(-fx.bank,Math.max(150,Math.round(w*4)))}; } }catch(e){} return _ea20(fx); }; }
+if(typeof EVENTS!=='undefined'){ const gate={loan_request:()=>S.me.age>=18&&S.me.bank>=20000,hometown_match:()=>S.me.age>=18,homesick:()=>!(typeof lifeGet==='function'&&lifeGet().home==='family')};
+  EVENTS.forEach(e=>{ const g=gate[e.id]; if(!g) return; const c0=e.cond; e.cond=()=>g()&&(!c0||c0()); }); }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -4575,7 +4640,7 @@ VIEWS['squad:3']=()=>{ const m=S.me, c=myClubObj(); if(!c) return '<p class="emp
 VIEWS['manager:1']=()=>{ const ps=S.me.promises; return `<div class="dash c1">${W('Promises',ps.length?`<table><thead><tr><th class="l">Promise</th><th>Progress</th><th class="l">Status</th></tr></thead><tbody>${ps.map(p=>`<tr><td class="l">${esc(p.desc)}</td><td>${p.count}/${p.need} · ${Math.max(0,p.due)} left</td><td class="l">${p.done?(p.kept?'<span class="pill g">Kept</span>':'<span class="pill r">Broken</span>'):'<span class="pill b">Active</span>'}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">No promises. Ask the manager for more playing time to get one.</p>')}</div>`; };
 VIEWS['contract:0']=()=>{ const m=S.me, k=m.contract; if(m.club==null) return `<div class="dash c1">${W('Contract','<p class="empty">You are a free agent. Offers are in Transfers.</p>')}</div>`; const ag=agentObj(); const c=club(m.club);
   const cd=(m.renewCd||0)>S.season*100+S.week;
-  return `<div class="dash c2">${W(`Contract · ${esc(c.name)}`,`<div class="kv"><span>Squad status</span><b>${k.role}</b><span>Weekly wage</span><b>${money(k.wage)}</b><span>Tax (40%)</span><b class="c-lo">−${money(k.wage*.4)}</b><span>Agent fee</span><b class="c-lo">${ag?'−'+money(k.wage*ag[2]):'None'}</b><span>Take-home per week</span><b class="c-hi">${money(k.wage*(.6-(ag?ag[2]:0)))}</b><span>Contract length</span><b>${k.years} season${k.years===1?'':'s'} left (to June ${S.year+k.years})</b><span>Signing-on fee</span><b>${money(k.signOn)}</b><span>Appearance bonus</span><b>${money(k.appBonus)}</b><span>Goal bonus</span><b>${money(k.goalBonus)}</b><span>Assist bonus</span><b>${money(k.assistBonus)}</b><span>Promotion bonus</span><b>${money(k.promoBonus)}</b><span>Loyalty bonus</span><b>${k.loyalty?money(k.loyalty):'None'}</b><span>Release clause</span><b>${k.release?money(k.release):'None'}</b><span>Image rights</span><b>${k.image?Math.round(k.image*100)+'%':'None'}</b>${m.loan?`<span>On loan at</span><b>${cname(m.loan.club)}</b>`:''}</div>`)}
+  return `<div class="dash c2">${W(`Contract · ${esc(c.name)}`,`<div class="kv"><span>Squad status</span><b>${k.role}</b><span>Weekly wage</span><b>${money(k.wage)}</b><span>Tax & social (${typeof taxRateStr==='function'?taxRateStr(k.wage,c.country):'40%'})</span><b class="c-lo">−${money(typeof weeklyTax==='function'?weeklyTax(k.wage,c.country):k.wage*.4)}</b><span>Agent fee</span><b class="c-lo">${ag?'−'+money(k.wage*ag[2]):'None'}</b><span>Take-home per week</span><b class="c-hi">${money(k.wage-(typeof weeklyTax==='function'?weeklyTax(k.wage,c.country):k.wage*.4)-(ag?k.wage*ag[2]:0))}</b><span>Contract length</span><b>${k.years} season${k.years===1?'':'s'} left (to June ${S.year+k.years})</b><span>Signing-on fee</span><b>${money(k.signOn)}</b><span>Appearance bonus</span><b>${money(k.appBonus)}</b><span>Goal bonus</span><b>${money(k.goalBonus)}</b><span>Assist bonus</span><b>${money(k.assistBonus)}</b><span>Promotion bonus</span><b>${money(k.promoBonus)}</b><span>Loyalty bonus</span><b>${k.loyalty?money(k.loyalty):'None'}</b><span>Release clause</span><b>${k.release?money(k.release):'None'}</b><span>Image rights</span><b>${k.image?Math.round(k.image*100)+'%':'None'}</b>${m.loan?`<span>On loan at</span><b>${cname(m.loan.club)}</b>`:''}</div>`)}
   ${W('Negotiate',`<div class="stack"><p class="note">${k.youth&&m.age<17?'Scholars can\'t sign a professional deal until they turn 17.':`Ask the club for a new deal. ${ag?`${ag[0]} will negotiate for you.`:'You\'ll negotiate yourself. An agent gets better terms.'}`}</p>
    <button class="btn" data-act="renew" ${k.youth&&m.age<17||cd||m.loan?'disabled':''}>${cd?'Club won\'t talk yet':'Ask for a new contract'}</button>
    <button class="btn sec" data-act="treq">${m.transferReq?'Withdraw transfer request':'Hand in transfer request'}</button>
@@ -5411,7 +5476,7 @@ VIEWS['fin:0']=()=>{ const m=S.me; const L=m.ledger||[]; const last=L[L.length-1
   return `<div class="dash sqhub">${W('Money',`<div class="stack"><div class="sbig" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><b class="num" style="font-size:22px">${money(m.bank)}</b><span>In the bank</span></div><div><b class="num" style="font-size:22px">${money(inc-out)}</b><span>Last week, after costs</span></div><div><b class="num" style="font-size:22px">${money(m.earn||0)}</b><span>Career earnings</span></div></div>
     ${pts?`<div class="trend2" style="margin-left:0;height:90px"><svg viewBox="0 0 320 88" preserveAspectRatio="none"><polyline points="${pts}"/></svg></div>`:''}</div>`)}
    ${W('Last week',last?`<div class="kv skv">${line('Wages',last.wage)}${line('Sponsors',last.spons)}${line('Match bonuses',last.bonus)}${line('Tax',last.tax,true)}${line('Agent',last.agent,true)}${line('Lifestyle',last.life,true,lf)}${line('Fines',last.fines,true)}${last.other?line('Other (events, deals)',last.other,last.other<0):''}</div>`:'<p class="empty">Your first weekly statement arrives after this week.</p>')}
-   ${W(`This season · ${S.year}/${String(S.year+1).slice(2)}`,`<div class="kv skv">${line('Wages',season.wage)}${line('Sponsors',season.spons)}${line('Match bonuses',season.bonus)}${line('Tax',season.tax,true)}${line('Agent',season.agent,true)}${line('Lifestyle',season.life,true)}${line('Fines',season.fines,true)}${line('Other',season.other,season.other<0)}</div>`)}
+   ${W(`This season · ${S.year}/${String(S.year+1).slice(2)}`,`<div class="kv skv">${line('Wages',season.wage)}${line('Sponsors',season.spons)}${line('Match bonuses',season.bonus)}${line('Tax',season.tax,true)}${line('Agent',season.agent,true)}${line('Lifestyle',season.life,true)}${line('Fines',season.fines,true)}${line('Other',season.other,season.other<0)}</div>${L.some(r=>r.s===S.season&&r.est)?'<p class="note" style="margin-top:8px">Weeks before your last update are worked out from your contract and match bonuses.</p>':''}`)}
    ${W('Contract money',m.contract&&m.club!=null?`<div class="kv skv">${line('Weekly wage',m.contract.wage)}${line('Appearance bonus',m.contract.appBonus||0)}${line('Goal bonus',m.contract.goalBonus||0)}${line('Assist bonus',m.contract.assistBonus||0)}<span>Years left</span><b>${m.contract.years}</b></div>`:'<p class="empty">No contract.</p>','contract:0')}</div>`; };
 VIEWS['fin:2']=()=>{ const m=S.me; const Lf=lifeGet(); const c=myClubObj(); const k=c?(COST_IDX[c.country]||1):1;
   const sec=(cat,title)=>{ const ok=lifeOpts(cat); return `<div class="lbl">${title}</div><div class="lfgrid">${ok.map(o=>`<button class="lfo ${Lf[cat]===o[0]?'on':''}" data-act="life" data-arg="${cat}:${o[0]}"><b>${esc(o[1])}</b><span>${o[2]?money(Math.round(o[2]*k))+'/wk':'Free'}</span><i>${esc(o[4])}</i></button>`).join('')}</div>`; };
@@ -5442,6 +5507,45 @@ function applyTheme(){ const p=themePref(); const light=p==='light'||(p==='syste
 try{ applyTheme(); if(typeof matchMedia!=='undefined') matchMedia('(prefers-color-scheme: light)').addEventListener('change',applyTheme); }catch(e){}
 VIEWS['saves:2']=()=>{ const p=themePref(); return `<div class="dash c1">${W('Appearance',`<div class="stack"><div class="lfgrid">${[['dark','Dark','Easy on the eyes at night.'],['light','Light','Bright and clear in daylight.'],['system','Match my phone','Follows your phone’s light or dark setting.']].map(([k,l,d])=>`<button class="lfo ${p===k?'on':''}" data-act="theme" data-arg="${k}"><b>${l}</b><i>${d}</i></button>`).join('')}</div><p class="note">Saved on this device.</p></div>`)}</div>`; };
 ACT.theme=k=>{ try{ localStorage.setItem('bw-theme',k); }catch(e){} applyTheme(); render(); };
+
+// ---------- v16: league tables that fit a phone, real zone key, dated timeline ----------
+let TMODE=(()=>{ try{ return localStorage.getItem('bw-tmode')||'short'; }catch(e){ return 'short'; } })();
+ACT.tmode=k=>{ TMODE=k; try{ localStorage.setItem('bw-tmode',k); }catch(e){} render(); };
+const ZONE_N={ucl:'Champions League',uel:'Europa League',uecl:'Conference League',pro:'Promotion',rel:'Relegation'};
+function zonesFor(lid,n){ const L=LMETA(lid), z=new Array(n).fill(''); const es=typeof EURO_SLOTS!=='undefined'&&EURO_SLOTS[lid];
+  if(L.tier===1&&es){ let i=0; for(const [k,c] of [['ucl',es[0]],['uel',es[1]],['uecl',es[2]]]) for(let j=0;j<c&&i<n;j++) z[i++]=k; }
+  if(L.tier>1&&L.up) for(let i=0;i<Math.min(L.up,n);i++) z[i]='pro';
+  if(L.down) for(let i=Math.max(0,n-L.down);i<n;i++) z[i]='rel'; return z; }
+function zoneKey(z){ const ks=[...new Set(z.filter(Boolean))]; return ks.length?`<div class="zkey">${ks.map(k=>`<span><i class="zb z-${k}"></i>${ZONE_N[k]}</span>`).join('')}</div>`:''; }
+function tcrest(id){ try{ return crest(club(id)); }catch(e){ return ''; } }
+const _tableHTML0=tableHTML;
+tableHTML=function(lid,rows,compact,hl){ if(compact) return _tableHTML0(lid,rows,compact,hl); const L=LMETA(lid), n=rows.length, z=zonesFor(lid,n), md=TMODE;
+  const head=md==='full'?'<th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>':md==='form'?'<th class="l">Last 5</th><th>Pts</th>':'<th>GD</th><th>Pts</th>';
+  const body=rows.map((r,i)=>{ const [id,p,w,d,l,gf,ga,pts,fm]=r; const gd=gf-ga, gds=`${gd>0?'+':''}${gd}`;
+    const cells=md==='full'?`<td>${w}</td><td>${d}</td><td>${l}</td><td>${gf}</td><td>${ga}</td><td>${gds}</td><td><b>${pts}</b></td>`:md==='form'?`<td class="l"><span class="frm">${(fm||[]).map(x=>`<span class="res ${x}">${x}</span>`).join('')||'<span class="note">–</span>'}</span></td><td><b>${pts}</b></td>`:`<td>${gds}</td><td><b>${pts}</b></td>`;
+    return `<tr class="${id===hl?'me':''}"><td class="stk pos">${z[i]?`<i class="zb z-${z[i]}"></i>`:''}${i+1}</td><td class="l stk tm"><span class="tcl">${tcrest(id)}<span class="tnm">${cname(id)}</span></span></td><td>${p}</td>${cells}</tr>`; }).join('');
+  return `<div class="tscroll"><table class="ltab m-${md}"><thead><tr><th class="stk pos">#</th><th class="l stk tm">Team</th><th>P</th>${head}</tr></thead><tbody>${body}</tbody></table></div>${zoneKey(z)}`; };
+function tmodeTabs(){ return `<div class="mtabs" style="grid-template-columns:repeat(3,1fr)">${[['short','Short'],['full','Full'],['form','Form']].map(([k,l])=>`<button class="${TMODE===k?'on':''}" data-act="tmode" data-arg="${k}">${l}</button>`).join('')}</div>`; }
+VIEWS['comps:0']=()=>{ const pk=compPickers(); let rows, title=LMETA(VLEAGUE).name;
+  if(VSEASON==='cur') rows=liveRows(VLEAGUE); else { const A=archOf(VSEASON); rows=A&&A.leagues[VLEAGUE]?A.leagues[VLEAGUE].rows.map(r=>r.concat([[]])):[]; title+=` · ${A?A.year+'/'+String(A.year+1).slice(2):''}`; }
+  return `<div class="dash c1">${W(title,`<div class="stack">${pk}${tmodeTabs()}${rows.length?tableHTML(VLEAGUE,rows,false,myClubId()):'<p class="empty">No data for that season.</p>'}<p class="note">Live on ${esc(LMETA(VLEAGUE).tv)}</p></div>`,null,'w-tbl')}</div>`; };
+// cups & Europe: let every card take the height it needs
+{ const _c2=VIEWS['comps:2']; VIEWS['comps:2']=()=>_c2().replace('<div class="stack" style="height:100%">','<div class="stack">').replace(/<div class="dash c2" style="flex:1;min-height:0;grid-template-rows:minmax\(0,1fr\) minmax\(0,1fr\)">/,'<div class="dash c2 cupsx">'); }
+
+// ---------- timeline with real dates ----------
+timelineItems=function(){ const m=S.me, it=[]; try{ stampLog(); }catch(e){}
+  const add=(at,k,t,d,fallbackS)=>{ const a=at||{s:fallbackS!=null?fallbackS:S.season,w:1,d:0}; it.push({key:absKey(a.s,a.w,a.d),when:absDateStr(a.s,a.w,a.d),k,t,d}); };
+  for(const [id,b] of Object.entries(m.badges||{})){ const B=(typeof BADGES!=='undefined'?BADGES:[]).find(x=>x[0]===id); if(!B) continue; if(!/debut|first_goal|first_assist|first_motm|hat|goals50|goals100|apps100|apps50/.test(id)) continue; add(b.at,'badge',B[2],B[3],b.s); }
+  (m.moves||[]).forEach(x=>add(x.at,'move',`${x.type==='Loan'?'Loan to':'Joined'} ${club(x.to)?club(x.to).name:'a new club'}`,x.fee?`Fee ${money(x.fee)}`:x.type,x.s));
+  (m.trophies||[]).forEach(x=>add(x.at,'trophy',x.name,x.club!=null&&club(x.club)?club(x.club).name:x.nation||'',x.s));
+  (m.awards||[]).filter(a=>!/Player of the Month/.test(a.name)).forEach(x=>add(x.at,'award',x.name,'',x.s));
+  const firsts={}; (m.intl.history||[]).slice().reverse().forEach(h=>{ const k=(h.nation||'')+h.level; if(firsts[k]) return; firsts[k]=1; const wd=whenToWD(h.when,h.s!=null?h.s:S.season)||{w:1,d:0}; add({s:h.s!=null?h.s:S.season,...wd},'intl',`First ${h.level==='Senior'?'senior':h.level} cap${h.nation?' for '+h.nation:''}`,`vs ${h.opp}`); });
+  (m.tourHist||[]).forEach(t=>add(t.at,'tour',`${t.name}${t.won?' winner':''}`,`${t.nation}${t.lvl==='Senior'?'':' '+t.lvl} · ${t.won?'Champions':'Out in the '+String(t.out).toLowerCase()}`,t.y!=null?S.season-(S.year-t.y):S.season));
+  if(m.retired) it.push({key:1e9,when:String(m.retired.y),k:'retire',t:'Retired',d:`Aged ${m.retired.age}`});
+  return it.sort((a,b)=>b.key-a.key); };
+VIEWS['career:4']=()=>{ const m=S.me; const L=legacyScore(); const it=timelineItems(); const ic={badge:'star',move:'swap',trophy:'star',award:'star',intl:'pin',tour:'star',retire:'cal'};
+  return `<div class="dash c1">${W(m.retired?'Career over':'Legacy so far',`<div class="stand"><div class="sbox" style="width:auto;padding:0 16px"><b>${L.sc}</b><span>legacy points</span></div><div><div class="stier">${L.tier}</div><p class="note" style="margin:2px 0 0">${L.apps} club apps · ${L.goals} goals · ${L.tro} trophies · ${L.caps} caps · ${L.aw} awards</p>${m.retired?`<p class="note">Retired at ${m.retired.age}${m.retired.after==='pundit'?', now a TV pundit':m.retired.after==='ambassador'?', now a club ambassador':m.retired.after==='coach'?', now coaching':''}.</p>`:''}</div></div>`)}
+   ${W('Timeline',it.length?`<div class="tl">${it.map(x=>{ const p=String(x.when).split(' '); const dd=p.length>=4?`<b>${p[1]} ${p[2]}</b><i>${p[3]}</i>`:`<b>${esc(x.when)}</b>`; return `<div class="tli k-${x.k}"><span class="tld">${dd}</span><span class="tlo">${hic(ic[x.k]||'star')}</span><div><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:''}</div></div>`; }).join('')}</div>`:'<p class="empty">Your big moments will appear here.</p>')}</div>`; };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
