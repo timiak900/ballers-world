@@ -929,6 +929,12 @@ tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .bkc span{font-size:12px;color:var(--mute)}.bkc b{font-family:var(--cond);font-size:24px;font-weight:800}.bkc i{font-style:normal;font-size:11.5px;color:var(--dim)}
 .bamt{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--text);font-size:16px}
 .tgl{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mute)}
+/* v17: fixtures, no clipped cards */
+.fxl{display:flex;flex-direction:column}.fxr{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.fxr:last-child{border-bottom:0}
+.fxd{display:flex;flex-direction:column;font-size:12px;color:var(--mute)}.fxd b{font-size:13px;color:var(--text);white-space:nowrap}.fxd span{color:var(--dim)}
+.fxm{display:flex;flex-direction:column;gap:2px;min-width:0}.fxo{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.fxo b{font-size:14.5px;line-height:1.25}.fxo .crest,.fxo .crest.gen,.fxo .crest.img{width:20px;height:22px}
+.fxm .note{font-size:12px;line-height:1.35}.fxr2{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.fxr2 b{font-size:14px}.fxr.up .fxo b{font-weight:600}
+.w>.wb{overflow-x:auto;-webkit-overflow-scrolling:touch}td.t{max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap}
 </style>
 
 <div class="app" id="app" hidden>
@@ -4172,6 +4178,20 @@ if(typeof financeWeek==='function'){ const _fw25=financeWeek; financeWeek=functi
 { const _ss25=startSeason; startSeason=function(){ const r=_ss25.apply(this,arguments); try{ if(S.me){ S.me.intS=0; S.me.coachSpend=0; } }catch(e){} return r; }; }
 function netWorth(){ const m=bk(); return m.bank+m.sav+m.fixed.reduce((s,f)=>s+f.amt,0); }
 
+// ---------- v17: training load (how hard your week is) feeds energy and injury risk ----------
+const HEAVY={gym:1,pace:1,coach:.8,finishing:.7,shooting:.75,passing:.6,dribbling:.75,heading:.7,defending:.7,setpieces:.5,weakfoot:.5,skills:.6,trait:.65};
+function dayLoad(d,i){ const m=S.me; if(!d) return 0; let l=0; const ex=m.pers&&m.pers[i]; const x=ex&&ex!=='none'&&!(PERSONAL[ex]||{}).rec?(HEAVY[ex]||.6):0;
+  if(d.type==='team'){ const a=m.att&&m.att[i]; l+=a==='skip'?0:a==='early'?1.2:1; l+=x; } else if(d.type==='recovery') l+=x*.8+((PERSONAL[ex]||{}).rec?-.4:0);
+  else if(d.type==='match'){ const st=typeof expectedStatus==='function'?expectedStatus(d):''; l+=/start|Starting/.test(st)?1.6:/bench/.test(st)?.5:0; } else if(d.type==='intlmatch') l+=1.5; else if(d.type==='intltrain') l+=.8;
+  else if(d.type==='off'&&(m.offPlan==='gym')) l+=.8; return l; }
+function weekLoad(){ const m=S.me; if(!S.days) return 0; return S.days.reduce((s,d,i)=>s+dayLoad(d,i),0); }
+function loadLabel(l){ return l<4.5?['Light','g']:l<7?['Normal','g']:l<8.5?['Heavy','y']:['Very heavy','r']; }
+function extrasThisWeek(){ const m=S.me; return (S.days||[]).filter((d,i)=>m.pers&&m.pers[i]&&m.pers[i]!=='none'&&!(PERSONAL[m.pers[i]]||{}).rec).length; }
+// extra sessions beyond three in a week wear you down, and a heavy week raises the chance of a training injury
+if(typeof personalSession==='function'){ const _ps26=personalSession; personalSession=function(i,light){ const m=S.me, k=m.pers&&m.pers[i]; const before=m.energy; const r=_ps26.apply(this,arguments);
+  try{ if(k&&k!=='none'&&!(PERSONAL[k]||{}).rec&&m.energy<before){ const done=(S.days||[]).slice(0,i+1).filter((d,j)=>m.pers[j]&&m.pers[j]!=='none'&&!(PERSONAL[m.pers[j]]||{}).rec).length; if(done>3) m.energy=clamp(m.energy-3*(done-3),0,100);
+    const L=weekLoad(); const p=.002*(HEAVY[k]||.6)+(L>=7?.003:0)+(L>=8.5?.006:0)+(m.energy<40?.01:0)+(m.injProne?.004:0); if(!m.injury&&Math.random()<p&&typeof injure==='function'){ injure('training'); news('bad','Injured in an extra session',`Your body was telling you something. ${L>=8.5?'That was too much work this week.':'Bad luck in a heavy session.'}`,true); } } }catch(e){} return r; }; }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -6193,6 +6213,26 @@ ACT.bamtSet=v=>{ const m=bk(); BAMT=v==='halfcur'?String(Math.max(0,Math.floor(m
 ACT.bmove=d=>{ const el=document.querySelector('.bamt'); const r=bankMove(d,el?el.value:BAMT); toast(r.txt); if(r.ok) BAMT=''; render(); };
 ACT.bfix=w=>{ const el=document.querySelector('.bamt'); const r=fixOpen(+w,el&&el.value?el.value:bk().sav); toast(r.txt); render(); };
 ACT.bfixBreak=i=>{ fixBreak(+i); render(); };
+
+// ---------- v17: training summary with load, fixture list that fits a phone ----------
+function typicalWeekDelta(){ const m=S.me; const P0=m.plan||defaultPlan(); const days=['recovery','team','team','team','prep','match','off']; let e=0, used=0, n=0, L=0;
+  for(const t of days){ if(t==='team'){ e-=P0.att==='early'?11:9; L+=P0.att==='early'?1.2:1; if(P0.extra!=='none'&&used<P0.count){ used++; const p=PERSONAL[P0.extra]||{}; e-=(p.e||6); if(used>3) e-=3*(used-3); L+=HEAVY[P0.extra]||.6; } }
+    else if(t==='recovery'){ e+=16; const p=PERSONAL[P0.rec]||{}; if(p.e) e-=p.e*.5; if(P0.rec!=='none'&&!p.rec) L+=(HEAVY[P0.rec]||.6)*.8; }
+    else if(t==='prep') e+=5; else if(t==='match'){ e-=24; L+=1.6; } else if(t==='off'){ const o=OFF_OPTS.find(x=>x[0]===P0.off); e+=o?o[2]:20; if(P0.off==='gym') L+=.8; }
+    e+=2; }
+  return {e:Math.round(e),L,used}; }
+{ const _t0=VIEWS['training:0']; VIEWS['training:0']=()=>{ const m=S.me; let h=_t0(); try{ const tw=typicalWeekDelta(); const L=weekLoad(), lb=loadLabel(L), tl=loadLabel(tw.L); const fc=energyForecast(); const last=fc.filter(x=>x!=null).slice(-1)[0]; const ex=extrasThisWeek(); const P0=m.plan||defaultPlan();
+   const eRisk=last<35?2:last<55?1:0, lRisk=L>=8.5?2:L>=7?1:0; const risk=Math.max(eRisk,lRisk); const rTxt=['Low','Medium','High'][risk], rCls=['c-hi','c-mid','c-lo'][risk];
+   const box=`<div class="wsum" style="margin-top:8px"><div><span class="lbl">Energy now</span><b>${Math.round(m.energy)}</b></div><div><span class="lbl">End of this week</span><b class="c-${eCls(last)==='g'?'hi':eCls(last)==='y'?'mid':'lo'}">${last!=null?last:'–'}</b></div><div><span class="lbl">This week's load</span><b class="c-${lb[1]==='g'?'hi':lb[1]==='y'?'mid':'lo'}">${lb[0]}</b></div><div><span class="lbl">Injury risk</span><b class="${rTxt==='High'?'c-lo':rTxt==='Medium'?'c-mid':'c-hi'}">${rTxt}</b></div></div>
+    <p class="note" style="margin:6px 0 0">A normal week on this plan: <b>${tw.e>=0?'+':''}${tw.e} energy</b> and a <b>${tl[0].toLowerCase()}</b> load. ${P0.count>3&&P0.extra!=='none'?`Most weeks only have three training days, so you'll fit ${Math.min(P0.count,3)} extras, not ${P0.count}. Anything past three a week wears you down faster.`:''}${ex?` This week: ${ex} extra session${ex===1?'':'s'} booked.`:''} Heavy weeks raise the chance of picking up an injury, even when your energy looks fine.</p>`;
+   h=h.replace(/<div class="wsum" style="margin-top:8px">[\s\S]*?Injury risk<\/span><b class="[^"]*">[^<]*<\/b><\/div><\/div>/,box); }catch(e){ console.warn('t0',e); } return h; }; }
+VIEWS['schedule:1']=()=>{ const {out,res}=myFixtureList(); if(!out) return '<p class="empty">No club.</p>'; const cid=myClubId();
+  const row=(f,r)=>{ const dt=r?absDateStr(r.s,r.w,5):fmtDate(gameDate(f.w,f.d!=null?f.d:5),true); const p=dt.split(' '); const opp=r?r.opp:f.opp, home=r?r.home:f.home;
+    const right=r?`<span class="res ${r.res}">${r.res}</span><b class="num">${r.us}–${r.them}${r.pens!=null?' p':''}</b>`:`<span class="pill">${home?'Home':'Away'}</span>`;
+    const sub=r?(r.mins?`${r.mins}'${r.g?` · ${r.g} goal${r.g>1?'s':''}`:''}${r.a?` · ${r.a} assist${r.a>1?'s':''}`:''}`:'Did not play'):'';
+    return `<div class="fxr${r?'':' up'}"><div class="fxd"><b>${p[1]||''} ${p[2]||''}</b><span>W${r?r.w:f.w}</span></div><div class="fxm"><div class="fxo">${tcrest(opp)}<b>${home?'':'@ '}${cname(opp)}</b>${f&&f.youth?` <span class="pill b">${S.youth.label}</span>`:''}</div><span class="note">${esc(r?r.comp:f.comp)}${sub?' · '+sub:''}</span></div><div class="fxr2">${right}${r&&r.mins&&r.rating!=null?`<span class="rt ${r.rating>=7?'g':r.rating<6?'r':''}">${r.rating.toFixed(1)}</span>`:''}</div></div>`; };
+  const up=out.filter(f=>f.w>=S.week&&!(f.w===S.week&&f.d!=null&&f.d<S.day)).filter(f=>!res.some(r=>r.w===f.w&&r.opp===f.opp));
+  return `<div class="dash c1">${W(`Results · ${res.length}`,res.length?`<div class="fxl">${res.slice().reverse().map(r=>row(null,r)).join('')}</div>`:'<p class="empty">No games played yet this season.</p>')}${W(`Fixtures · ${up.length}`,up.length?`<div class="fxl">${up.map(f=>row(f,null)).join('')}</div><p class="note">Cup ties appear once the draw for that round is made.</p>`:'<p class="empty">No more fixtures this season.</p>')}</div>`; };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
