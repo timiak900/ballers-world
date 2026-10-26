@@ -2005,7 +2005,7 @@ function teamSession(i,d){
 function personalSession(i,light){
   const m=S.me, k=m.pers[i]; if(!k||k==='none') return; const T=PERSONAL[k]; if(!T) return;
   if(T.rec){ m.energy=clamp(m.energy+12,0,100); m.bank-=150; return; }
-  let mult=growthMult()*(light?.6:1); if(T.coach){ const cost=roundWage(Math.max(300,m.contract?m.contract.wage*.15:300)); if(m.bank<cost){ return; } m.bank-=cost; mult*=1.9; }
+  let mult=growthMult()*(light?.6:1); if(T.coach&&m.coachFocus==='off') return; if(T.coach){ const cost=roundWage(Math.max(300,m.contract?m.contract.wage*.15:300)); if(m.bank<cost){ return; } m.bank-=cost; mult*=1.9; }
   const ups=[];
   const attrs=T.coach?(PERSONAL[m.coachFocus||'finishing'].a||['fin']):T.a;
   if(attrs) attrs.forEach(a=>{ if(addTXP(a,7*mult*rnd(.7,1.1)/Math.max(1,attrs.length/2.5))) ups.push(`${ANAME[a]} +1`); });
@@ -3575,7 +3575,7 @@ if(typeof credit==='function'){ const _cr=credit; credit=function(cid,goals,lid)
   try{ const lr=S._lr; if(!lr||lr.lid!==lid||(lr.h!==cid&&lr.a!==cid)) return; const f=cid===lr.h?lr.gh:lr.ga, ag=cid===lr.h?lr.ga:lr.gh; const res=f>ag?.35:f<ag?-.35:0; let best=null,bv=0;
    for(const p of xi){ const b=before.get(p.id)||[0,0]; const g=(p.g||0)-b[0], as=(p.as||0)-b[1]; const def=['GK','CB','LB','RB','CDM'].includes(p.p); let r=6.55+res+g*.9+as*.5+(def&&ag===0?.45:0)-(def?ag*.18:0)+(p.o-70)*.012+rnd(-.45,.45); r=clamp(Math.round(r*10)/10,4.5,10);
     p.rs=(p.rs||0)+r; p.rn=(p.rn||0)+1; if(p.p==='GK'&&ag===0) p.cs=(p.cs||0)+1; if(r>bv){ bv=r; best=p; } } if(best&&Math.random()<.5) best.mo=(best.mo||0)+1; }catch(e){} }; }
-function leaguePlayers(lid){ const out=[]; for(const cid of S.leagues[lid].clubs){ for(const pid of club(cid).squad){ const p=P(pid); if(!p) continue; out.push({id:p.id,n:p.n,c:cid,p:p.p,a:p.a,o:p.o,g:p.g||0,as:p.as||0,ap:p.ap||0,rn:p.rn||0,r:p.rn?p.rs/p.rn:null,cs:p.cs||0,mo:p.mo||0}); } }
+function leaguePlayers(lid){ const out=[]; for(const cid of S.leagues[lid].clubs){ for(const pid of club(cid).squad){ const p=P(pid); if(!p) continue; out.push({id:p.id,n:p.n,c:cid,p:p.p,a:p.a,o:p.o,g:p.g||0,as:p.as||0,ap:Math.max(p.ap||0,p.rn||0),rn:p.rn||0,r:p.rn?p.rs/p.rn:null,cs:p.cs||0,mo:p.mo||0}); } }
   const m=S.me; const st=m&&m.ss?m.ss['L:'+lid]:null; if(st&&myLeague()===lid){ const ar=avg(st.rat||[]); out.push({id:'me',n:`${m.first} ${m.last}`,c:myClubId(),p:m.pos,a:m.age,o:ovr(),g:st.g,as:st.a,ap:st.apps,rn:st.apps,r:ar||null,cs:st.cs||0,mo:st.motm||0,me:1}); } return out; }
 
 // ---------- v15: social media that matters + realistic context scenarios ----------
@@ -3734,7 +3734,7 @@ function backfillLedger(){ const m=S.me; if(!m||m.club==null||!m.contract||S.wee
     const back=S.week-1-w; const bank=hist.length>back?hist[hist.length-1-back]:null; const tax=weeklyTax(k.wage+sp);
     rows.push({s:S.season,w,wage:k.wage,spons:sp,bonus,tax,agent:ag?Math.round(k.wage*ag[2]):0,life,fines:0,other:0,bank:bank!=null?Math.round(bank):null,est:1}); earn+=k.wage+sp+bonus; }
   m.ledger=m.ledger.concat(rows).sort((a,b)=>a.s-b.s||a.w-b.w); if(m.ledger.length>80) m.ledger=m.ledger.slice(-80); m.earn=(m.earn||0)+earn; }
-function migrate20(){ try{ if(!S||!S.me) return; backfillLedger(); stampLog(); if(typeof soc==='function'){ soc(); socDaily(); } }catch(e){ console.warn('migrate20',e); } }
+function migrate20(){ try{ if(!S||!S.me) return; backfillLedger(); stampLog(); if(typeof lsBackfill==='function') lsBackfill(); if(typeof soc==='function'){ soc(); socDaily(); } }catch(e){ console.warn('migrate20',e); } }
 if(typeof loadSlot==='function'){ const _ls20=loadSlot; loadSlot=function(){ const r=_ls20.apply(this,arguments); if(r) migrate20(); return r; }; }
 if(typeof finishDay==='function'){ const _fd20=finishDay; finishDay=function(){ const r=_fd20.apply(this,arguments); try{ stampLog(); }catch(e){} return r; }; }
 // a schoolboy's parents cover most one-off costs; and no lending thousands at 16
@@ -4116,6 +4116,17 @@ if(typeof EVENTS!=='undefined'){ const cap=()=>capObj(), fnm=p=>p.n.split(' ')[0
  ev('fam_birthday',()=>livingAway(),()=>({title:'Your mum\'s birthday',txt:'It\'s your mum\'s birthday on your day off. Home is a long way away.',
    o:[['Go home for the day',()=>{ S.me.homesick=Math.max(0,(S.me.homesick||0)-15); return {txt:'A long day of travel for a few hours at home. She\'s thrilled.',r:evApply({morale:4,energy:-5})}; }],['Video call and flowers',()=>({txt:'She shows the flowers to everyone on the call.',r:evApply({morale:1})})]]}));
 }
+
+// ---------- v17: league stats filled in for saves that started tracking mid-season ----------
+function lsBackfill(){ if(!S||!S.leagues||S.lsFill===S.season) return; S.lsFill=S.season;
+  for(const lid in S.leagues){ const T=tbl(lid); for(const cid of S.leagues[lid].clubs){ const c=club(cid), row=T[cid]; if(!c||!row||!row[0]) continue; const P0=row[0], ppg=row[6]/P0, gapg=row[5]/P0, csP=Math.exp(-gapg), lvl=clubLevel(c);
+    const sq=c.squad.map(P).filter(Boolean); const gk=sq.filter(p=>p.p==='GK').sort((a,b)=>b.o-a.o)[0]; const add=[];
+    for(const p of sq){ const games=p===gk?P0:(p.p==='GK'?0:(p.ap||0)); const miss=Math.max(0,games-(p.rn||0)); if(!miss) continue;
+      const ga=((p.g||0)+(p.as||0)*.6)/Math.max(1,games); const r=clamp(6.45+(ppg-1.35)*.3+ga*1.1+(p.o-lvl)*.012+rnd(-.15,.15),5.8,8.2);
+      p.rs=(p.rs||0)+r*miss; p.rn=(p.rn||0)+miss; if(p.p==='GK') p.cs=(p.cs||0)+Math.round(miss*csP); add.push([p,miss,r]); }
+    // Player of the Match: about half the games, to whoever played best
+    const missTeam=Math.max(0,...add.map(x=>x[1])); let potm=Math.round(missTeam*.5); const wsum=add.reduce((s,x)=>s+Math.pow(x[2],6)*x[1],0);
+    if(wsum>0) for(const [p,miss,r] of add){ const share=Math.pow(r,6)*miss/wsum; const v=Math.floor(potm*share+Math.random()); p.mo=(p.mo||0)+v; } } } }
 
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
@@ -5441,7 +5452,7 @@ function dayCard(d,i,fc,edit){ const m=S.me, dt=gameDate(S.week,i), info=dayDeta
   else body+=`<p class="note">${info.note}</p>`;
   if(edit&&!past&&!m.injury){
     if(d.type==='team') body+=`<div class="seg">${ATT_OPTS.map(([k,l])=>`<button class="chip ${k==='skip'?'warnc':''}" aria-pressed="${m.att[i]===k}" data-act="att" data-arg="${i}:${k}">${l}</button>`).join('')}</div>`;
-    if(['team','recovery'].includes(d.type)||(m.club==null&&!m.loan)) body+=`<label class="dcl" for="pers${i}">Extra session</label><select id="pers${i}" data-ch="pers" data-i="${i}">${Object.entries(PERSONAL).map(([k,v])=>`<option value="${k}" ${m.pers[i]===k?'selected':''}>${v.name}${v.e&&v.e>0?` (−${v.e} energy)`:v.rec?' (+12 energy)':''}</option>`).join('')}</select>`;
+    if(['team','recovery'].includes(d.type)||(m.club==null&&!m.loan)) body+=`<label class="dcl" for="pers${i}">Extra session</label><select id="pers${i}" data-ch="pers" data-i="${i}">${Object.entries(PERSONAL).filter(([k])=>!(k==='coach'&&m.coachFocus==='off'&&m.pers[i]!=='coach')).map(([k,v])=>`<option value="${k}" ${m.pers[i]===k?'selected':''}>${v.name}${v.e&&v.e>0?` (−${v.e} energy)`:v.rec?' (+12 energy)':''}</option>`).join('')}</select>`;
     if(d.type==='off') body+=`<select data-ch="offPlan" aria-label="Day off plan">${OFF_OPTS.map(([k,l])=>`<option value="${k}" ${m.offPlan===k?'selected':''}>${l}</option>`).join('')}</select>`;
   } else if(!past&&(['team','recovery'].includes(d.type))){ const extra=PERSONAL[m.pers[i]||'none']; body+=`<p class="note" style="color:var(--text)">${d.type==='team'?({early:'Arriving early',on:'On time',late:'Arriving late',skip:'Skipping'}[m.att[i]]):''}${extra&&extra.name!=='None'?`${d.type==='team'?' · ':''}Extra: ${extra.name}`:''}</p>`; }
   if(m.injury&&!past&&d.type!=='match') body+=`<p class="note" style="color:var(--neg)">Rehab: ${esc(m.injury.type)}</p>`;
@@ -5466,7 +5477,7 @@ VIEWS['training:0']=()=>{ const m=S.me; m.plan=m.plan||defaultPlan(); const fc=e
     <button class="preset ${m.plan&&m.plan.preset==='fresh'?'on':''}" data-act="preset" data-arg="fresh"><b>Stay fresh</b><span>On time, spa on recovery days, no extras. Best when tired or before big games.</span></button></div>
     <div class="grid3 planf" style="margin-top:8px">
      <div class="fld"><label for="pl_att">Attendance</label><select id="pl_att" data-ch="plan" data-k="att">${ATT_OPTS.map(([k,l])=>`<option value="${k}" ${m.plan.att===k?'selected':''}>${l}</option>`).join('')}</select></div>
-     <div class="fld"><label for="pl_ex">Extra session</label><select id="pl_ex" data-ch="plan" data-k="extra">${Object.entries(PERSONAL).filter(([k,v])=>!v.rec).map(([k,v])=>`<option value="${k}" ${m.plan.extra===k?'selected':''}>${v.name}</option>`).join('')}</select></div>
+     <div class="fld"><label for="pl_ex">Extra session</label><select id="pl_ex" data-ch="plan" data-k="extra">${Object.entries(PERSONAL).filter(([k,v])=>!v.rec&&!(k==='coach'&&S.me.coachFocus==='off')).map(([k,v])=>`<option value="${k}" ${m.plan.extra===k?'selected':''}>${v.name}</option>`).join('')}</select></div>
      <div class="fld"><label for="pl_n">Extras per week</label><select id="pl_n" data-ch="plan" data-k="count">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${+m.plan.count===n?'selected':''}>${n}</option>`).join('')}</select></div>
      <div class="fld"><label for="pl_r">Recovery days</label><select id="pl_r" data-ch="plan" data-k="rec">${[['none','Club recovery only'],['recovery','Spa & recovery'],['gym','Gym'],['pace','Sprint work']].map(([k,l])=>`<option value="${k}" ${m.plan.rec===k?'selected':''}>${l}</option>`).join('')}</select></div>
      <div class="fld"><label for="pl_o">Day off</label><select id="pl_o" data-ch="plan" data-k="off">${OFF_OPTS.map(([k,l])=>`<option value="${k}" ${m.plan.off===k?'selected':''}>${l}</option>`).join('')}</select></div></div>
@@ -5475,7 +5486,7 @@ VIEWS['training:0']=()=>{ const m=S.me; m.plan=m.plan||defaultPlan(); const fc=e
     ${work.length?`<div class="lbl" style="margin-top:8px">This week you'll work on</div><div class="chips">${work.slice(0,10).map(([k,v])=>`<span class="pill b">${ANAME[k]} ×${Math.round(v)}</span>`).join(' ')}</div>`:''}</div></section>
    <div class="days">${S.days.map((d,i)=>dayCard(d,i,fc[i],true)).join('')}</div>
    <section class="w"><div class="wh"><span>Extras</span></div><div class="wb"><div class="grid2"><div class="fld"><label for="trt">PlayStyle to develop</label><select id="trt" data-ch="traitTarget"><option value="">None</option>${TRAITS.filter(t=>!m.traits.includes(t[0])).map(t=>`<option ${m.traitTarget===t[0]?'selected':''}>${esc(t[0])}</option>`).join('')}</select></div>
-    <div class="fld"><label for="cch">Private coach works on</label><select id="cch" data-ch="coachFocus">${Object.entries(PERSONAL).filter(([k,v])=>v.a).map(([k,v])=>`<option value="${k}" ${(m.coachFocus||'finishing')===k?'selected':''}>${v.name}</option>`).join('')}</select></div></div>
+    <div class="fld"><label for="cch">Private coach works on</label><select id="cch" data-ch="coachFocus"><option value="off" ${m.coachFocus==='off'?'selected':''}>No private coach</option>${Object.entries(PERSONAL).filter(([k,v])=>v.a).map(([k,v])=>`<option value="${k}" ${(m.coachFocus||'finishing')===k?'selected':''}>${v.name}</option>`).join('')}</select></div></div>
     <p class="note" style="margin-top:6px">Early: +18% gains and the manager notices. Late: −20% and a fine. Skip: no gains, a big fine and you'll probably be dropped. Private coach doubles gains for ${money(roundWage(Math.max(300,m.contract?m.contract.wage*.15:300)))} a session.</p></div></section></div>`; };
 VIEWS['training:2']=()=>{ const m=S.me; const groups={}; TRAITS.forEach(t=>(groups[t[1]]=groups[t[1]]||[]).push(t));
   return `<div class="stack">${Object.entries(groups).map(([g,list])=>`<section class="w"><div class="wh"><span>${g}</span></div><div class="wb">${list.map(t=>{ const has=m.traits.includes(t[0]); const met=traitReqMet(t); const pr=m.traitProg[t[0]]||0;
@@ -5852,13 +5863,13 @@ ACT.post=k=>{ const r=doPost(k); if(!r.ok){ toast(r.txt); return; } modal(`<div 
 let LSTAB='players';
 function lsTable(list,cols){ return `<table class="mini"><thead><tr><th>#</th><th class="l">Player</th>${cols.map(c=>`<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${list.map((x,i)=>`<tr class="${x.me?'me':''}"><td>${i+1}</td><td class="l t"><span class="tcl">${crest(club(x.c))}<span><b style="font-weight:600">${esc(x.n)}</b><br><span class="note">${esc(club(x.c).short||club(x.c).name)} · ${x.p}</span></span></span></td>${cols.map(c=>`<td>${c[1](x)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length+2}" class="l">No data yet.</td></tr>`}</tbody></table>`; }
 VIEWS['comps:1']=()=>{ const pk=compPickers(); const lid=VLEAGUE; const L=LMETA(lid);
-  const tabs=`<div class="mtabs" style="grid-template-columns:repeat(3,1fr)">${[['players','Players'],['teams','Teams'],['xi','Team of the season']].map(([k,l])=>`<button class="${LSTAB===k?'on':''}" data-act="lstab" data-arg="${k}">${l}</button>`).join('')}</div>`;
+  const tabs=`<div class="mtabs" style="grid-template-columns:repeat(3,1fr)">${[['players','Players'],['teams','Teams'],['xi','Best XI']].map(([k,l])=>`<button class="${LSTAB===k?'on':''}" data-act="lstab" data-arg="${k}">${l}</button>`).join('')}</div>`;
   if(VSEASON!=='cur'){ const A=archOf(VSEASON); const top=A&&A.leagues[lid]?A.leagues[lid].top:{g:[],a:[]}; const t=(list,k,l)=>`<table class="mini"><thead><tr><th>#</th><th class="l">Player</th><th class="l">Club</th><th>${l}</th></tr></thead><tbody>${list.slice(0,20).map((x,i)=>`<tr class="${x.me?'me':''}"><td>${i+1}</td><td class="l t">${esc(x.n)}</td><td class="l t">${cname(x.c)}</td><td><b>${x[k]}</b></td></tr>`).join('')||'<tr><td colspan="4" class="l">No data.</td></tr>'}</tbody></table>`;
     return `<div class="stack">${pk}<div class="dash c2">${W(`Top scorers · ${esc(L.name)}`,t(top.g,'g','Goals'),null,'w-tbl')}${W('Most assists',t(top.a,'a','Assists'),null,'w-tbl')}</div><p class="note">Full player and team stats are kept for the current season.</p></div>`; }
   const ps=leaguePlayers(lid); const games=Math.max(1,...S.leagues[lid].clubs.map(c=>tbl(lid)[c][0])); const minApps=Math.max(1,Math.round(games*.35));
   let body='';
   if(LSTAB==='players'){ const top=(arr,k,n=10)=>arr.slice().sort((a,b)=>b[k]-a[k]||a.ap-b.ap).filter(x=>x[k]>0).slice(0,n);
-    const rated=ps.filter(x=>x.r!=null&&x.rn>=minApps).sort((a,b)=>b.r-a.r).slice(0,10); const gks=ps.filter(x=>x.p==='GK'&&x.ap>0).sort((a,b)=>b.cs-a.cs).slice(0,8);
+    let rated=ps.filter(x=>x.r!=null&&x.rn>=minApps).sort((a,b)=>b.r-a.r).slice(0,10); if(rated.length<10) rated=ps.filter(x=>x.r!=null&&x.rn>=Math.max(1,Math.round(games*.2))).sort((a,b)=>b.r-a.r).slice(0,10); const gks=ps.filter(x=>x.p==='GK'&&x.ap>0).sort((a,b)=>b.cs-a.cs).slice(0,8);
     const ga=ps.map(x=>({...x,ga:x.g+x.as})); 
     body=`<div class="dash sqhub">${W('Top scorers',lsTable(top(ps,'g'),[['Apps',x=>x.ap],['G',x=>`<b>${x.g}</b>`]]),null,'w-tbl')}${W('Most assists',lsTable(top(ps,'as'),[['Apps',x=>x.ap],['A',x=>`<b>${x.as}</b>`]]),null,'w-tbl')}
       ${W(`Best average rating · min ${minApps} games`,lsTable(rated,[['Apps',x=>x.rn],['Avg',x=>rt(x.r)]]),null,'w-tbl')}${W('Goals + assists',lsTable(top(ga,'ga'),[['G',x=>x.g],['A',x=>x.as],['G+A',x=>`<b>${x.ga}</b>`]]),null,'w-tbl')}
