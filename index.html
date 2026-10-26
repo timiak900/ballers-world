@@ -972,6 +972,7 @@ p.dl.narr{align-self:center;max-width:94%;margin:2px 0;font-style:italic;color:v
 .tcev p{margin:2px 0;font-size:13.5px;line-height:1.4}.tcev .big{font-family:var(--cond);font-weight:700;font-size:16px;white-space:nowrap}.tcev.trm{grid-template-columns:32px 1fr}.tcev.loan .big{color:var(--mute)}.tcic{display:grid;place-items:center}
 .rstage{display:flex;align-items:center;gap:4px;margin:6px 0}.rstage i{flex:1;max-width:34px;height:5px;border-radius:3px;background:var(--line)}.rstage i.on{background:var(--acc,#2563eb)}.rstage.cold i.on{background:#6b7280}.rstage span{margin-left:6px;font-size:12px;font-weight:700;color:var(--mute);white-space:nowrap}
 .rhist{display:flex;flex-direction:column;gap:4px;margin:6px 0;padding-left:10px;border-left:2px solid var(--line);font-size:13px;line-height:1.4}
+.tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
 </style>
 
 <div class="app" id="app" hidden>
@@ -5184,6 +5185,96 @@ function winterLoans(){ if(!(S.week>=WINDOW_WINTER[0]&&S.week<=WINDOW_WINTER[1])
 // the old death rule killed rumours eight weeks after they started; now it's eight weeks without news
 function tWhen(x){ try{ return absDateStr(x.s,x.w,x.d||0).replace(/ \d{4}$/,''); }catch(e){ return 'W'+x.w; } }
 
+// ===================== v38: the whole tournament: every group, every tie, scorers, hype and awards =====================
+// more nations so every confederation can fill a real tournament
+(function(){ const add=(cf,list)=>list.forEach(([n,p])=>{ if(!NATION_OPP[cf].includes(n)) NATION_OPP[cf].push(n); if(typeof OPP_POOL!=='undefined'&&!OPP_POOL[n]) OPP_POOL[n]=p; });
+  add('CAF',[['Uganda','CAFC'],['Benin','WAF'],['Angola','CAFC'],['Equatorial Guinea','CAFC'],['Mozambique','RSA'],['Tanzania','CAFC'],['Comoros','CAFC'],['Namibia','RSA']]);
+  add('AFC',[['Iraq','GULF'],['Jordan','GULF'],['United Arab Emirates','GULF'],['Oman','GULF'],['Bahrain','GULF'],['Syria','GULF'],['Kyrgyzstan','UZB'],['Palestine','GULF'],['Lebanon','GULF'],['Tajikistan','UZB'],['Kuwait','GULF'],['Turkmenistan','UZB'],['North Korea','KOR']]);
+  add('CONCACAF',[['Guatemala','LAT'],['Trinidad and Tobago','JAM'],['Curaçao','JAM'],['Suriname','JAM'],['Nicaragua','LAT'],['Cuba','LAT'],['Dominican Republic','LAT']]);
+  Object.assign(FLAG_NAME,{Uganda:'UG',Benin:'BJ',Angola:'AO','Equatorial Guinea':'GQ',Mozambique:'MZ',Tanzania:'TZ',Comoros:'KM',Namibia:'NA',Iraq:'IQ',Jordan:'JO','United Arab Emirates':'AE',Oman:'OM',Bahrain:'BH',Syria:'SY',Kyrgyzstan:'KG',Palestine:'PS',Lebanon:'LB',Tajikistan:'TJ',Kuwait:'KW',Turkmenistan:'TM','North Korea':'KP',Guatemala:'GT','Trinidad and Tobago':'TT','Curaçao':'CW',Suriname:'SR',Nicaragua:'NI',Cuba:'CU','Dominican Republic':'DO'}); })();
+const TF_K={'Round of 32':32,'Round of 16':16,'Quarter-final':8,'Semi-final':4,'Final':2};
+const TF_AGE={U17:[15,17],U19:[17,19],U21:[19,21],Senior:null};
+function tfSquad(t,name){ t.sq=t.sq||{}; if(!t.sq[name]){ const str=t.str[name]||68; const adj=t.lvl==='Senior'?0:t.lvl==='U21'?-10:t.lvl==='U19'?-16:-21; const seen=new Set(); const nr=NATIONS.find(r=>r[1]===name); const pl=nr?poolFor(nr[0]):poolFor(name); t.sq[name]=genSquad(pl,str+adj,23,TF_AGE[t.lvl]).map(p=>{ let k=0; while(seen.has(p.n)&&k++<12) p.n=nameFor(pl); seen.add(p.n); return {n:p.n,p:p.p,o:p.o,a:p.a}; }); } return t.sq[name]; }
+function tfPS(t,nation,p){ t.ps=t.ps||{}; const k=nation+'|'+p.n; return t.ps[k]=t.ps[k]||{nat:nation,n:p.n,p:p.p,a:p.a,o:p.o,g:0,as:0,ap:0,rt:[]}; }
+function tfCredit(t,nation,gl,opp){ const sq=tfSquad(t,nation); const xi=sq.slice().sort((a,b)=>b.o-a.o).slice(0,11); xi.forEach(p=>tfPS(t,nation,p).ap++);
+  for(let i=0;i<gl;i++){ const s=wpick(xi.filter(p=>p.p!=='GK'),p=>({ST:4.5,LW:3,RW:3,CAM:2.6,CM:1.4,CDM:.5,CB:.6,LB:.35,RB:.35}[p.p]||.5)*Math.pow(p.o/70,2)); if(!s) continue; tfPS(t,nation,s).g++; if(Math.random()<.7){ const a=pick(xi.filter(p=>p!==s&&p.p!=='GK')); if(a) tfPS(t,nation,a).as++; } } }
+function tfSim(t,h,a,stage,ko){ const s=x=>({str:t.str[x]||68}); let [gh,ga]=simGame(s(h),s(a)); let pens=null; if(ko&&gh===ga){ gh+=poisson(.3); ga+=poisson(.3); if(gh===ga) pens=Math.random()<sig(((t.str[h]||68)-(t.str[a]||68))/6)?h:a; }
+  tfCredit(t,h,gh,a); tfCredit(t,a,ga,h); const r={stage,h,a,gh,ga,pens}; (t.fres=t.fres||[]).push(r); return r; }
+function tfAdd(tb,h,a,gh,ga){ [h,a].forEach(x=>{ tb[x]=tb[x]||[0,0,0,0,0,0,0]; }); tableAdd(tb,h,a,gh,ga); }
+function tfSort(tb,names){ return names.slice().sort((x,y)=>{ const a=tb[x],b=tb[y]; return b[6]-a[6]||(b[4]-b[5])-(a[4]-a[5])||b[4]-a[4]; }); }
+const TF_MD=[[[0,1],[2,3]],[[0,2],[1,3]],[[0,3],[1,2]]];
+// build the full field the first time we need it (also for a tournament already in progress)
+function tfBuild(t,fresh){ if(!t||t.field) return t&&t.field; const T=tourFor(t.conf,t.lvl,t.y)||{world:0}; const first=t.stages[1]; const K=TF_K[first]||8;
+  let G=t.thirds?(K===32?12:K===16?6:K===8?3:2):Math.max(1,K/2); let pool=tourPool(t.conf,T.world); if(t.conf==='CONMEBOL'&&!T.world) pool=pool.concat(tourPool('CONCACAF',false).filter(x=>!pool.some(y=>y.name===x.name)));
+  const mine=t.teams.map(x=>x.name); pool=pool.filter(x=>!mine.includes(x.name)); if(t.opp&&!mine.includes(t.opp.name)&&!pool.some(x=>x.name===t.opp.name)) pool.push({name:t.opp.name,str:t.opp.str});
+  G=Math.max(1,Math.min(G,Math.floor((pool.length+4)/4))); t.str={}; t.teams.forEach(x=>t.str[x.name]=x.str); const pick4=shuffle(pool.slice()).sort((a,b)=>(b.str+rnd(0,10))-(a.str+rnd(0,10))).slice(0,(G-1)*4); pick4.forEach(x=>t.str[x.name]=x.str); if(t.opp) t.str[t.opp.name]=t.opp.str;
+  const L='ABCDEFGHIJKL'; const groups=[{n:'A',teams:mine}]; const rest=shuffle(pick4.map(x=>x.name)); for(let g=1;g<G;g++) groups.push({n:L[g],teams:rest.slice((g-1)*4,g*4)});
+  t.field={groups,K,G}; t.ftab={}; groups.forEach(g=>g.teams.forEach(x=>t.ftab[x]=[0,0,0,0,0,0,0])); mine.forEach(x=>t.ftab[x]=(t.table[x]||[0,0,0,0,0,0,0]).slice());
+  const mds=t.stage>0||t.done?3:t.gi; for(let md=0;md<mds;md++) tfGroupMD(t,md);
+  if(t.stage>0&&!fresh){ tfKO(t); tfResume(t); } return t.field; }
+function tfGroupMD(t,md){ const F=t.field; F.groups.slice(1).forEach(g=>{ (TF_MD[md]||[]).forEach(([i,j])=>{ const h=g.teams[i], a=g.teams[j]; if(!h||!a) return; const r=tfSim(t,h,a,`Group ${g.n}`); tfAdd(t.ftab,h,a,r.gh,r.ga); }); }); t.field.md=md+1; }
+function tfSyncMine(t){ (t.field.groups[0].teams||[]).forEach(x=>{ if(t.table[x]) t.ftab[x]=t.table[x].slice(); }); }
+// the knockout bracket: you're in it if the tournament says you went through
+function tfKO(t){ const F=t.field; if(F.ko) return; tfSyncMine(t); const K=F.K; const pos=[[],[],[],[]]; F.groups.forEach(g=>{ const o=tfSort(t.ftab,g.teams); o.forEach((x,i)=>pos[i]&&pos[i].push(x)); });
+  const rank=a=>tfSort(t.ftab,a); let q=rank(pos[0]).concat(rank(pos[1])); const need=K-q.length; if(need>0) q=q.concat(rank(pos[2]).slice(0,need)); if(q.length<K) q=q.concat(rank(pos[3]).slice(0,K-q.length));
+  q=q.filter(x=>x!==t.nation); const through=t.stage>0&&!(t.done&&t.out==='Group stage'); if(through){ q=q.slice(0,K-1); const ix=Math.min(q.length,Math.max(0,q.length-1-ri(0,Math.min(5,q.length-1)))); q.splice(ix,0,t.nation); }
+  q=q.slice(0,K); const pairs=[]; for(let i=0;i<K/2;i++) pairs.push([q[i],q[K-1-i]]);
+  F.ko=[pairs]; F.kow=[]; }
+function tfForce(t,k,on){ const F=t.field; const pairs=F.ko[k]; if(!pairs||!on) return; const mp=pairs.find(p=>p.includes(t.nation)); if(!mp) return; const op=mp[0]===t.nation?1:0; if(mp[op]===on) return; const other=pairs.find(p=>p!==mp&&p.includes(on)); if(other) other[other.indexOf(on)]=mp[op]; mp[op]=on; if(!t.str[on]) t.str[on]=(t.opp&&t.opp.name===on?t.opp.str:68); }
+// a save that was already in the knockouts: rebuild the path you actually took
+function tfResume(t){ const F=t.field; const ko=t.results.filter(r=>!/^Group/.test(r.stage)); for(let k=0;k<t.stage;k++){ tfForce(t,k,k<ko.length?ko[k].opp:(t.opp&&t.opp.name)); if(k<ko.length&&F.ko[k]) tfPlayRound(t,k,ko[k].res==='W',ko[k]); } }
+function tfMyPair(t,r){ const F=t.field; return (F.ko[r]||[]).find(p=>p.includes(t.nation)); }
+// play out every other tie in round r (yours comes from your actual result)
+function tfPlayRound(t,r,myWin,mr){ const F=t.field; if(F.kow[r]) return; const stage=t.stages[r+1]||'Final'; const win=[]; (F.ko[r]||[]).forEach(p=>{ if(p.includes(t.nation)&&myWin!==undefined){ win.push(myWin?t.nation:(p[0]===t.nation?p[1]:p[0])); const last=mr||t.results[t.results.length-1]; if(last) (t.fres=t.fres||[]).push({stage,h:t.nation,a:p[0]===t.nation?p[1]:p[0],gh:last.us,ga:last.th,pens:last.pens?(last.res==='W'?t.nation:(p[0]===t.nation?p[1]:p[0])):null,mine:1}); return; }
+    const res=tfSim(t,p[0],p[1],stage,true); win.push(res.gh>res.ga?p[0]:res.ga>res.gh?p[1]:res.pens); });
+  F.kow[r]=win; if(win.length>1){ const nx=[]; for(let i=0;i<win.length;i+=2) nx.push([win[i],win[i+1]]); F.ko[r+1]=nx; } else F.champ=win[0]; }
+// group games: the other groups play their matchday alongside yours
+{ const _ta38=tourAfter; tourAfter=function(L){ const t=S.tour; const st0=t?t.stage:null, gi0=t?t.gi:null, done0=t&&t.done; try{ if(t&&!done0&&L&&L.intl){ tfBuild(t); tfMine(t,L,t.opp?t.opp.name:null); } }catch(e){ console.warn('tf38a',e); } const n0=t?t.results.length:0; const r=_ta38.apply(this,arguments); try{ if(!t||done0||!L||!L.intl) return r;
+    const last=t.results[n0]; if(last&&last.rt==null){ last.rt=L.rating; last.mins=L.mins; last.as=L.a||0; last.motm=!!L.motm; }
+    if(st0===0){ if(t.field.md<=gi0) tfGroupMD(t,gi0); tfSyncMine(t); tfMDnews(t,gi0); if(t.stage>0||t.done) { if(t.field.md<3) for(let md=t.field.md;md<3;md++) tfGroupMD(t,md); tfSyncMine(t); tfKO(t,false); } }
+    else if(st0>0){ tfPlayRound(t,st0-1,last&&last.res==='W',last); }
+    tfHype(t,L); }catch(e){ console.warn('tf38',e); } return r; }; }
+tourKoOpp=function(){ const t=S.tour; try{ tfBuild(t,true); const F=t.field; if(!F.ko){ for(let md=F.md||0;md<3;md++) tfGroupMD(t,md); tfSyncMine(t); tfKO(t); } const r=t.stage-1; if(r>0&&!F.kow[r-1]) tfPlayRound(t,r-1,true,t.results[t.results.length-1]); const p=tfMyPair(t,r); if(p){ const o=p[0]===t.nation?p[1]:p[0]; return {name:o,str:t.str[o]||68}; } }catch(e){ console.warn('ko38',e); }
+  const pool=tourPool(t.conf,false).filter(x=>x.name!==t.nation); const o=pick(pool); return {name:o.name,str:o.str}; };
+// your games feed the scorer charts with real names, so keep the same squads all tournament
+let TF_GSQ=null;
+{ const _gs38=genSquad; genSquad=function(){ if(TF_GSQ&&TF_GSQ.length) return TF_GSQ.shift().map(p=>Object.assign({},p)); return _gs38.apply(this,arguments); }; }
+{ const _im38=intlMatch; intlMatch=function(n){ const m=S.me, ic=m.intlCall, t=S.tour; try{ if(t&&!t.done&&ic&&ic.tour){ tfBuild(t); TF_GSQ=[tfSquad(t,t.nation).filter(p=>p.n!==`${m.first} ${m.last}`),tfSquad(t,t.opp.name)]; } }catch(e){ TF_GSQ=null; } try{ return _im38.apply(this,arguments); } finally{ TF_GSQ=null; } }; }
+function tfMine(t,L,oppN){ const c=S.mctx; if(!c||!c.sim) return; const sim=c.sim, side=sim.meSide||'h', other=side==='h'?'a':'h'; const me=`${S.me.first} ${S.me.last}`;
+  const mp=tfPS(t,t.nation,{n:me,p:S.me.pos,a:S.me.age,o:ovr()}); mp.me=1; if(L.played){ mp.ap++; mp.rt.push(L.rating); }
+  sim[side].xi.filter(p=>!p.me).forEach(p=>tfPS(t,t.nation,p).ap++); if(oppN) sim[other].xi.forEach(p=>tfPS(t,oppN,p).ap++);
+  sim.events.filter(e=>e.type==='goal').forEach(e=>{ const nat=e.side===side?t.nation:oppN; if(!nat) return; if(e.who) tfPS(t,nat,{n:e.who,p:'',a:0,o:0}).g++; if(e.ast) tfPS(t,nat,{n:e.ast,p:'',a:0,o:0}).as++; }); }
+// the story around it: previews, scouts, big clubs watching
+function tfPreview(t){ const m=S.me; const T=tourFor(t.conf,t.lvl,t.y)||{}; tfBuild(t); const youth=t.lvl!=='Senior'; const all=Object.keys(t.str);
+  const host=t.host||(t.host=pick(all.filter(x=>x!==t.nation))||t.nation); const stars=[]; all.sort((a,b)=>t.str[b]-t.str[a]).slice(0,6).forEach(n=>{ const p=tfSquad(t,n).slice().sort((a,b)=>b.o-a.o)[0]; if(p) stars.push(`${p.n} (${n})`); });
+  const meIn=ovr()>=(nationRow(t.code)||[0,0,70])[2]-(youth?18:2)||avg((m.form||[]).slice(-5))>=7.4; if(meIn) stars.splice(1,0,`${m.first} ${m.last} (${t.nation})`);
+  const scouts=S.clubs.filter(c=>c.rep>=82&&c.league&&c.league!=='EUR').sort(()=>Math.random()-.5).slice(0,4).map(c=>c.name);
+  news('world',`${T.name||t.name} preview: ${youth?'the future stars to watch':'the players to watch'}`,`The tournament kicks off in ${host}. ${youth?'Scouts call it a shop window for the next generation.':'The best in the world, one summer.'} Names to watch: ${stars.slice(0,4).join(', ')}.`);
+  if(youth) news('world',`Scouts flock to ${host}`,`${scouts.slice(0,3).join(', ')} and ${scouts[3]||'others'} will all have scouts at the ${T.name||t.name}.`);
+  if(meIn) news('you',`Named as one to watch`,`${outlet()} include you in their list of players to watch at the ${T.name||t.name}.`); }
+{ const _tb38=tourBegin; tourBegin=function(){ const r=_tb38.apply(this,arguments); try{ const t=S.tour; if(t&&!t.done){ tfBuild(t,true); tfPreview(t); } }catch(e){ console.warn('tb38',e); } return r; }; }
+function tfHype(t,L){ const m=S.me; if(!L.played) return; if((L.rating>=8||(L.g||0)>=2)&&Math.random()<.75){ const watch=S.clubs.filter(c=>c.rep>=80&&c.league&&c.league!=='EUR'&&c.id!==m.club).sort(()=>Math.random()-.5).slice(0,ri(2,3)); if(!watch.length) return;
+    news('you',`Big clubs watching ${m.last}`,`${outlet()}: ${watch.map(c=>c.name).join(', ')} had scouts in the stands for ${t.nation}'s game against ${(t.results[t.results.length-1]||{}).opp||'them'}.`); m.rep=clamp(m.rep+.8,0,100); m.followers+=ri(500,4000)*(t.lvl==='Senior'?5:1);
+    const c=watch[0]; S.rumours=S.rumours||[]; S.rumours.unshift({s:S.season,w:S.week,pid:-1,n:`${m.first} ${m.last}`,pos:m.pos,o:ovr(),from:m.club,to:c.id,src:'Mercato Live',rel:.6,txt:`${c.name} were impressed by ${m.last} at the ${t.name} and are considering a move.`,st:'open',me:1,stg:'interest',hist:[{s:S.season,w:S.week,d:S.day||0,t:`${c.name} were impressed by ${m.last} at the ${t.name}.`}]}); } }
+function tfMDnews(t,md){ const rs=(t.fres||[]).filter(r=>/^Group/.test(r.stage)&&!r.mine).slice(-t.field.G*2); if(!rs.length) return; const big=rs.slice().sort((a,b)=>Math.abs(b.gh-b.ga)-Math.abs(a.gh-a.ga))[0];
+  news('world',`${t.name}: matchday ${md+1}`,`${big.gh>big.ga?big.h:big.a} ${big.gh>big.ga?`beat ${big.a} ${big.gh}-${big.ga}`:big.ga>big.gh?`beat ${big.h} ${big.ga}-${big.gh}`:`and ${big.h} draw ${big.gh}-${big.ga}`}. ${rs.length} games across the groups today.`,true); }
+// the end: finish the tournament, crown the champion, give out the awards
+{ const _te38=tourEnd; tourEnd=function(won,out){ const t=S.tour; try{ tfBuild(t); if(!t.field.ko){ for(let md=t.field.md||0;md<3;md++) tfGroupMD(t,md); tfSyncMine(t); t.done=true; t.out=out; tfKO(t); t.done=false; } const F=t.field; if(t.stage>0&&!F.kow[t.stage-1]&&F.ko[t.stage-1]) tfPlayRound(t,t.stage-1,!!won,t.results[t.results.length-1]); let r=F.kow.length; while(F.ko[r]&&!F.champ){ tfPlayRound(t,r); r++; } if(won) F.champ=t.nation; }catch(e){ console.warn('te38',e); }
+  const res=_te38.apply(this,arguments); try{ tfAwards(t,won); }catch(e){ console.warn('aw38',e); } return res; }; }
+function tfAwards(t,won){ const m=S.me, F=t.field; if(!F) return; const youth=t.lvl!=='Senior'; const prog={}; Object.keys(t.str).forEach(n=>prog[n]=0); (F.kow||[]).forEach((w,i)=>w.forEach(n=>prog[n]=Math.max(prog[n],i+1))); if(F.champ) prog[F.champ]=(F.kow||[]).length+1;
+  const ps=Object.values(t.ps||{}).filter(p=>p.n); const meK=t.nation+'|'+`${m.first} ${m.last}`; const sc=p=>p.g*3+p.as*2+(prog[p.nat]||0)*3+(p.me&&p.rt.length?(avg(p.rt)-6.8)*3:rnd(0,4))+(p.ap||0)*.2; const maxP=Math.max(...Object.values(prog));
+  const boot=ps.slice().sort((a,b)=>b.g-a.g||b.as-a.as||a.ap-b.ap)[0]; const ball=ps.filter(p=>(prog[p.nat]||0)>=maxP-2).sort((a,b)=>sc(b)-sc(a))[0];
+  const gks=Object.keys(t.str).filter(n=>(prog[n]||0)>=Math.max(1,(F.kow||[]).length-1)).map(n=>({nat:n,gk:(tfSquad(t,n).find(p=>p.p==='GK')||{}).n,ga:t.ftab[n]?t.ftab[n][5]:9})).sort((a,b)=>a.ga-b.ga); const glove=gks[0];
+  const young=!youth?ps.filter(p=>(p.me?m.age:p.a)<=21).sort((a,b)=>sc(b)-sc(a))[0]:null;
+  const grpOf=p=>{ const pp=p.p||(p.me?m.pos:''); return pp==='GK'?'G':['CB','LB','RB'].includes(pp)?'D':['CDM','CM','CAM'].includes(pp)?'M':'F'; };
+  const tott=[]; [['G',1],['D',4],['M',3],['F',3]].forEach(([g,k])=>ps.filter(p=>grpOf(p)===g).sort((a,b)=>sc(b)-sc(a)).slice(0,k).forEach(p=>tott.push(p)));
+  const A={champ:F.champ||null,boot:boot?{n:boot.n,nat:boot.nat,g:boot.g}:null,ball:ball?{n:ball.n,nat:ball.nat}:null,glove:glove&&glove.gk?{n:glove.gk,nat:glove.nat}:null,young:young?{n:young.n,nat:young.nat}:null,tott:tott.map(p=>({n:p.n,nat:p.nat,me:!!p.me})),top:ps.slice().sort((a,b)=>b.g-a.g||b.as-a.as).slice(0,10).map(p=>({n:p.n,nat:p.nat,g:p.g,as:p.as,ap:p.ap,me:!!p.me}))};
+  t.awards=A; const h=(m.tourHist||[])[0]; if(h&&h.name===t.name&&h.y===t.y){ h.awards=A; h.fres=(t.fres||[]).slice(-40); }
+  const meName=`${m.first} ${m.last}`; const mine=[]; const give=(key,label,sp,rep)=>{ mine.push(label); m.awards.push({s:S.season,y:t.y,name:`${t.name} ${label}`}); m.sp+=sp; m.rep=clamp(m.rep+rep,0,100); gainXP(sp*40); };
+  if(A.ball&&A.ball.n===meName&&A.ball.nat===t.nation) give('ball','Golden Ball',youth?4:8,youth?3:6); if(A.boot&&A.boot.n===meName&&A.boot.nat===t.nation&&A.boot.g>0) give('boot','Golden Boot',youth?3:6,youth?2:4); if(A.young&&A.young.n===meName) give('young','Best Young Player',4,3); if(A.tott.some(p=>p.me)) give('tott','Team of the Tournament',youth?2:4,1);
+  news('world',`${A.champ||'The winners'} win the ${t.name}`,`${A.ball?`Golden Ball: ${A.ball.n} (${A.ball.nat}). `:''}${A.boot?`Golden Boot: ${A.boot.n} (${A.boot.nat}) with ${A.boot.g}. `:''}${A.glove?`Golden Glove: ${A.glove.n} (${A.glove.nat}).`:''}`);
+  if(mine.length) news('good',`${t.name}: ${mine.join(', ')}`,`Individual honours at the ${t.name}: ${mine.join(', ')}. ${youth?'Scouts will remember this summer.':'A summer that defines a career.'}`); }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -7530,6 +7621,26 @@ let TCF='all', TCL='all', TCX={};
   return `<div class="dash c1">${tabs}${body}</div>`; }; }
 Object.assign(ACT,{ tcf:k=>{ TCF=k; render(); }, tcx:k=>{ TCX[k]=!TCX[k]; render(); } });
 document.addEventListener('change',e=>{ const el=e.target.closest&&e.target.closest('[data-ch]'); if(!el||el.dataset.ch!=='tcl') return; TCL=el.value; e.stopImmediatePropagation(); render(); },true);
+
+// ---------- v38 UI: the tournament hub ----------
+let TFV='groups';
+function tfTable(t,g){ const o=tfSort(t.ftab,g.teams); return `<table class="mini"><thead><tr><th>#</th><th class="l">Group ${g.n}</th><th>P</th><th>GD</th><th>Pts</th></tr></thead><tbody>${o.map((n,i)=>{ const r=t.ftab[n]||[0,0,0,0,0,0,0]; return `<tr class="${n===t.nation?'me':''}"><td>${i+1}</td><td class="l">${natName(n)}</td><td>${r[0]}</td><td>${r[4]-r[5]>0?'+':''}${r[4]-r[5]}</td><td><b>${r[6]}</b></td></tr>`; }).join('')}</tbody></table>`; }
+function tfKoHTML(t){ const F=t.field; if(!F.ko) return '<p class="empty">The knockouts start once the groups are done.</p>'; return F.ko.map((pairs,r)=>{ const stage=t.stages[r+1]||'Final'; const done=F.kow[r]; const res=(t.fres||[]).filter(x=>x.stage===stage);
+  return `<div class="lbl" style="margin-top:8px">${esc(stage)}</div>${pairs.map(([h,a])=>{ const x=res.find(z=>(z.h===h&&z.a===a)||(z.h===a&&z.a===h)); const sc=x?(x.h===h?`${x.gh}–${x.ga}`:`${x.ga}–${x.gh}`):'v'; const w=done?done.find(n=>n===h||n===a):null; return `<div class="mrow${h===t.nation||a===t.nation?' me':''}"><span class="tcl h"><span class="bn${w===h?' pw':''}">${natName(h)}</span></span><b class="sc">${sc}</b><span class="tcl a"><span class="bn${w===a?' pw':''}">${natName(a)}</span></span></div>${x&&x.pens?`<div class="mpen">${esc(x.pens)} win on penalties</div>`:''}`; }).join('')}`; }).join('')+(F.champ?`<p style="margin:10px 0 0;font-weight:700">🏆 ${natName(F.champ)} are champions</p>`:''); }
+function tfScorers(t){ const ps=Object.values(t.ps||{}).filter(p=>p.n&&(p.g||p.as)).sort((a,b)=>b.g-a.g||b.as-a.as||a.ap-b.ap).slice(0,20); const me=`${S.me.first} ${S.me.last}`;
+  return ps.length?`<table><thead><tr><th>#</th><th class="l">Player</th><th class="l">Nation</th><th>G</th><th>A</th><th>Apps</th></tr></thead><tbody>${ps.map((p,i)=>`<tr class="${p.me||p.n===me?'me':''}"><td>${i+1}</td><td class="l t">${esc(p.n)}</td><td class="l">${natName(p.nat)}</td><td><b>${p.g}</b></td><td>${p.as}</td><td>${p.ap}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">No goals yet.</p>'; }
+function tfMeHTML(t){ const rs=t.results||[]; if(!rs.length) return '<p class="empty">Your first game is coming up.</p>'; const me=Object.values(t.ps||{}).find(p=>p.me)||{g:0,as:0,ap:0,rt:[]};
+  return `<div class="kv"><span>Games</span><b>${me.ap}</b><span>Goals</span><b>${me.g}</b><span>Assists</span><b>${me.as}</b><span>Average rating</span><b>${me.rt&&me.rt.length?avg(me.rt).toFixed(2):'–'}</b></div><table style="margin-top:8px"><thead><tr><th class="l">Stage</th><th class="l">Opponent</th><th>Score</th><th>Mins</th><th>G</th><th>A</th><th>Rating</th></tr></thead><tbody>${rs.map(r=>`<tr><td class="l">${esc(r.stage)}</td><td class="l t">${natName(r.opp)}</td><td>${r.us}-${r.th}${r.pens?' (p)':''}</td><td>${r.mins!=null?r.mins:'–'}</td><td>${r.g||0}</td><td>${r.as||0}</td><td>${r.rt!=null?`<b>${Number(r.rt).toFixed(1)}</b>`:'–'}</td></tr>`).join('')}</tbody></table>`; }
+function tfAwardsHTML(A){ if(!A) return '<p class="empty">Awards are given out after the final.</p>'; const row=(l,x,extra)=>x?`<span>${l}</span><b>${esc(x.n)} · ${natName(x.nat)}${extra||''}</b>`:''; 
+  return `<div class="kv">${A.champ?`<span>Champions</span><b>${natName(A.champ)}</b>`:''}${row('Golden Ball',A.ball)}${row('Golden Boot',A.boot,A.boot?` · ${A.boot.g} goals`:'')}${row('Golden Glove',A.glove)}${row('Best Young Player',A.young)}</div><div class="lbl" style="margin-top:8px">Team of the Tournament</div><p class="note" style="margin:0">${A.tott.map(p=>p.me?`<b style="color:var(--text)">${esc(p.n)}</b>`:esc(p.n)).join(' · ')}</p>`; }
+tourCard=function(){ const t=S.tour; if(!t) return ''; try{ tfBuild(t); }catch(e){} const F=t.field; if(!F) return '';
+  const tabs=[['groups','Groups'],['ko','Knockouts'],['scorers','Top scorers'],['me','Your games'],['awards','Awards']];
+  const seg=`<div class="seg nwtabs">${tabs.map(([k,l])=>`<button class="chip" aria-pressed="${TFV===k}" data-act="tfv" data-arg="${k}">${l}</button>`).join('')}</div>`;
+  const head=`<p class="note" style="margin:0 0 6px">${t.done?(t.won?'Champions!':'Out in the '+esc(String(t.out).toLowerCase())+'.'):`Next: <b style="color:var(--text)">${esc(tourStageName())}</b> vs ${natName(t.opp.name)}`} · ${Object.keys(t.str).length} teams${t.host?' · hosted in '+esc(t.host):''}</p>`;
+  const body=TFV==='groups'?`<div class="tfgrid">${F.groups.map(g=>tfTable(t,g)).join('')}</div>`:TFV==='ko'?tfKoHTML(t):TFV==='scorers'?tfScorers(t):TFV==='me'?tfMeHTML(t):tfAwardsHTML(t.awards);
+  return W(`${flagOf(t.code)||''} ${esc(t.name)} · ${esc(t.nation)}${t.lvl==='Senior'?'':' '+t.lvl}`,`<div class="stack">${head}${seg}${body}</div>`,null,'w-tbl'); };
+ACT.tfv=k=>{ TFV=k; render(); };
+tourHistCard=function(){ const h=(S.me.tourHist||[]); if(!h.length) return ''; return W('Tournaments',`<div class="bdlist">${h.map(x=>`<div class="bd"><div class="bdl"><b>${esc(x.name)} ${x.y}</b><span>${natName(x.nation)}${x.lvl==='Senior'?'':' '+x.lvl} · ${x.games.length} games · ${x.games.reduce((s,g)=>s+(g.g||0),0)} goals${x.awards&&x.awards.champ?` · won by ${esc(x.awards.champ)}`:''}${x.awards&&x.awards.boot?` · Golden Boot ${esc(x.awards.boot.n)}`:''}</span></div><div></div><span class="pill ${x.won?'g':''}">${x.won?'Winners':esc(x.out)}</span></div>`).join('')}</div>`); };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
