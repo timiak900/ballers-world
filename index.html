@@ -1068,6 +1068,40 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 @media (max-width:520px){ .og{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .of-step{white-space:nowrap}
 .of-d{color:var(--mute)}
+.sheet .sx{position:sticky;top:0;align-self:flex-end;flex:none;margin:-6px -6px -34px auto;width:38px;height:38px;display:block;border-radius:50%;border:1px solid var(--line-2);background:var(--panel-2);color:var(--text);font-size:16px;line-height:1;z-index:3}
+
+/* v43 agent pitches */
+.pz .wb{display:flex;flex-direction:column;gap:12px}
+.pz-head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.pz-head b{display:block;font-size:15px}
+.pz-head span{display:block;font-size:12.5px;color:var(--mute)}
+.pz-av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-family:var(--cond);font-size:18px;background:linear-gradient(135deg,var(--accent),#7c5cff);color:#fff}
+.pz-av.off{background:var(--panel-3);color:var(--mute)}
+.pz-stars .stars{font-size:15px;letter-spacing:1px}
+.pz-slots{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.pz-slots span{display:block;font-size:11.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.pz-slots b{font-size:15px}
+.pz-dots{display:flex;gap:6px}
+.pz-dots i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px}
+.pz-dots i.free{border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.pz-dots i.used{background:var(--panel-3);border:2px solid var(--panel-3)}
+.pz-dots i.lock{border:1px dashed var(--line-2);opacity:.6}
+.pz-list{display:flex;flex-direction:column}
+.pz-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);text-align:left;width:100%;background:none;border-left:0;border-right:0;border-top:0;color:var(--text)}
+.pz-row:last-child{border-bottom:0}
+.pz-rt b{display:block;font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.pz-rt span{display:block;font-size:12px;color:var(--mute);overflow-wrap:anywhere}
+.pz-ch{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.pz-ch i{font-style:normal;font-size:11.5px;color:var(--mute)}
+.pz-btn{cursor:pointer}
+.pz-sheet{display:flex;flex-direction:column;gap:12px}
+.pz-pick{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.pz-pick b{display:block;font-size:18px}
+.pz-pick span{font-size:13px;color:var(--mute)}
+.pz-big{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.pz-big span{display:block;font-size:12px;color:var(--mute)}
+.pz-big b{font-family:var(--cond);font-size:34px;font-weight:800;line-height:1}
+.pz-quote{margin:0;font-size:14px;line-height:1.45;border-left:3px solid var(--accent);padding:2px 0 2px 10px}
 </style>
 
 <div class="app" id="app" hidden>
@@ -2077,7 +2111,7 @@ function createMe(o){
   const target=startTarget(o.start,o.age,c);
   let tries=0; while(Math.abs(ovr()-target)>1&&tries++<60){ const d=Math.sign(target-ovr()); const w=OVRW[posKey(me.pos)]; for(const k in w) a[k]=clamp(a[k]+d,20,92); }
   const role=roleFor(cid,ovr(),o.age);
-  const wage=o.age<17?roundWage(Math.min(400,wageBase(c)*.05+60)):wageFor(cid,ovr(),role);
+  const wage=o.age<17?roundWage(Math.min(250,wageBase(c)*.05+60)):roundWage(Math.min(wageFor(cid,ovr(),role),o.age<18?2500:1e9));
   me.contract={club:cid,role,wage,years:o.age<17?17-o.age+1:ri(2,3),signOn:o.age<17?0:roundWage(wage*4),appBonus:roundWage(wage*.08),goalBonus:roundWage(wage*.12),assistBonus:roundWage(wage*.06),promoBonus:roundWage(wage*4),loyalty:0,release:null,image:0,youth:o.age<17};
   me.bank+=me.contract.signOn;
   c.squad.forEach(pid=>me.mates[pid]=ri(35,55));
@@ -5538,7 +5572,7 @@ const MO_W={g:1,d:1,o:.6,c:.6,a:.55,k:.35};
 { const _mp41=momentPick; momentPick=function(ix,ev){ try{ const M=ev&&ev.mo; if((ix==null||ix==='auto')&&M&&!M.sit&&M.o){ let bi=-1,bv=-1; M.o.forEach((o,j)=>{ const ch=momentChance(o); if(ch==null) return; const v=ch*(MO_W[o[3]]||.5); if(v>bv){ bv=v; bi=j; } }); if(bi>=0) ix=bi; } }catch(e){} const r=_mp41.call(this,ix,ev); try{ const c=S.mctx, M=ev&&ev.mo; const o=M&&M.o&&M.o.find(x=>x[0]===ev.choice); if(c&&o&&o[3]==='g'&&r&&r.kind!=='goal'&&!ev.chain) c.missG=(c.missG||0)+1; }catch(e){} return r; }; }
 // teenagers are paid like teenagers: scholarship money until 17, a first pro deal after that
 function youthWageCap(age){ return age<17?400:age<18?6000:Infinity; }
-function youthWageFix(all){ const m=S.me; if(!m||m.age>=18) return; const cap=youthWageCap(m.age); (m.offers||[]).forEach(o=>{ if(o.wage>cap) o.wage=roundWage(cap); }); if(all&&m.contract&&m.contract.wage>cap){ const k=cap/m.contract.wage; m.contract.wage=roundWage(cap); ['appBonus','goalBonus','assistBonus','promoBonus','loyalty','signOn'].forEach(f=>{ if(m.contract[f]) m.contract[f]=roundWage(m.contract[f]*k); }); } }
+function youthWageFix(all){ const m=S.me; if(!m||m.age>=18) return; const cap=youthWageCap(m.age); (m.offers||[]).forEach(o=>{ if(o.type!=='pre'&&o.wage>cap) o.wage=roundWage(cap); }); if(all&&m.contract&&m.contract.wage>cap){ const k=cap/m.contract.wage; m.contract.wage=roundWage(cap); ['appBonus','goalBonus','assistBonus','promoBonus','loyalty','signOn'].forEach(f=>{ if(m.contract[f]) m.contract[f]=roundWage(m.contract[f]*k); }); } }
 { const _on41=openNego; openNego=function(){ const N=_on41.apply(this,arguments); try{ const m=S.me; if(N&&m&&m.age<18){ const cap=youthWageCap(m.age); if(N.start&&N.start.wage>cap){ N.start.wage=roundWage(cap); N.start.signOn=roundWage(Math.min(N.start.signOn,cap*4)); } if(N.ft&&N.ft.wage>cap){ N.ft.wage=roundWage(cap); N.ft.max=roundWage(cap*1.15); } } }catch(e){} return N; }; }
 { const _sc41=signContract; signContract=function(){ const r=_sc41.apply(this,arguments); try{ youthWageFix(1); }catch(e){} return r; }; }
 { const _fd41=finishDay; finishDay=function(){ const r=_fd41.apply(this,arguments); try{ if(S.mode!=='mgr') youthWageFix(); }catch(e){} return r; }; }
@@ -5619,6 +5653,64 @@ function celebFuture(e,mins){ const c=S.mctx, sim=c.sim; const t=e.t+rnd(mins[0]
     miss:{hea:['Over the bar with your header.','You get under it. Over.','Glances off your head and wide.'],fk:['Just over. The crowd groans.','Into the wall.','Wide of the post by a whisker.'],lon:['Fizzes just wide of the post.','Into row Z.','Dips, but not enough. Over.'],pen:['Wide! You can\'t believe it.','Off the post and out!','Over the bar. You hold your head.'],vol:['Skied it. Should have hit the target.','You lean back and it flies over.','Off your shin and wide.'],x:['Pulled wide. So close.','Dragged it across goal and wide.','Skews off your boot.','A yard wide. You should score.','Hooked wide. Snatched at it.','Over. You leaned back.','Inches wide of the far post.','You catch it all wrong. Wide.','Into the side netting. The crowd thought it was in.','Rattles the post and away!']},
     block:{x:['Blocked on the line!','A defender throws himself in front of it.','Charged down at the last second.']}};
   Object.entries(pools).forEach(([tp,o])=>Object.entries(o).forEach(([k,xs])=>{ try{ Object.defineProperty(MISS_TXT[tp],k,{get:()=>pick(xs),enumerable:true,configurable:true}); }catch(e){} })); })();
+
+// ===================== v43: stricter teenage wages, elite academies need a reason, agents pitch you to clubs =====================
+// ---------- wages for teenagers ----------
+// scholarship money until 17, a modest first pro deal at 17, and pre-agreements for 18 that look like real ones
+youthWageCap=function(age){ return age<17?250:age<18?2500:Infinity; };
+function preWageCap(){ return 5000; }
+function youthWageFix43(){ const m=S.me; if(!m||m.youthFix43) return; m.youthFix43=1; (m.offers||[]).forEach(o=>{ if(o.type==='pre'&&o.wage>preWageCap()) o.wage=roundWage(preWageCap()); });
+  if(m.age<18&&m.contract&&m.contract.wage>youthWageCap(m.age)){ const was=m.contract.wage; youthWageFix(1); news('you','Contract brought into line',`Your club have redone your paperwork to match the rules for players your age. Your wage is now ${money(m.contract.wage)} a week (it was ${money(was)}).`); } }
+{ const _fd43=finishDay; finishDay=function(){ const r=_fd43.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me){ youthWageFix43(); (S.me.offers||[]).forEach(o=>{ if(o.type==='pre'&&o.wage>preWageCap()) o.wage=roundWage(preWageCap()); }); } }catch(e){} return r; }; }
+{ const _ls43=loadSlot; loadSlot=function(){ const r=_ls43.apply(this,arguments); try{ if(r&&S&&S.me&&S.mode!=='mgr') youthWageFix43(); }catch(e){} return r; }; }
+
+// ---------- the very biggest academies only come for you if you've given them a reason ----------
+function eliteEyes(){ const m=S.me; const yc=Object.values((m.intl&&m.intl.youth)||{}).reduce((s,v)=>s+v,0); const yf=m.yform&&m.yform.length?avg(m.yform.slice(-6)):6.5; const tfAw=(m.awards||[]).some(a=>a.tf); const tourGoals=(m.tourHist||[]).reduce((s,h)=>s+(h.games||[]).reduce((t,r)=>t+(r.g||0),0),0);
+  return (m.wrep||0)>=30||tfAw||tourGoals>=5||(yc>=6&&yf>=7.3)||m.pot>=88; }
+{ const _yo43=youthOffers; youthOffers=function(n){ const m=S.me; const before=(m.offers||[]).length; const r=_yo43.apply(this,arguments); try{ if(!eliteEyes()){ const cur=club(m.club); const added=m.offers.slice(before); const drop=added.filter(o=>{ const c=club(o.club); return c&&cur&&c.country!==cur.country&&c.rep>=86; }); if(drop.length){ m.offers=m.offers.filter(o=>!drop.includes(o)); } } m.offers.forEach(o=>{ if(o.type==='pre'&&o.wage>preWageCap()) o.wage=roundWage(preWageCap()); }); }catch(e){} return r; }; }
+
+// ---------- your agent offers you to clubs ----------
+function agStars(ag){ if(!ag) return 0; const s=ag.skill!=null?ag.skill:ag[3]; return s>=.78?5:s>=.68?4:s>=.62?3:s>=.56?2:1; }
+function pitchSlots(ag){ const st=agStars(ag); return st>=4?3:st>=2?2:1; }
+function pitchWin(){ const w=S.week; return S.season*10+(w<=WINDOW_SUMMER[1]?1:2); }
+function pitchState(){ const m=S.me; const k=pitchWin(); if(!m.pitch||m.pitch.win!==k){ const old=m.pitch&&m.pitch.list?m.pitch.list.filter(p=>p.st==='sent'):[]; m.pitch={win:k,used:0,list:old}; } return m.pitch; }
+function pitchLeft(){ const ag=agentObj(); if(!ag) return 0; return Math.max(0,pitchSlots(ag)-pitchState().used); }
+function pitchEff(){ const m=S.me; const o=ovr(); return m.age<=21?o+Math.max(0,(m.pot-o))*.25:o; }
+function pitchNeed(c){ const m=S.me; const grp=SEL_GROUP&&SEL_GROUP[m.pos]?SEL_GROUP[m.pos]:[m.pos]; const mine=(c.squad||[]).map(id=>typeof P==='function'?P(id):null).filter(p=>p&&grp.includes(p.p)); const better=mine.filter(p=>p.o>=ovr()).length; return better<=1?'need':better<=2?'some':'deep'; }
+// what your agent thinks your chances are with a club
+function pitchChance(c){ const m=S.me, ag=agentObj(); if(!ag||!c) return 0; const st=agStars(ag); const L=clubLevel(c); const eff=pitchEff(); const youth=m.age<17&&m.club!=null;
+  let x=sig((eff-L+(youth?9:4))/3.2)*(youth?.8:1); const need=pitchNeed(c); x*=need==='need'?1.15:need==='some'?1:.7;
+  x*=.45+.11*st; if(!ag[5].includes(c.country)) x*=ag.type==='Connected'?.85:.55;
+  const repGap=c.rep-m.rep-(youth?40:30); if(repGap>0) x*=Math.max(.15,1-repGap/40); if(c.rep>=86&&youth&&!eliteEyes()) x*=.25;
+  const af=pitchAfford(c); if(af==='no') x*=.04; else if(af==='stretch') x*=.6;
+  const b=(m.pitchBoost||{})[c.id]; if(b&&b>=S.season) x*=1.35;
+  return clamp(x,.01,.8); }
+function pitchAfford(c){ const m=S.me; if(m.club==null||m.loan||(m.age<17)) return 'yes'; const ask=typeof askingPrice==='function'?askingPrice(c.id):myValue(); const bud=budgetFor(c)*.65; return ask>bud*1.1?'no':ask>bud*.8?'stretch':'yes'; }
+function pitchBand(x){ return x>=.55?['g','Good chance']:x>=.28?['b','Worth a try']:x>=.1?['y','Long shot']:['r','Very unlikely']; }
+function pitchTargets(){ const m=S.me; const cur=m.club!=null?club(m.club):null; const have=new Set((m.offers||[]).map(o=>o.club).concat((pitchState().list||[]).filter(p=>p.st==='sent'||p.st==='yes').map(p=>p.club)).concat((m.approaches||[]).filter(a=>a.stage!=='dead').map(a=>a.club)));
+  return S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&(!cur||c.id!==cur.id)&&!have.has(c.id)&&(!cur||rivalry(cur.id,c.id)<2)); }
+function pitchSend(cid){ const m=S.me, ag=agentObj(), c=club(cid); if(!ag) return {ok:false,txt:'You need an agent for that.'}; if(pitchLeft()<=0) return {ok:false,txt:`${ag[0]} has used all ${pitchSlots(ag)} calls for this window.`};
+  const ps=pitchState(); if(ps.list.some(p=>p.club===cid&&(p.st==='sent'||p.st==='yes'))) return {ok:false,txt:'Already done.'};
+  const ch=pitchChance(c); ps.used++; ps.list.unshift({club:cid,st:'sent',ch:Math.round(ch*100)/100,at:evDayAbs()+ri(2,5),w:S.week});
+  if(m.club!=null&&!m.loan&&c.rep>=myClubObj().rep+5&&Math.random()<.2){ m.rel.manager=clamp(m.rel.manager-3,0,100); news('bad','Word gets back to the manager',`${myClubObj().mgr} has heard that ${ag[0]} is offering you to other clubs. He isn't impressed.`,true); }
+  return {ok:true,txt:`${ag[0]} is on the phone to ${c.name}. Expect an answer in a few days.`}; }
+const PITCH_NO={need:['They\'re happy with what they have in your position.','Their coach wants a different profile.','They\'ve just signed someone in your position.'],level:['They think you need another season or two first.','They like you, but you\'re not ready for their level yet.','Their scouts want to see more consistency.'],money:['The fee your club would want is out of their range.','They can\'t afford the wages it would take.'],far:['They don\'t really know you. Not enough of a profile yet.','They didn\'t return the call.']};
+function pitchResolve(){ const m=S.me, ag=agentObj(); if(!m||!m.pitch||!m.pitch.list) return; const now=evDayAbs();
+  m.pitch.list.forEach(p=>{ if(p.st!=='sent'||now<p.at) return; const c=club(p.club); if(!c){ p.st='no'; return; } const ch=pitchChance(c)*.5+(p.ch||0)*.5; const roll=Math.random();
+    const unaff=pitchAfford(c)==='no'; if(roll<ch&&!unaff){ p.st='yes'; p.txt=pitchYes(c); (typeof mail==='function'?mail:news)('good',`${c.name} are interested`,`${ag?ag[0]:'Your agent'}: "${p.txt}"`,{from:ag?ag[0]:'Agent',role:ag?ag[1]:'Agent',cat:'deals',go:'transfers:0',goLbl:'Open offers'}); }
+    else if(roll<ch+.25&&ch>=.08&&!unaff){ p.st='watch'; p.txt=pick(['They\'ll send scouts to watch you over the next few weeks.','Not right now, but they\'ve asked for your highlights and will keep tabs on you.','They\'re keen to see more. Keep performing and they\'ll come back.']); (m.pitchBoost=m.pitchBoost||{})[c.id]=S.season+1; (typeof mail==='function'?mail:news)('you',`${c.name} are keeping an eye on you`,`${ag?ag[0]:'Your agent'}: "${p.txt}"`,{from:ag?ag[0]:'Agent',role:ag?ag[1]:'Agent',cat:'deals',go:'transfers:0',goLbl:'Open'}); }
+    else { const L=clubLevel(c); const why=unaff?'money':pitchNeed(c)==='deep'?'need':pitchEff()<L-4?'level':pitchAfford(c)==='stretch'?'money':!ag||!ag[5].includes(c.country)?'far':'level'; p.st='no'; p.txt=pick(PITCH_NO[why]); (typeof mail==='function'?mail:news)('bad',`${c.name} pass`,`${ag?ag[0]:'Your agent'}: "${p.txt}"`,{from:ag?ag[0]:'Agent',role:ag?ag[1]:'Agent',cat:'deals',go:'transfers:0',goLbl:'Open'}); } }); }
+function pitchYes(c){ const m=S.me; const youth=m.age<17&&m.club!=null;
+  if(youth){ const cur=club(m.club); const rule=moveRule(c); const comp=roundFee(trainingComp(c,cur,m.age)*(1+clamp((m.pot-74)/12,0,2))*rnd(.9,1.2)); const why='Your agent got them interested';
+    if(rule==='ok') m.offers.push({id:Math.random().toString(36).slice(2),club:c.id,type:'youth',fee:comp,wage:roundWage(Math.min(wageFor(c.id,ovr(),'Youth'),youthWageCap(m.age))),role:'Youth',years:Math.max(1,17-m.age+1),blocked:false,expires:S.week+4,via:'Your agent',why});
+    else m.offers.push({id:Math.random().toString(36).slice(2),club:c.id,type:'pre',fee:roundFee(comp*rnd(1.3,2)),wage:roundWage(Math.min(wageFor(c.id,ovr(),'Prospect'),preWageCap())),role:'Prospect',years:3,blocked:false,expires:S.week+4,via:'Your agent',joinSeason:S.season+Math.max(1,18-m.age),why:`${why}. Under FIFA rules you can't move abroad until you're 18, so they want an agreement now and you join then.`});
+    return pick(['They want you. An offer is in.','Good news. They\'ve made an offer for you.','They\'ve been watching. They want to bring you in.']); }
+  if(m.club==null){ const ft=fairTerms(c.id); m.offers.push({id:Math.random().toString(36).slice(2),club:c.id,type:'free',fee:0,wage:roundWage(ft.wage),role:ft.role,years:ft.years,blocked:false,expires:S.week+3,via:'Your agent',why:'Your agent got them interested'}); return pick(['They\'ll sign you. Terms are on the table.','They\'ve offered you a contract.']); }
+  if(typeof startApproach==='function'){ startApproach(c.id); if(windowOpen()&&typeof approachTick==='function') approachTick(); }
+  return windowOpen()?pick(['They\'re going to make a bid to your club.','They want you. Expect a bid for you very soon.']):pick(['They want you. They\'ll bid when the window opens.','Interest is real. They\'ll move when the window opens.']); }
+{ const _fd43b=finishDay; finishDay=function(){ const r=_fd43b.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me) pitchResolve(); }catch(e){ console.warn('pitch',e); } return r; }; }
+// League of Ireland clubs sell for League of Ireland money
+{ const _mv43=myValue; myValue=function(){ const v=_mv43.apply(this,arguments); try{ const m=S.me; const c=m&&m.club!=null?club(m.club):null; const L=c&&c.league?LMETA(c.league):null; if(L&&L.c==='IRL'){ const k=L.tier===1?.3:.2, cap=L.tier===1?2500000:800000; return Math.round(Math.min(v*k,cap)/1e4)*1e4; } }catch(e){} return v; }; }
 
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
@@ -6422,7 +6514,7 @@ function renderWizard(){
   const c=o.club!=null?club(o.club):null;
   // preview the likely status
   let prev='';
-  if(c){ const lvl=clubLevel(c); const tgt=startTarget(o.start,o.age,c); const role=o.age<17?'Youth':roleFor(c.id,tgt,o.age); const wage=o.age<17?Math.min(400,Math.round(wageBase(c)*.05+60)):wageFor(c.id,tgt,role);
+  if(c){ const lvl=clubLevel(c); const tgt=startTarget(o.start,o.age,c); const role=o.age<17?'Youth':roleFor(c.id,tgt,o.age); const wage=o.age<17?Math.min(250,Math.round(wageBase(c)*.05+60)):Math.min(wageFor(c.id,tgt,role),o.age<18?2500:1e9);
     const note=o.age<17?'Academy scholar. You play U18 football and train with the first team when the coaches let you.':ROLES.indexOf(role)<=1?'Expect to start in the U21s or go out on loan. Breaking into this team will take time.':ROLES.indexOf(role)===2?'Rotation player. You will get chances, but you have to take them.':'You should get regular football here.';
     prev=`<div class="kv"><span>Club</span><b>${esc(c.name)}</b><span>League</span><b>${LMETA(c.league).name}</b><span>Stadium</span><b>${esc(c.stadium)}</b><span>Manager</span><b>${esc(c.mgr)}</b><span>Team level</span><b>${lvl} OVR</b><span>Your starting OVR</span><b>about ${tgt}</b><span>Squad status</span><b>${role}</b><span>Weekly wage</span><b>${money(wage)}</b></div><p class="note">${note}</p>${o.traits.length?`<div class="lbl" style="margin-top:4px">PlayStyle boosts</div>${o.traits.map(n=>{ const t=TRAITS.find(x=>x[0]===n); return `<p class="note" style="margin:2px 0"><b style="color:var(--text)">${esc(n)}</b>: ${Object.entries(t[2]).map(([k,v])=>`${ANAME[k]} ${v-Math.max(0,18-o.age)*2}+`).join(', ')}</p>`; }).join('')}`:''}`; }
   $('#start').innerHTML=`<div class="inner"><div class="row sb"><div class="logo" style="font-size:26px"><i style="height:24px"></i>New career · Slot ${o.slot}</div><button class="btn sec" data-act="toStart">Back</button></div>
@@ -8134,11 +8226,11 @@ function ngMeter(N,t){ const r=ngRead(N,t); const ag=agentObj(); const pos=[12,3
   return `<div class="ng-meter"><div class="row sb"><span>${ag?esc(ag[0])+' reads it':'Your read on it'}</span><b style="color:${col}">${['Easy yes','Likely yes','Push back','Breakdown risk','Role refused'][r.lvl]}</b></div><div class="ng-scale"><i style="left:${pos}%;background:${col}"></i></div><p class="note" style="margin:0">${esc(r.txt)}${ag?'':' Without an agent this is a guess.'}</p></div>`; }
 function ngStepper(id,label,val,R,sub){ return `<div class="ng-row"><div class="ng-lab"><span>${label}</span>${sub?`<i>${sub}</i>`:''}</div><div class="ng-ctl"><button class="ng-pm" data-act="ngStep" data-arg="${id}|-1" ${val<=R.lo?'disabled':''} aria-label="Less">−</button><b class="ng-val" id="ngv-${id}">${ngEur(val)}${id==='wage'?'<small>/wk</small>':''}</b><button class="ng-pm" data-act="ngStep" data-arg="${id}|1" ${val>=R.hi?'disabled':''} aria-label="More">+</button></div><input class="ng-rng" type="range" min="${R.lo}" max="${R.hi}" step="${R.st}" value="${val}" data-ngr="${id}" aria-label="${label}"></div>`; }
 function ngChips(id,label,opts,cur,fmt,note){ return `<div class="ng-row"><div class="ng-lab"><span>${label}</span>${note?`<i>${note}</i>`:''}</div><div class="ng-chips">${opts.map(o=>`<button class="chip" aria-pressed="${String(cur)===String(o)}" data-act="ngSet" data-arg="${id}|${o}">${fmt?fmt(o):esc(String(o))}</button>`).join('')}</div></div>`; }
-function ngSheet(h){ const sh=$('#sheet'); const keep=!$('#modal').hidden&&sh&&sh.querySelector('.ng'); const y=sh?sh.scrollTop:0; modal(h); if(keep&&sh) sh.scrollTop=y; }
+function ngSheet(h){ const sh=$('#sheet'); const keep=!$('#modal').hidden&&sh&&sh.querySelector('.ng'); const y=sh?sh.scrollTop:0; modal(`<button class="sx" data-act="ngClose" aria-label="Close">✕</button>`+h); if(keep&&sh) sh.scrollTop=y; }
 function ngTermsLines(t){ return `<div class="lines"><div><span>Wage</span><b>${ngEur(t.wage)}/wk</b></div><div><span>Length</span><b>${t.years} season${t.years>1?'s':''}</b></div><div><span>Role</span><b>${esc(t.role)}</b></div><div><span>Signing-on fee</span><b>${ngEur(t.signOn)}</b></div><div><span>Release clause</span><b>${esc(t.release)}</b></div><div><span>Bonuses</span><b>${esc(t.bonus||'Standard')}</b></div></div>`; }
 showNego=function(){ const N=S.nego; if(!N) return; const c=club(N.cid); const ag=agentObj(); const head=N.ctx==='renew'?'New contract':N.ctx==='loan'?'Loan move':'Personal terms';
   const lab=`<div class="label">${head} · ${esc(c.name)}</div>`;
-  if(N.status==='accept'){ ngSheet(`<div class="ng">${lab}<h2 class="disp">Deal agreed</h2><p class="note" style="margin:0">${esc(c.name)} have agreed these terms. Nothing is signed until you sign it.</p>${ngTermsLines(N.terms)}<div class="row ng-btns"><button class="btn" data-act="sign">Sign</button><button class="btn sec" data-act="ngReopen">Change terms</button><button class="btn sec" data-act="ngWalk">Walk away</button></div></div>`); return; }
+  if(N.status==='accept'){ ngSheet(`<div class="ng">${lab}<h2 class="disp">Deal agreed</h2><p class="note" style="margin:0">${esc(c.name)} have agreed these terms. Nothing is signed until you sign it.</p>${ngTermsLines(N.terms)}<div class="row ng-btns"><button class="btn" data-act="sign">Sign</button><button class="btn sec" data-act="ngClose">Not ready yet</button><button class="btn sec" data-act="ngReopen">Change terms</button><button class="btn sec" data-act="ngWalk">Walk away</button></div><p class="note" style="margin:0">${N.offer&&N.offer.expires?`Not sure yet? The deal stays on the table until ${esc(wkDate(N.offer.expires,6))}. You can come back to it from Transfers.`:'Not sure yet? You can come back to this from your Contract page.'}</p></div>`); return; }
   if(N.status==='wait'){ const d=Math.max(1,N.readyAt-evDayAbs()); ngSheet(`<div class="ng">${lab}<h2 class="disp">Waiting on ${esc(c.name)}</h2><p style="margin:0">${esc(c.name)} ${N.breaks?'aren\'t happy with what you asked for':'are looking at your proposal'}. They'll come back with their answer in about ${d} day${d>1?'s':''}.</p><div class="kv"><span>Talks broken down</span><b>${N.breaks} of ${N.patience}</b></div>${N.sent?`<div class="lbl">What you asked for</div>${ngTermsLines(N.sent)}`:''}<div class="row ng-btns"><button class="btn" data-act="negoPark">OK</button>${N._snap?'<button class="btn sec" data-act="ngAmend">Change my proposal</button>':''}<button class="btn sec" data-act="ngWalk">Walk away</button></div>${N._snap?'<p class="note" style="margin:0">Sent it by mistake? You can withdraw it before they reply. It won\'t count against you.</p>':''}</div>`); return; }
   if(N.status==='walk'||N.status==='reject'){ ngSheet(`<div class="ng">${lab}<h2 class="disp">Talks over</h2><p style="margin:0">${esc(N.msg)}</p><button class="btn" data-act="negoClose">Close</button></div>`); return; }
   if(N.ctx==='loan'){ ngSheet(`<div class="ng"><div class="label">Loan · ${esc(c.name)}</div><h2 class="disp">Go on loan?</h2><p style="margin:0">${esc(c.name)} (${LMETA(c.league).name}, level ${clubLevel(c)}) want you until the end of the season. Your parent club keeps paying your wage of ${money(S.me.contract.wage)}.</p><div class="row ng-btns"><button class="btn" data-act="loanYes">Accept loan</button><button class="btn sec" data-act="negoPark">Not now</button><button class="btn sec" data-act="ngWalk">Turn it down</button></div></div>`); return; }
@@ -8200,6 +8292,52 @@ VIEWS['transfers:0']=()=>{ const m=S.me; const w=windowOpen(); const cur=m.club!
     card:[w=>`Yellow card: ${w}`,w=>`${w} goes into the book`,w=>`Booking for ${w}`]};
   const base={save:w=>`${w} forces a save`,miss:w=>`${w} fires wide`,block:w=>`${w}'s shot is blocked`,post:w=>`${w} hits the post!`,card:w=>`Yellow card: ${w}`};
   const _el42=evLine; evLine=function(e,sim){ const h=_el42.apply(this,arguments); try{ const V=EVV[e&&e.type]; if(!V||!e.who) return h; const w=esc(e.who); const k=Math.abs(Math.floor((e.t||0)*977+w.length*31))%V.length; const from=base[e.type](w); return h.replace(from,V[k](w)); }catch(err){ return h; } }; }
+
+ACT.ngClose=()=>{ S.nego=null; closeModal(); render(); };
+
+// ---------- v43 UI: your agent offers you to clubs ----------
+const PZ={tab:'best',pick:null};
+function agInitials(n){ return String(n).split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase(); }
+function pzStatus(p){ const now=evDayAbs(); if(p.st==='sent'){ const d=Math.max(1,p.at-now); return ['b',`Waiting · ${d} day${d>1?'s':''}`]; } return p.st==='yes'?['g','Interested']:p.st==='watch'?['y','Watching you']:['r','Passed']; }
+function agentPitchCard(){ const m=S.me, ag=agentObj();
+  if(!ag) return `<section class="w pz"><div class="wb"><div class="pz-head"><div class="pz-av off">?</div><div><b>No agent</b><span>An agent can call clubs and offer you to them.</span></div></div><button class="btn sec" data-act="go" data-arg="contract:1">Find an agent</button></div></section>`;
+  const st=agStars(ag), max=pitchSlots(ag), ps=pitchState(), left=pitchLeft(); const cty=ag[5].map(c=>COUNTRIES[c]?COUNTRIES[c].name:c).join(', ');
+  const slots=[0,1,2].map(i=>i<max?(i<ps.used?'<i class="used"></i>':'<i class="free"></i>'):'<i class="lock" title="Better agents get more calls">🔒</i>').join('');
+  const list=(ps.list||[]).slice(0,6).map(p=>{ const c=club(p.club); if(!c) return ''; const [k,l]=pzStatus(p); return `<div class="pz-row">${crest(c)}<div class="pz-rt"><b>${esc(c.name)}</b>${p.txt?`<span>${esc(p.txt)}</span>`:`<span>${esc(LMETA(c.league).name)} · level ${clubLevel(c)}</span>`}</div><span class="pill ${k}">${l}</span></div>`; }).join('');
+  return `<section class="w pz"><div class="wb"><div class="pz-head"><div class="pz-av">${agInitials(ag[0])}</div><div><b>${esc(ag[0])}</b><span>${esc(ag[1])}</span></div><span class="pz-stars">${stars(st)}</span></div>
+    <div class="pz-slots"><div><span>Calls this window</span><b>${left} of ${max} left</b></div><div class="pz-dots">${slots}</div></div>
+    <p class="note" style="margin:0">${st<=1?'A one-star agent has a short contact list and not much pull. Clubs may not take the call seriously.':st>=4?'Plenty of pull. Sporting directors pick up when '+esc(ag[0].split(' ')[0])+' rings.':'Decent contacts, mainly in '+esc(cty)+'.'}</p>
+    <button class="btn" data-act="pzOpen" ${left?'':'disabled'}>${left?'Pitch me to a club':'No calls left this window'}</button>${list?`<div class="pz-list">${list}</div>`:''}</div></section>`; }
+{ const _tv43=VIEWS['transfers:0']; VIEWS['transfers:0']=()=>{ const h=_tv43(); try{ return h.replace('<div class="dash c1">','<div class="dash c1">'+agentPitchCard()); }catch(e){ return h; } }; }
+function pzRows(){ const m=S.me, cur=m.club!=null?club(m.club):null; const myL=cur?clubLevel(cur):0; const home=cur?cur.country:m.nat;
+  let xs=pitchTargets().map(c=>({c,L:clubLevel(c),ch:pitchChance(c)}));
+  if(PZ.tab==='best') xs=xs.filter(x=>x.L>=myL-4||!cur).sort((a,b)=>b.ch*Math.min(1.3,1+(b.L-myL)/40)-a.ch*Math.min(1.3,1+(a.L-myL)/40));
+  else if(PZ.tab==='step') xs=xs.filter(x=>x.L>=myL+4).sort((a,b)=>b.L-a.L);
+  else if(PZ.tab==='home') xs=xs.filter(x=>x.c.country===home&&(x.L>=myL-2||!cur)).sort((a,b)=>b.L-a.L);
+  else xs=xs.filter(x=>x.c.country!==home&&(x.L>=myL-2||!cur)).sort((a,b)=>b.ch-a.ch);
+  return {xs:xs.slice(0,25),myL}; }
+function pzNeedTxt(c){ const n=pitchNeed(c); return n==='need'?'Short in your position':n==='some'?'Some competition':'Well stocked in your position'; }
+function pzSheet(){ const m=S.me, ag=agentObj(); if(!ag) return; const left=pitchLeft(); const fn=ag[0].split(' ')[0]; const cur=m.club!=null?club(m.club):null; const home=cur?cur.country:m.nat;
+  if(PZ.pick!=null){ const c=club(PZ.pick); const ch=pitchChance(c); const [k,l]=pitchBand(ch); const L=clubLevel(c), myL=cur?clubLevel(cur):null;
+    const say=ch>=.55?`They need someone like you. I'm confident.`:ch>=.28?`It's a fair shout. I'll sell you well.`:ch>=.1?`Honestly, it's a long shot. But you never know.`:`I'll make the call if you want, but I don't think they'll bite.`;
+    modal(`<button class="sx" data-act="pzClose" aria-label="Close">✕</button><div class="pz-sheet"><div class="label">Pitch to a club</div><div class="pz-pick">${crest(c,true)}<div><b>${esc(c.name)}</b><span>${esc(LMETA(c.league).name)} · level ${L}${myL!=null?` <em class="of-step ${L>myL?'up':L<myL?'dn':''}">${L>myL?'▲ +'+(L-myL):L<myL?'▼ '+(L-myL):'same level'}</em>`:''}</span></div></div>
+      <div class="pz-big"><div><span>${esc(fn)}'s read</span><b>${Math.round(ch*100)}%</b></div><span class="pill ${k}">${l}</span></div>
+      <div class="kv"><span>Your position</span><b>${pzNeedTxt(c)}</b>${m.club!=null&&!(m.age<17)?`<span>Your club's asking price</span><b>${{yes:'They can afford it',stretch:'A stretch for them',no:'Out of their range'}[pitchAfford(c)]}</b>`:''}<span>Your agent's contacts</span><b>${ag[5].includes(c.country)?'Knows people there':'Doesn\'t know this league well'}</b>${m.age<17&&m.club!=null?`<span>At your age</span><b>${c.country===(cur&&cur.country)?'Academy move':'Agreement now, move at 18'}</b>`:''}</div>
+      <p class="pz-quote">"${esc(say)}"</p><p class="note" style="margin:0">This uses one of your ${pitchSlots(ag)} calls this window. ${left-1} left after this.${cur&&!m.loan&&c.rep>=cur.rep+5?' Your manager might hear about it.':''}</p>
+      <div class="row ng-btns"><button class="btn" data-act="pzSend" data-arg="${c.id}">Make the call</button><button class="btn sec" data-act="pzBack">Back</button></div></div>`); return; }
+  const {xs,myL}=pzRows(); const tabs=[['best','Best fits'],['step','Step up'],['home',`In ${COUNTRIES[home]?COUNTRIES[home].name:'your country'}`],['abroad','Abroad']];
+  const sh=$('#sheet'); const y=!$('#modal').hidden&&sh&&sh.querySelector('.pz-sheet')?sh.scrollTop:0;
+  modal(`<button class="sx" data-act="pzClose" aria-label="Close">✕</button><div class="pz-sheet"><div class="label">Pitch to a club · ${left} call${left===1?'':'s'} left</div><h2 class="disp">Who should ${esc(fn)} call?</h2>
+    <p class="note" style="margin:0">${stars(agStars(ag))} ${esc(fn)}'s read on each club is shown. Better agents get more calls and more doors open.</p>
+    <div class="seg ih-tabs">${tabs.map(([k2,l2])=>`<button class="chip" aria-pressed="${PZ.tab===k2}" data-act="pzTab" data-arg="${k2}">${esc(l2)}</button>`).join('')}</div>
+    <div class="pz-list">${xs.length?xs.map(x=>{ const [k,l]=pitchBand(x.ch); return `<button class="pz-row pz-btn" data-act="pzPick" data-arg="${x.c.id}">${crest(x.c)}<div class="pz-rt"><b>${esc(x.c.name)}</b><span>${esc(LMETA(x.c.league).name)} · level ${x.L}${cur?` <em class="of-step ${x.L>myL?'up':x.L<myL?'dn':''}">${x.L>myL?'▲'+(x.L-myL):x.L<myL?'▼'+(myL-x.L):'='}</em>`:''} · ${esc(pzNeedTxt(x.c))}</span></div><span class="pz-ch"><span class="pill ${k}">${l}</span><i>${Math.round(x.ch*100)}%</i></span></button>`; }).join(''):'<p class="empty">No clubs here worth a call right now.</p>'}</div></div>`);
+  if(y&&sh) sh.scrollTop=0; }
+ACT.pzOpen=()=>{ PZ.pick=null; pzSheet(); };
+ACT.pzTab=k=>{ PZ.tab=k; PZ.pick=null; pzSheet(); };
+ACT.pzPick=id=>{ PZ.pick=+id; pzSheet(); };
+ACT.pzBack=()=>{ PZ.pick=null; pzSheet(); };
+ACT.pzClose=()=>{ PZ.pick=null; closeModal(); render(); };
+ACT.pzSend=id=>{ const r=pitchSend(+id); PZ.pick=null; closeModal(); render(); toast(r.txt); };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
