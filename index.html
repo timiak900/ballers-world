@@ -1152,6 +1152,72 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .ci-bar{display:grid;grid-template-columns:minmax(120px,42%) 1fr 78px;gap:10px;align-items:center;font-size:13px}
 .ci-bar b{text-align:right;font-size:12px}
 .ci-pos{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--panel-3)}
+.ci-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ci-tabs .chip{margin:0;width:100%;justify-content:center;text-align:center;padding-left:6px;padding-right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-hons{display:flex;flex-direction:column}
+.ci-hon{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.ci-hon:last-child{border-bottom:0}
+.ci-hon>b{font-size:22px;font-weight:800;text-align:center;color:var(--gold,#e3b324);line-height:1}
+.ci-hon span{display:block;font-size:13.5px;font-weight:600}
+.ci-hon small{display:block;font-size:11.5px;color:var(--mute);margin-top:2px}
+.ci-seas{display:flex;flex-direction:column}
+.ci-seas>div{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
+.ci-seas>div span:nth-child(2){color:var(--mute);overflow-wrap:anywhere}
+.ci-mgs{display:flex;flex-direction:column}
+.ci-mg{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.ci-mg:last-child{border-bottom:0}
+.ci-mg b{display:block;font-size:13.5px}
+.ci-mg b small{font-weight:500;color:var(--mute)}
+.ci-mg span:not(.pill){display:block;font-size:11.5px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+.ci-mg .pill{white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+.ci-mgr{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}
+.ci-mgr-top b{display:block;font-size:17px}
+.ci-mgr-top span{display:block;font-size:12.5px;color:var(--mute);margin-top:2px}
+.ci-mgr .lines b{text-align:right;overflow-wrap:anywhere}
+.pp-wrap{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:640px){.pp-wrap{grid-template-columns:1fr}}
+.pp-side{display:flex;flex-direction:column;min-width:0}
+.pp-pitch{position:relative;aspect-ratio:3/4;width:100%;max-width:280px;margin:0 auto;background:linear-gradient(180deg,#1f6a3d,#185731);border-radius:12px;border:2px solid rgba(255,255,255,.28);overflow:hidden}
+.pp-pitch .pp-half{position:absolute;left:0;right:0;top:50%;height:0;border-top:2px solid rgba(255,255,255,.22)}
+.pp-pitch .pp-box{position:absolute;left:28%;right:28%;height:13%;border:2px solid rgba(255,255,255,.22)}
+.pp-pitch .pp-box.b{bottom:-2px;border-bottom:0}.pp-pitch .pp-box.t{top:-2px;border-top:0}
+.pp-dot{position:absolute;transform:translate(-50%,-50%);min-width:42px;height:30px;padding:0 6px;border-radius:15px;font-size:11.5px;font-weight:800;color:#fff;border:2px solid rgba(255,255,255,.55);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.pp-dot.nat,.pp-k.nat{background:#16a35c}.pp-dot.acc,.pp-k.acc{background:#62b83f}.pp-dot.com,.pp-k.com{background:#d6a51d}.pp-dot.unc,.pp-k.unc{background:#e07a26}.pp-dot.awk,.pp-k.awk{background:#c9403f}
+.pp-dot.main{border-color:#fff;outline:3px solid rgba(255,255,255,.35)}
+.pp-dot.tr{animation:ppPulse 1.6s ease-in-out infinite}
+@keyframes ppPulse{50%{box-shadow:0 0 0 6px rgba(255,255,255,.18)}}
+@media (prefers-reduced-motion:reduce){.pp-dot.tr{animation:none}}
+.pp-key{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;margin-top:8px;font-size:11.5px;color:var(--mute)}
+.pp-key span{display:inline-flex;align-items:center;gap:5px}
+.pp-k{width:10px;height:10px;border-radius:50%;display:inline-block}
+.pp-cur{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}
+.pp-list{display:flex;flex-direction:column}
+.pp-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.pp-row:last-child{border-bottom:0}
+.pp-row b{display:block;font-size:13.5px}.pp-row b small{font-weight:500;color:var(--mute)}
+.pp-row>div>span{display:block;font-size:11.5px;color:var(--mute);margin-top:2px}
+.pp-row.main b{color:var(--accent)}
+.pp-row .btn{padding:4px 10px;font-size:12px}
+.pp-roles{display:flex;flex-direction:column;gap:8px}
+.pp-role{padding:10px 12px;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:6px}
+.pp-role.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.pp-role b{font-size:13.5px}
+.pp-ru{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center}
+.pp-ru .btn{padding:4px 10px;font-size:12px}
+.tl-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.tl-slots{grid-template-columns:1fr}}
+.tl-slot{display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}
+.tl-slot>span{font-size:11.5px;color:var(--mute)}
+.tl-slot.empty{border-style:dashed;background:none}
+.tl-slot.empty b{font-size:13px}
+.tl-slot .btn{align-self:flex-start;padding:4px 10px;font-size:12px}
+.tl-list{display:flex;flex-direction:column}
+.tl-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.tl-row:last-child{border-bottom:0}
+.tl-row b{font-size:13.5px}
+.tl-row .note{overflow-wrap:anywhere}
+.tl-row .btn{padding:4px 12px;font-size:12px}
+.dash>.seg.sqv{grid-column:1/-1}
 .dp-n{font-size:17px}
 .dp-path{display:flex;flex-wrap:wrap;gap:5px}
 .dp-st{font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--mute)}
@@ -1884,6 +1950,66 @@ const NATMIX={
 };
 const NATCODE_POOL=k=>NAMES[k]?k:({AUT:'GER',SUI:'GER',TUR:'GER',NIR:'IRL'}[k]||'ENG');
 
+// ===================== v47: more real first-team players (2025/26 squads; some will be out of date) =====================
+const KEYPLAYERS2={
+ 'Arsenal':'Jurriën Timber|RB|24|84|NED;Ben White|RB|27|82|ENG;Riccardo Calafiori|LB|23|82|ITA;Piero Hincapié|LB|23|82|ECU;Myles Lewis-Skelly|LB|18|78|ENG;Cristhian Mosquera|CB|21|78|ESP;Martín Zubimendi|CDM|26|86|ESP;Mikel Merino|CM|29|83|ESP;Christian Nørgaard|CDM|31|79|DEN;Eberechi Eze|CAM|27|84|ENG;Noni Madueke|RW|23|81|ENG;Gabriel Martinelli|LW|24|82|BRA;Leandro Trossard|LW|30|81|BEL;Kai Havertz|ST|26|83|GER;Ethan Nwaneri|CAM|18|77|ENG;Kepa Arrizabalaga|GK|30|78|ESP',
+ 'Liverpool':'Ibrahima Konaté|CB|26|85|FRA;Milos Kerkez|LB|21|81|HUN;Andy Robertson|LB|31|81|SCO;Jeremie Frimpong|RB|24|82|NED;Conor Bradley|RB|22|78|NIR;Joe Gomez|CB|28|78|ENG;Giovanni Leoni|CB|18|72|ITA;Alexis Mac Allister|CM|26|86|ARG;Curtis Jones|CM|24|80|ENG;Wataru Endō|CDM|32|77|JPN;Cody Gakpo|LW|26|83|NED;Hugo Ekitiké|ST|23|83|FRA;Federico Chiesa|RW|27|78|ITA;Rio Ngumoha|LW|16|70|ENG;Giorgi Mamardashvili|GK|24|82|GEO',
+ 'Manchester City':'Joško Gvardiol|CB|23|85|CRO;John Stones|CB|31|81|ENG;Nathan Aké|CB|30|80|NED;Abdukodir Khusanov|CB|21|77|UZB;Rayan Aït-Nouri|LB|24|81|ALG;Nico O\'Reilly|LB|20|76|ENG;Rico Lewis|RB|20|79|ENG;Matheus Nunes|RB|27|80|POR;Nico González|CDM|23|80|ESP;Mateo Kovačić|CM|31|81|CRO;Bernardo Silva|CAM|31|85|POR;Rayan Cherki|CAM|22|82|FRA;Savinho|RW|21|80|BRA;Oscar Bobb|RW|22|76|NOR;Omar Marmoush|ST|26|82|EGY;James Trafford|GK|22|78|ENG',
+ 'Manchester United':'Matthijs de Ligt|CB|26|82|NED;Leny Yoro|CB|19|79|FRA;Harry Maguire|CB|32|78|ENG;Ayden Heaven|CB|18|71|ENG;Luke Shaw|LB|30|78|ENG;Patrick Dorgu|LB|20|77|DEN;Diogo Dalot|RB|26|80|POR;Noussair Mazraoui|RB|27|79|MAR;Casemiro|CDM|33|80|BRA;Manuel Ugarte|CDM|24|79|URU;Mason Mount|CAM|26|78|ENG;Amad Diallo|RW|23|81|CIV;Joshua Zirkzee|ST|24|77|NED;Altay Bayındır|GK|27|75|TUR',
+ 'Chelsea':'Levi Colwill|CB|22|82|ENG;Wesley Fofana|CB|24|80|FRA;Trevoh Chalobah|CB|26|80|ENG;Benoît Badiashile|CB|24|78|FRA;Tosin Adarabioyo|CB|27|77|ENG;Jorrel Hato|LB|19|78|NED;Marc Cucurella|LB|27|83|ESP;Malo Gusto|RB|22|80|FRA;Romeo Lavia|CDM|21|78|BEL;Andrey Santos|CM|21|78|BRA;Pedro Neto|RW|25|82|POR;Alejandro Garnacho|LW|21|80|ARG;Jamie Gittens|LW|21|79|ENG;Liam Delap|ST|22|78|ENG;Marc Guiu|ST|19|72|ESP;Filip Jørgensen|GK|23|76|DEN',
+ 'Tottenham Hotspur':'Pedro Porro|RB|26|82|ESP;Destiny Udogie|LB|22|80|ITA;Djed Spence|LB|25|77|ENG;Kevin Danso|CB|27|78|AUT;Radu Drăgușin|CB|23|76|ROU;João Palhinha|CDM|30|81|POR;Rodrigo Bentancur|CM|28|80|URU;Pape Matar Sarr|CM|23|80|SEN;Lucas Bergvall|CM|19|77|SWE;Archie Gray|CM|19|76|ENG;Yves Bissouma|CDM|29|78|MLI;James Maddison|CAM|28|82|ENG;Brennan Johnson|RW|24|79|WAL;Wilson Odobert|LW|20|75|FRA;Randal Kolo Muani|ST|26|80|FRA;Richarlison|ST|28|77|BRA;Antonín Kinský|GK|22|74|CZE',
+ 'Newcastle United':'Kieran Trippier|RB|35|77|ENG;Tino Livramento|RB|22|80|ENG;Lewis Hall|LB|20|78|ENG;Dan Burn|CB|33|78|ENG;Fabian Schär|CB|33|78|SUI;Malick Thiaw|CB|24|79|GER;Joelinton|CM|29|81|BRA;Jacob Ramsey|CM|24|78|ENG;Joe Willock|CM|26|76|ENG;Harvey Barnes|LW|27|79|ENG;Jacob Murphy|RW|30|79|ENG;Anthony Elanga|RW|23|79|SWE;Yoane Wissa|ST|29|80|COD;Aaron Ramsdale|GK|27|77|ENG',
+ 'Aston Villa':'Pau Torres|CB|28|81|ESP;Tyrone Mings|CB|32|77|ENG;Victor Lindelöf|CB|31|77|SWE;Matty Cash|RB|28|79|POL;Lucas Digne|LB|32|78|FRA;Ian Maatsen|LB|23|77|NED;Boubacar Kamara|CDM|25|82|FRA;Amadou Onana|CDM|24|81|BEL;John McGinn|CM|31|80|SCO;Emiliano Buendía|CAM|28|78|ARG;Harvey Elliott|CAM|22|78|ENG;Jadon Sancho|LW|25|77|ENG;Evann Guessand|RW|24|77|CIV',
+ 'Brighton & Hove Albion':'Bart Verbruggen|GK|22|79|NED;Lewis Dunk|CB|33|78|ENG;Ferdi Kadıoğlu|LB|25|79|TUR;Joël Veltman|RB|33|75|NED;Mats Wieffer|CDM|26|78|NED;Diego Gómez|CM|22|76|PAR;Georginio Rutter|CAM|23|78|FRA;Brajan Gruda|RW|21|75|GER',
+ 'Crystal Palace':'Maxence Lacroix|CB|25|80|FRA;Chris Richards|CB|25|78|USA;Tyrick Mitchell|LB|25|78|ENG;Daichi Kamada|CM|29|78|JPN;Will Hughes|CM|30|76|ENG;Yeremy Pino|RW|22|78|ESP;Eddie Nketiah|ST|26|75|ENG',
+ 'Everton':'James Tarkowski|CB|32|79|ENG;Vitaliy Mykolenko|LB|26|77|UKR;Jake O\'Brien|RB|24|76|IRL;Séamus Coleman|RB|37|72|IRL;Idrissa Gueye|CDM|36|77|SEN;Kiernan Dewsbury-Hall|CM|27|78|ENG;Dwight McNeil|LW|25|77|ENG;Thierno Barry|ST|22|76|FRA;Beto|ST|27|75|POR',
+ 'Fulham':'Joachim Andersen|CB|29|79|DEN;Calvin Bassey|CB|25|77|NGA;Kenny Tete|RB|29|77|NED;Emile Smith Rowe|CAM|25|78|ENG;Harry Wilson|RW|28|78|WAL;Rodrigo Muniz|ST|24|77|BRA;Samuel Chukwueze|RW|26|77|NGA',
+ 'Bournemouth':'Đorđe Petrović|GK|25|78|SRB;Adrien Truffert|LB|23|77|FRA;Alex Jiménez|RB|20|74|ESP;James Hill|CB|23|74|ENG;Alex Scott|CM|22|77|ENG;Ryan Christie|CM|30|76|SCO;Lewis Cook|CM|28|76|ENG;Marcus Tavernier|LW|26|77|ENG;David Brooks|RW|28|76|WAL;Eli Junior Kroupi|ST|19|73|FRA',
+ 'Brentford':'Jordan Henderson|CM|35|77|ENG;Vitaly Janelt|CM|27|76|GER;Kristoffer Ajer|CB|27|76|NOR;Rico Henry|LB|28|75|ENG;Dango Ouattara|RW|23|77|BFA;Keane Lewis-Potter|LW|24|76|ENG',
+ 'Nottingham Forest':'Neco Williams|RB|24|78|WAL;Nikola Milenković|CB|27|81|SRB;Ibrahim Sangaré|CDM|27|77|CIV;Callum Hudson-Odoi|LW|24|78|ENG;Dan Ndoye|RW|24|78|SUI;Omari Hutchinson|RW|21|77|ENG;Igor Jesus|ST|24|76|BRA;Nicolò Savona|RB|22|75|ITA',
+ 'West Ham United':'Lucas Paquetá|CAM|28|81|BRA;Aaron Wan-Bissaka|RB|27|78|ENG;El Hadji Malick Diouf|LB|20|76|SEN;Mateus Fernandes|CM|21|76|POR;Niclas Füllkrug|ST|32|76|GER;Callum Wilson|ST|33|75|ENG;Alphonse Areola|GK|32|77|FRA',
+ 'Sunderland':'Omar Alderete|CB|28|76|PAR;Dan Ballard|CB|25|75|NIR;Trai Hume|RB|23|74|NIR;Habib Diarra|CM|21|76|SEN;Simon Adingra|LW|23|77|CIV;Chemsdine Talbi|RW|20|74|MAR;Bertrand Traoré|RW|30|74|BFA',
+ 'Leeds United':'Joe Rodon|CB|27|77|WAL;Pascal Struijk|CB|26|76|NED;Jayden Bogle|RB|25|75|ENG;Gabriel Gudmundsson|LB|26|74|SWE;Sean Longstaff|CM|27|75|ENG;Brenden Aaronson|CAM|24|75|USA;Daniel James|RW|27|75|WAL;Wilfried Gnonto|LW|21|75|ITA;Joël Piroe|ST|26|75|NED',
+ 'Wolverhampton Wanderers':'Jørgen Strand Larsen|ST|25|78|NOR;Emmanuel Agbadou|CB|28|77|CIV;Toti Gomes|CB|26|76|POR;Ladislav Krejčí|CB|26|76|CZE;Jhon Arias|RW|28|77|COL;Rodrigo Gomes|LW|22|74|POR;Jackson Tchatchoua|RB|24|74|CMR',
+ 'Burnley':'Maxime Estève|CB|23|75|FRA;Quilindschy Hartman|LB|24|73|NED;Hannibal Mejbri|CM|22|74|TUN;Jaidon Anthony|LW|26|74|ENG;Loum Tchaouna|RW|22|73|FRA;Lesley Ugochukwu|CDM|21|73|FRA',
+ 'Real Madrid':'Trent Alexander-Arnold|RB|26|85|ENG;Dani Carvajal|RB|33|82|ESP;Éder Militão|CB|27|83|BRA;Antonio Rüdiger|CB|32|84|GER;David Alaba|CB|33|79|AUT;Raúl Asencio|CB|22|76|ESP;Álvaro Carreras|LB|22|80|ESP;Ferland Mendy|LB|30|79|FRA;Eduardo Camavinga|CM|22|82|FRA;Dani Ceballos|CM|29|78|ESP;Rodrygo|RW|24|83|BRA;Franco Mastantuono|RW|18|77|ARG;Brahim Díaz|CAM|26|79|MAR;Gonzalo García|ST|21|74|ESP;Andriy Lunin|GK|26|78|UKR',
+ 'FC Barcelona':'Jules Koundé|RB|26|85|FRA;Alejandro Balde|LB|21|81|ESP;Ronald Araújo|CB|26|82|URU;Eric García|CB|24|79|ESP;Andreas Christensen|CB|29|79|DEN;Gerard Martín|LB|23|74|ESP;Marc Casadó|CDM|22|78|ESP;Gavi|CM|21|81|ESP;Dani Olmo|CAM|27|84|ESP;Fermín López|CAM|22|81|ESP;Marc Bernal|CDM|18|72|ESP;Marcus Rashford|LW|27|80|ENG;Ferran Torres|ST|25|80|ESP;Roony Bardghji|RW|19|73|SWE;Marc-André ter Stegen|GK|33|84|GER;Wojciech Szczęsny|GK|35|78|POL',
+ 'Atlético de Madrid':'Marcos Llorente|RB|30|81|ESP;Nahuel Molina|RB|27|78|ARG;Robin Le Normand|CB|28|81|ESP;José María Giménez|CB|30|81|URU;Dávid Hancko|CB|27|80|SVK;Clément Lenglet|CB|30|77|FRA;Matteo Ruggeri|LB|23|77|ITA;Conor Gallagher|CM|25|81|ENG;Pablo Barrios|CM|22|80|ESP;Johnny Cardoso|CDM|23|79|USA;Thiago Almada|CAM|24|78|ARG;Giuliano Simeone|RW|22|78|ARG;Nicolás González|LW|27|79|ARG;Alexander Sørloth|ST|29|81|NOR',
+ 'FC Bayern München':'Jonathan Tah|CB|29|84|GER;Kim Min-jae|CB|28|82|KOR;Hiroki Ito|CB|26|79|JPN;Alphonso Davies|LB|24|82|CAN;Raphaël Guerreiro|LB|31|78|POR;Konrad Laimer|RB|28|81|AUT;Josip Stanišić|RB|25|79|CRO;Sacha Boey|RB|25|77|FRA;Aleksandar Pavlović|CDM|21|80|GER;Leon Goretzka|CM|30|81|GER;Lennart Karl|CAM|17|72|GER;Serge Gnabry|RW|30|80|GER;Nicolas Jackson|ST|24|79|SEN;Jonas Urbig|GK|22|75|GER',
+ 'Borussia Dortmund':'Waldemar Anton|CB|29|80|GER;Niklas Süle|CB|29|77|GER;Ramy Bensebaini|LB|30|78|ALG;Daniel Svensson|LB|23|77|SWE;Julian Ryerson|RB|27|78|NOR;Yan Couto|RB|23|76|BRA;Emre Can|CDM|31|77|GER;Marcel Sabitzer|CM|31|80|AUT;Felix Nmecha|CM|24|79|GER;Pascal Groß|CM|34|78|GER;Jobe Bellingham|CM|19|76|ENG;Carney Chukwuemeka|CAM|21|74|ENG;Maximilian Beier|ST|22|79|GER;Fábio Silva|ST|23|75|POR',
+ 'Bayer 04 Leverkusen':'Edmond Tapsoba|CB|26|80|BFA;Jarell Quansah|CB|22|78|ENG;Loïc Badé|CB|25|78|FRA;Lucas Vázquez|RB|34|76|ESP;Robert Andrich|CDM|30|79|GER;Aleix García|CM|28|80|ESP;Malik Tillman|CAM|23|79|USA;Eliesse Ben Seghir|CAM|20|77|MAR;Claudio Echeverri|CAM|19|73|ARG;Ernest Poku|RW|21|75|NED;Nathan Tella|RW|26|77|NGA;Christian Kofane|ST|19|73|CMR',
+ 'RB Leipzig':'Castello Lukeba|CB|22|80|FRA;El Chadaille Bitshiabu|CB|20|75|FRA;David Raum|LB|27|79|GER;Xaver Schlager|CM|27|80|AUT;Nicolas Seiwald|CDM|24|78|AUT;Assan Ouédraogo|CAM|19|74|GER;Antonio Nusa|LW|20|77|NOR;Johan Bakayoko|RW|22|77|BEL;Rômulo|ST|23|75|BRA',
+ 'Eintracht Frankfurt':'Kaua Santos|GK|22|76|BRA;Arthur Theate|CB|25|78|BEL;Nathaniel Brown|LB|22|76|GER;Rasmus Kristensen|RB|28|77|DEN;Hugo Larsson|CM|21|78|SWE;Ellyes Skhiri|CDM|30|77|TUN;Mario Götze|CAM|33|76|GER;Jean-Mattéo Bahoya|LW|20|74|FRA',
+ 'VfB Stuttgart':'Jeff Chabot|CB|27|77|GER;Maximilian Mittelstädt|LB|28|78|GER;Atakan Karazor|CDM|28|77|GER;Bilal El Khannouss|CAM|21|77|MAR;Jamie Leweling|RW|24|78|GER;Ermedin Demirović|ST|27|78|BIH',
+ 'Inter':'Manuel Akanji|CB|30|82|SUI;Francesco Acerbi|CB|37|79|ITA;Stefan de Vrij|CB|33|79|NED;Yann Bisseck|CB|24|79|GER;Federico Dimarco|LB|27|83|ITA;Carlos Augusto|LB|26|77|BRA;Denzel Dumfries|RB|29|82|NED;Henrikh Mkhitaryan|CM|36|79|ARM;Piotr Zieliński|CM|31|80|POL;Davide Frattesi|CM|25|79|ITA;Petar Sučić|CM|22|77|CRO;Luis Henrique|RW|23|76|BRA;Ange-Yoan Bonny|ST|21|76|FRA;Pio Esposito|ST|20|73|ITA;Josep Martínez|GK|27|77|ESP',
+ 'AC Milan':'Fikayo Tomori|CB|27|80|ENG;Strahinja Pavlović|CB|24|79|SRB;Matteo Gabbia|CB|25|78|ITA;Koni De Winter|CB|23|76|BEL;Pervis Estupiñán|LB|27|79|ECU;Davide Bartesaghi|LB|19|72|ITA;Youssouf Fofana|CM|26|79|FRA;Samuele Ricci|CDM|24|79|ITA;Ruben Loftus-Cheek|CM|29|78|ENG;Ardon Jashari|CM|23|78|SUI;Alexis Saelemaekers|RW|26|79|BEL;Christopher Nkunku|ST|27|80|FRA;Santiago Giménez|ST|24|78|MEX',
+ 'Juventus':'Pierre Kalulu|CB|25|80|FRA;Federico Gatti|CB|27|79|ITA;Lloyd Kelly|CB|26|77|ENG;Andrea Cambiaso|LB|25|81|ITA;Juan Cabal|LB|24|77|COL;Khéphren Thuram|CM|24|80|FRA;Weston McKennie|CM|27|79|USA;Francisco Conceição|RW|22|80|POR;Edon Zhegrova|RW|26|79|KOS;Loïs Openda|ST|25|80|BEL;Michele Di Gregorio|GK|28|81|ITA',
+ 'Napoli':'Giovanni Di Lorenzo|RB|32|82|ITA;Amir Rrahmani|CB|31|80|KOS;Sam Beukema|CB|26|79|NED;Mathías Olivera|LB|27|78|URU;Leonardo Spinazzola|LB|32|77|ITA;André-Frank Zambo Anguissa|CM|29|82|CMR;Billy Gilmour|CM|24|78|SCO;Matteo Politano|RW|32|79|ITA;David Neres|LW|28|80|BRA;Noa Lang|LW|26|79|NED;Romelu Lukaku|ST|32|81|BEL;Lorenzo Lucca|ST|25|77|ITA;Vanja Milinković-Savić|GK|28|79|SRB',
+ 'Roma':'Gianluca Mancini|CB|29|80|ITA;Mario Hermoso|CB|30|78|ESP;Angeliño|LB|28|79|ESP;Wesley|RB|21|76|BRA;Bryan Cristante|CDM|30|78|ITA;Lorenzo Pellegrini|CAM|29|79|ITA;Stephan El Shaarawy|LW|32|76|ITA;Artem Dovbyk|ST|28|80|UKR;Evan Ferguson|ST|20|75|IRL',
+ 'Lazio':'Mario Gila|CB|24|79|ESP;Nuno Tavares|LB|25|78|POR;Adam Marušić|RB|32|77|MNE;Nicolò Rovella|CDM|23|79|ITA;Mattéo Guendouzi|CM|26|79|FRA;Gustav Isaksen|RW|24|77|DEN;Boulaye Dia|ST|28|76|SEN',
+ 'Atalanta':'Isak Hien|CB|26|79|SWE;Berat Djimsiti|CB|32|77|ALB;Davide Zappacosta|RB|33|76|ITA;Marten de Roon|CDM|34|78|NED;Mario Pašalić|CM|30|78|CRO;Nikola Krstović|ST|25|78|MNE;Kamaldeen Sulemana|LW|23|75|GHA',
+ 'Bologna':'Jhon Lucumí|CB|27|79|COL;Juan Miranda|LB|25|77|ESP;Remo Freuler|CDM|33|77|SUI;Jens Odgaard|CAM|26|76|DEN;Thijs Dallinga|ST|24|76|NED;Jonathan Rowe|LW|22|75|ENG',
+ 'Como':'Marc-Oliver Kempf|CB|30|76|GER;Lucas Da Cunha|CM|24|77|FRA;Máximo Perrone|CDM|22|77|ARG;Assane Diao|RW|20|75|SEN;Jayden Addai|RW|20|72|NED',
+ 'Villarreal CF':'Pau Navarro|CB|20|74|ESP;Juan Foyth|RB|27|79|ARG;Sergi Cardona|LB|26|76|ESP;Dani Parejo|CM|36|78|ESP;Pape Gueye|CDM|26|78|SEN;Thomas Partey|CDM|32|79|GHA;Nicolas Pépé|RW|30|77|CIV;Georges Mikautadze|ST|24|78|GEO;Tajon Buchanan|RW|26|75|CAN',
+ 'Real Betis':'Diego Llorente|CB|31|76|ESP;Marc Bartra|CB|34|75|ESP;Ricardo Rodríguez|LB|32|76|SUI;Héctor Bellerín|RB|30|75|ESP;Pablo Fornals|CM|29|78|ESP;Marc Roca|CDM|28|77|ESP;Abde Ezzalzouli|LW|23|78|MAR;Rodrigo Riquelme|LW|25|76|ESP;Pau López|GK|30|76|ESP',
+ 'Athletic Club':'Dani Vivian|CB|26|81|ESP;Yeray Álvarez|CB|30|78|ESP;Aitor Paredes|CB|25|77|ESP;Yuri Berchiche|LB|35|75|ESP;Mikel Jauregizar|CDM|21|77|ESP;Iñigo Ruiz de Galarreta|CM|32|78|ESP;Mikel Vesga|CM|32|76|ESP;Álex Berenguer|LW|30|77|ESP;Gorka Guruzeta|ST|28|77|ESP',
+ 'Real Sociedad':'Igor Zubeldia|CB|28|79|ESP;Jon Aramburu|RB|22|75|VEN;Sergio Gómez|LB|24|76|ESP;Beñat Turrientes|CM|23|77|ESP;Pablo Marín|CM|22|75|ESP;Ander Barrenetxea|LW|23|77|ESP;Gonçalo Guedes|RW|28|76|POR;Orri Óskarsson|ST|21|75|ISL',
+ 'Sevilla FC':'Tanguy Nianzou|CB|23|76|FRA;José Ángel Carmona|RB|23|75|ESP;Lucien Agoumé|CDM|23|76|FRA;Djibril Sow|CM|28|76|SUI;Chidera Ejuke|LW|27|75|NGA;Alexis Sánchez|ST|36|72|CHI',
+ 'Valencia CF':'Mouctar Diakhaby|CB|28|77|GUI;César Tárrega|CB|23|76|ESP;Pepelu|CDM|27|77|ESP;Luis Rioja|LW|31|75|ESP;Diego López|RW|23|76|ESP;Dani Rodríguez|CAM|37|72|ESP',
+ 'Paris Saint-Germain':'Lucas Chevalier|GK|23|82|FRA;Nuno Mendes|LB|23|86|POR;Lucas Hernández|LB|29|79|FRA;Illia Zabarnyi|CB|23|80|UKR;Lucas Beraldo|CB|21|78|BRA;Fabián Ruiz|CM|29|83|ESP;Warren Zaïre-Emery|CM|19|81|FRA;Senny Mayulu|CM|19|74|FRA;Lee Kang-in|CAM|24|79|KOR;Bradley Barcola|LW|23|82|FRA;Gonçalo Ramos|ST|24|80|POR;Ibrahim Mbaye|RW|17|70|FRA',
+ 'Olympique de Marseille':'Leonardo Balerdi|CB|26|80|ARG;Benjamin Pavard|CB|29|79|FRA;CJ Egan-Riley|CB|22|75|ENG;Ulisses Garcia|LB|29|75|SUI;Geoffrey Kondogbia|CDM|32|77|CTA;Angel Gomes|CAM|24|78|ENG;Amine Gouiri|ST|25|79|ALG;Matt O\'Riley|CM|24|78|DEN;Hamed Junior Traorè|CAM|25|75|CIV',
+ 'AS Monaco':'Philipp Köhn|GK|27|78|SUI;Thilo Kehrer|CB|28|78|GER;Mohammed Salisu|CB|26|77|GHA;Caio Henrique|LB|28|78|BRA;Vanderson|RB|24|79|BRA;Denis Zakaria|CDM|28|80|SUI;Maghnes Akliouche|RW|23|79|FRA;Ansu Fati|LW|22|75|ESP;Mika Biereth|ST|22|77|DEN',
+ 'Olympique Lyonnais':'Clinton Mata|CB|32|76|ANG;Nicolás Tagliafico|LB|32|77|ARG;Ainsley Maitland-Niles|RB|27|74|ENG;Orel Mangala|CDM|27|77|BEL;Tanner Tessmann|CM|23|76|USA;Ernest Nuamah|RW|21|76|GHA;Martín Satriano|ST|24|74|URU;Rémy Descamps|GK|29|74|FRA',
+ 'LOSC Lille':'Aïssa Mandi|CB|33|76|ALG;Nathan Ngoy|CB|22|75|BEL;Romain Perraud|LB|28|76|FRA;Thomas Meunier|RB|33|75|BEL;Ayyoub Bouaddi|CDM|17|73|FRA;Nabil Bentaleb|CM|30|75|ALG;Félix Correia|LW|24|75|POR;Osame Sahraoui|LW|24|75|NOR',
+ 'SL Benfica':'Tomás Araújo|CB|23|79|POR;António Silva|CB|21|80|POR;Samuel Dahl|LB|22|75|SWE;Amar Dedić|RB|22|77|BIH;Enzo Barrenechea|CDM|24|77|ARG;Leandro Barreiro|CM|25|77|LUX;Georgiy Sudakov|CAM|22|80|UKR;Andreas Schjelderup|LW|21|77|NOR;Franjo Ivanović|ST|21|75|CRO',
+ 'FC Porto':'Jan Bednarek|CB|29|78|POL;Nehuén Pérez|CB|25|77|ARG;Francisco Moura|LB|26|76|POR;Martim Fernandes|RB|19|75|POR;Victor Froholdt|CM|19|74|DEN;Pablo Rosario|CDM|28|75|NED;William Gomes|LW|19|75|BRA;Borja Sainz|LW|24|77|ESP;Luuk de Jong|ST|35|75|NED',
+ 'Sporting CP':'Ousmane Diomande|CB|21|80|CIV;Zeno Debast|CB|21|78|BEL;Maximiliano Araújo|LB|25|78|URU;Iván Fresneda|RB|21|74|ESP;Hidemasa Morita|CM|30|79|JPN;Daniel Bragança|CM|26|77|POR;Geovany Quenda|RW|18|78|POR;Geny Catamo|RW|24|76|MOZ;Fotis Ioannidis|ST|25|78|GRE',
+ 'AFC Ajax':'Josip Šutalo|CB|25|77|CRO;Youri Baas|CB|22|76|NED;Anton Gaaei|RB|22|75|DEN;Davy Klaassen|CM|32|75|NED;Kian Fitz-Jim|CM|22|73|NED;Oliver Edvardsen|LW|25|76|NOR;Steven Berghuis|RW|33|76|NED;Kasper Dolberg|ST|27|76|DEN',
+ 'PSV':'Sergiño Dest|RB|24|77|USA;Ryan Flamingo|CB|22|77|NED;Mauro Júnior|LB|26|75|BRA;Jerdy Schouten|CDM|28|79|NED;Ismael Saibari|CAM|24|79|MAR;Dennis Man|RW|26|76|ROU;Couhaib Driouech|LW|23|75|NED;Matej Kovář|GK|25|76|CZE',
+ 'Feyenoord':'Gernot Trauner|CB|33|76|AUT;Tsuyoshi Watanabe|CB|28|76|JPN;Jordan Lotomba|RB|26|74|SUI;Gijs Smal|LB|28|75|NED;Hwang In-beom|CM|28|78|KOR;Luciano Valente|CAM|21|74|NED;Leo Sauer|LW|19|72|SVK;Casper Tengstedt|ST|25|74|DEN'};
+{ const all=new Set(); for(const k in KEYPLAYERS) KEYPLAYERS[k].split(';').filter(Boolean).forEach(x=>all.add(x.split('|')[0]));
+  for(const k in KEYPLAYERS2){ if(!KEYPLAYERS2[k]) continue; const add=KEYPLAYERS2[k].split(';').filter(x=>{ const n=x&&x.split('|')[0]; if(!n||all.has(n)) return false; all.add(n); return true; }); if(add.length) KEYPLAYERS[k]=(KEYPLAYERS[k]?KEYPLAYERS[k]+';':'')+add.join(';'); } }
+
 // ---------- extra name pools so national teams and generated players sound right ----------
 Object.assign(NAMES,{
  EGY:{f:'Mohamed,Ahmed,Mahmoud,Omar,Mostafa,Karim,Hossam,Amr,Tarek,Youssef,Ibrahim,Ramadan,Emam,Zizo,Akram,Marwan,Hamdy,Nabil',l:'Salah,Hegazy,Fathy,Abdelmonem,Trezeguet,Elneny,Hamdi,Sobhi,Ashour,Shobeir,Gaber,Rabia,Attia,Marmoush,Kamal,Mostafa,Hassan,Fawzy'},
@@ -2472,7 +2598,7 @@ function windowOpen(){ const w=S.week; return (w>=WINDOW_SUMMER[0]&&w<=WINDOW_SU
 function genOffers(n){
   if(S.me.age<17&&S.me.club!=null) return youthOffers(n);
   const m=S.me, ag=agentObj(), o=ovr(), cur=m.club!=null?club(m.club):null; const contacts=ag?(ag.type==='Connected'?[...new Set(ag[5].concat(['ENG','ESP','ITA','GER','FRA','POR','NED']))]:ag[5]):(cur&&cur.country?[cur.country]:['ENG']);
-  const have=new Set(m.offers.map(x=>x.club)); const cands=S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&c.id!==m.club&&!have.has(c.id)).filter(c=>!cur||rivalry(cur.id,c.id)<2||m.transferReq&&Math.random()<.2).filter(c=>{ const L=clubLevel(c); if(o<L-7-(ag?2:0)||o>L+12) return false; if(!contacts.includes(c.country)&&Math.random()>.12+(m.wrep||0)/160) return false; if(m.rep<c.rep-45-(ag?ag.skill*15:0)) return false; return true; });
+  const have=new Set(m.offers.map(x=>x.club)); const cands=S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&c.id!==m.club&&!have.has(c.id)).filter(c=>!cur||rivalry(cur.id,c.id)<2||m.transferReq&&Math.random()<.2||typeof rivalCross==='function'&&Math.random()<rivalCross(cur.id,c.id)*.25).filter(c=>{ const L=clubLevel(c); if(o<L-7-(ag?2:0)||o>L+12) return false; if(!contacts.includes(c.country)&&Math.random()>.12+(m.wrep||0)/160) return false; if(m.rep<c.rep-45-(ag?ag.skill*15:0)) return false; return true; });
   const picks=cands.map(c=>({c,s:c.rep+rnd(0,25)-Math.abs(clubLevel(c)-o)*2})).sort((a,b)=>b.s-a.s).slice(0,n).map(x=>x.c);
   const loanMode=m.loanReq||(['Prospect','Rotation'].includes(m.contract&&m.contract.role)&&m.age<=22&&Math.random()<.5);
   let apCount=0; picks.forEach((c,i)=>{ const loan=loanMode&&i%2===0&&clubLevel(c)<clubLevel(cur||c)&&m.club!=null; if(!loan&&m.club!=null&&!m.loan&&typeof startApproach==='function'){ startApproach(c.id); apCount++; return; } const ft=fairTerms(c.id); const fee=m.club==null||loan?0:Math.round(myValue()*rnd(.85,1.35)/1e4)*1e4;
@@ -2598,8 +2724,7 @@ function developWorld(){
   for(const p of S.players){ p.a++; if(p.a<=23){ p.o=Math.min(p.pt,p.o+ri(1,4)); } else if(p.a<=29){ p.o+=ri(-1,1); } else if(p.a<=32){ p.o-=ri(0,2); } else p.o-=ri(1,4); p.o=clamp(p.o,35,94); p.sn++;
     if(p.a>=35&&Math.random()<(p.a-33)*.25){ // retire and replace with a youngster
       const c=club(p.c), lvl=clubLevel(c); if(p.real) (S._retN=S._retN||[]).push({n:p.n,a:p.a,o:p.o}); p.n=nameFor(c.country&&NATMIX[c.country]?natFor(c.country):'ENG'); p.a=ri(17,19); p.o=Math.round(clamp(lvl-ri(8,14),35,80)); p.pt=p.o+ri(6,20); p.real=0; p.sn=0; if(S.me&&S.me.mates&&S.me.mates[p.id]!=null) S.me.mates[p.id]=ri(35,50); } }
-  // managers sometimes change
-  S.clubs.forEach(c=>{ if(S.mode==='mgr'&&c.id===myClubId()) return; if(c.league&&Math.random()<.12){ const old=c.mgr; c.mgr=nameFor(c.country&&NAMES[c.country]?c.country:'ENG'); if(S.me&&c.id===myClubId()){ if(typeof managerChange==='function') managerChange(c.id,old,c.mgr,'left',S.me.rel.manager); news('bad',`${old} leaves ${c.name}`,`${c.mgr} is the new manager. Everyone starts from scratch.`); S.me.rel.manager=50; S.me.rel.tactical=Math.round(S.me.rel.tactical*.4); S.me.promises=[]; } else if(c.rep>=80) news('world',`${c.name} appoint ${c.mgr}`,`${old} has left the club.`); } });
+  // managers: see mgSummer (engine47)
   refreshLevels(); S.clubs.forEach(c=>{ if(c.league) pickCaptains(c.id); }); }
 function developMe(){ const m=S.me; m.age++; const o=ovr(); const a=m.attrs;
   const tm=m.talentMult||1; ATTRS_LIST.forEach(k=>{ if(m.age<=21&&o<m.pot) a[k]=Math.min(99,a[k]+(Math.random()<.32*tm?ri(1,2):0)); else if(m.age<=26&&o<m.pot) a[k]=Math.min(99,a[k]+(Math.random()<.25*tm?1:0)); else if(m.age>=31){ const drop=['acc','spd','agi','stm'].includes(k)?ri(0,2):(Math.random()<.3?1:0); a[k]=Math.max(25,a[k]-drop); } });
@@ -2956,10 +3081,10 @@ function genReactionOld(){
 // ===================== REALISTIC TRANSFER MARKET =====================
 // Market values, contracts, untouchables, rivalries, budgets, player willingness, three-club chains.
 const RIVAL_PAIRS=[['Arsenal','Tottenham Hotspur'],['Arsenal','Chelsea'],['Chelsea','Tottenham Hotspur'],['Liverpool','Everton'],['Liverpool','Manchester United'],['Manchester United','Manchester City'],['Newcastle United','Sunderland'],['Aston Villa','Birmingham City'],['West Ham United','Millwall'],['West Ham United','Tottenham Hotspur'],['Crystal Palace','Brighton & Hove Albion'],['Leeds United','Manchester United'],['Sheffield United','Sheffield Wednesday'],['Nottingham Forest','Derby County'],['Bristol City','Bristol Rovers'],['Stoke City','Port Vale'],['Ipswich Town','Norwich City'],['Southampton','Portsmouth'],['Cardiff City','Swansea City'],['Blackburn Rovers','Burnley'],['West Bromwich Albion','Wolverhampton Wanderers'],['Bolton Wanderers','Wigan Athletic'],['Coventry City','Leicester City'],['Fulham','Chelsea'],['Brentford','Queens Park Rangers'],['Charlton Athletic','Millwall'],['Liverpool','Manchester City'],
- ['Real Madrid','FC Barcelona'],['Real Madrid','Atlético de Madrid'],['FC Barcelona','Espanyol'],['Sevilla FC','Real Betis'],['Athletic Club','Real Sociedad'],['Celta','Deportivo de La Coruña'],['Real Oviedo','Sporting de Gijón'],['Valencia CF','Real Madrid'],['FC Barcelona','Atlético de Madrid'],
+ ['Real Madrid','FC Barcelona'],['Real Madrid','Atlético de Madrid'],['FC Barcelona','RCD Espanyol'],['Sevilla FC','Real Betis'],['Athletic Club','Real Sociedad'],['RC Celta','Deportivo de La Coruña'],['Real Oviedo','Sporting de Gijón'],['Valencia CF','Real Madrid'],['FC Barcelona','Atlético de Madrid'],
  ['Inter','AC Milan'],['Inter','Juventus'],['AC Milan','Juventus'],['Juventus','Torino'],['Genoa','Sampdoria'],['Roma','Lazio'],['Napoli','Juventus'],['Fiorentina','Juventus'],['Napoli','Roma'],
- ['Borussia Dortmund','Schalke 04'],['FC Bayern München','Borussia Dortmund'],['Hamburger SV','Werder Bremen'],['Hamburger SV','FC St. Pauli'],['1. FC Köln','Borussia Mönchengladbach'],['FC Bayern München','Bayer 04 Leverkusen'],
- ['Paris Saint-Germain','Olympique de Marseille'],['Olympique Lyonnais','AS Saint-Étienne'],['RC Lens','Lille'],['OGC Nice','AS Monaco'],['Olympique de Marseille','Olympique Lyonnais'],
+ ['Borussia Dortmund','FC Schalke 04'],['FC Bayern München','Borussia Dortmund'],['Hamburger SV','SV Werder Bremen'],['Hamburger SV','FC St. Pauli'],['1. FC Köln','Borussia Mönchengladbach'],['FC Bayern München','Bayer 04 Leverkusen'],
+ ['Paris Saint-Germain','Olympique de Marseille'],['Olympique Lyonnais','AS Saint-Étienne'],['RC Lens','LOSC Lille'],['OGC Nice','AS Monaco'],['Olympique de Marseille','Olympique Lyonnais'],
  ['SL Benfica','Sporting CP'],['SL Benfica','FC Porto'],['FC Porto','Sporting CP'],['SC Braga','Vitória SC'],
  ['AFC Ajax','Feyenoord'],['AFC Ajax','PSV'],['PSV','Feyenoord'],
  ['Shamrock Rovers','Bohemians'],['Bohemians','Shelbourne'],['Shamrock Rovers',"St Patrick's Athletic"],['Dundalk','Drogheda United'],['Derry City','Finn Harps']];
@@ -3017,7 +3142,7 @@ function sellerTerms(p,seller,buyer){ const v=marketValue(p); if(ctOf(p)<=0) ret
   const r=rivalry(seller.id,buyer.id); let mult=1, chance=1;
   if(untouchable(p)){ mult=2.4; chance=.08; }
   else { const s=standing(p); if(s.rank<8) { mult=1.35; chance=.6; } else if(s.starter){ mult=1.2; chance=.75; } else { mult=.9; chance=.95; } }
-  if(r===2){ chance*=.04; mult*=1.6; } else if(r===1){ chance*=.3; mult*=1.3; }
+  if(r===2){ chance*=typeof rivalCross==='function'?clamp(rivalCross(seller.id,buyer.id)*.3,.008,.16):.04; mult*=1.6; } else if(r===1){ chance*=.3; mult*=1.3; }
   if(buyer.rep<seller.rep-4){ chance*=.35; } // big clubs rarely sell down unless he's surplus
   if(ctOf(p)===1){ mult*=.8; chance=Math.min(1,chance*1.6); }
   if(S.week>=WINDOW_WINTER[0]&&S.week<=WINDOW_WINTER[1]&&standing(p).starter) chance*=.5; // mid-season, keep your starters
@@ -3410,7 +3535,7 @@ function rumourWeek(){ S.rumours=S.rumours||[]; const inWin=windowOpen(); const 
   const pool=S.players.filter(p=>{ const c=club(p.c); return c&&c.league&&c.league!=='EUR'&&!c.b&&p.a<=31&&(p.o>=72||(p.real&&p.o>=68))&&p.mv!==S.season; });
   const buyers=S.clubs.filter(c=>c.league&&c.league!=='EUR'&&!c.b&&S.leagues[c.league]);
   for(let i=0;i<n&&pool.length;i++){ const p=pick(pool); const from=club(p.c); if(S.rumours.some(r=>r.pid===p.id&&r.st==='open')) continue;
-    const opts=buyers.filter(b=>b.id!==from.id&&b.rep>=from.rep-3&&clubLevel(b)>=p.o-5&&clubLevel(b)<=p.o+6&&rivalry(b.id,from.id)<2&&!(S.mode==='mgr'&&b.id===myc)); if(!opts.length) continue;
+    const opts=buyers.filter(b=>b.id!==from.id&&b.rep>=from.rep-3&&clubLevel(b)>=p.o-5&&clubLevel(b)<=p.o+6&&(rivalry(b.id,from.id)<2||typeof rivalCross==='function'&&Math.random()<rivalCross(b.id,from.id)*.3)&&!(S.mode==='mgr'&&b.id===myc)); if(!opts.length) continue;
     const to=pick(opts); const src=Math.random()<.5?pick(RUMOUR_SRC.slice(0,5)):pick(RUMOUR_SRC); S.rumours.unshift(rumourFor(p,to,src)); }
   // stories about you (player career)
   if(S.mode!=='mgr'&&S.me){ for(const a of (S.me.approaches||[])){ if(a.stage==='dead'||a.rumoured) continue; a.rumoured=1; const to=club(a.club); S.rumours.unshift({s:S.season,w:S.week,pid:-1,n:(S.me.first+" "+S.me.last),pos:S.me.pos,o:ovr(),from:S.me.club,to:a.club,src:'The Touchline',rel:.85,txt:`${to.name} have made contact over ${(S.me.first+" "+S.me.last)}. ${a.stage==='bid'||a.stage==='agreed'?'A bid has gone in.':'Their scouts have been at the last few games.'}`,st:'open',me:1}); } }
@@ -6827,6 +6952,447 @@ function youthIntake(c){ const n=ri(3,5); const lvl=clubLevel(c); const got=[]; 
   const best=got.slice().sort((a,b)=>b.pt-a.pt)[0]; news('good','Youth intake day',`${n} youngsters join the first-team squad from the academy. The coaches are most excited about ${best.n} (${best.p}, ${best.a}).`); }
 function takeJob(cid){ const M=S.M; M.jobs=[]; mgrJoin(cid,false); }
 
+// ===================== v47 data: real club honours, legends, past managers and managers' profiles =====================
+// Honours before the 2025/26 season (Irish clubs: before the 2025 season). Codes: L league, C main cup, LC league cup,
+// UCL European Cup / Champions League, UEL UEFA Cup / Europa League, UECL Conference League, CWC Cup Winners' Cup, FC Fairs Cup.
+// Format: code count/last year won. Some details will be out of date.
+const CLUB_HON={
+ 'Arsenal':'L13/2004,C14/2020,LC2/1993,CWC1/1994,FC1/1970','Aston Villa':'L7/1981,C7/1957,LC5/1996,UCL1/1982','Chelsea':'L6/2017,C8/2018,LC5/2015,UCL2/2021,UEL2/2019,UECL1/2025,CWC2/1998',
+ 'Everton':'L9/1987,C5/1995,CWC1/1985','Liverpool':'L20/2025,C8/2022,LC10/2024,UCL6/2019,UEL3/2001','Manchester City':'L10/2024,C7/2023,LC8/2021,UCL1/2023,CWC1/1970',
+ 'Manchester United':'L20/2013,C13/2024,LC6/2023,UCL3/2008,UEL1/2017,CWC1/1991','Newcastle United':'L4/1927,C6/1955,LC1/2025,FC1/1969','Tottenham Hotspur':'L2/1961,C8/1991,LC4/2008,UEL3/2025,CWC1/1963',
+ 'West Ham United':'C3/1980,UECL1/2023,CWC1/1965','Crystal Palace':'C1/2025','Nottingham Forest':'L1/1978,C2/1959,LC4/1990,UCL2/1980','Leeds United':'L3/1992,C1/1972,LC1/1968,FC2/1971',
+ 'Wolverhampton Wanderers':'L3/1959,C4/1960,LC2/1980','Sunderland':'L6/1936,C2/1973','Burnley':'L2/1960,C1/1914','Leicester City':'L1/2016,C1/2021,LC3/2000','Blackburn Rovers':'L3/1995,C6/1928,LC1/2002',
+ 'Ipswich Town':'L1/1962,C1/1978,UEL1/1981','Portsmouth':'L2/1950,C2/2008','Sheffield Wednesday':'L4/1930,C3/1935,LC1/1991','Sheffield United':'L1/1898,C4/1925','Derby County':'L2/1975,C1/1946',
+ 'West Bromwich Albion':'L1/1920,C5/1968,LC1/1966','Birmingham City':'LC2/2011','Southampton':'C1/1976','Middlesbrough':'LC1/2004','Stoke City':'LC1/1972','Swansea City':'LC1/2013','Norwich City':'LC2/1985',
+ 'Coventry City':'C1/1987','Wigan Athletic':'C1/2013','Bolton Wanderers':'C4/1958','Huddersfield Town':'L3/1926,C1/1922','Cardiff City':'C1/1927','Luton Town':'LC1/1988','Queens Park Rangers':'LC1/1967',
+ 'Oxford United':'LC1/1986','Charlton Athletic':'C1/1947','Preston North End':'L2/1890,C2/1938','Barnsley':'C1/1912','Blackpool':'C1/1953','Bradford City':'C1/1911','Notts County':'C1/1894',
+ 'Real Madrid':'L36/2024,C20/2023,UCL15/2024,UEL2/1986','FC Barcelona':'L28/2025,C32/2025,UCL5/2015,CWC4/1997,FC3/1966','Atlético de Madrid':'L11/2021,C10/2013,UEL3/2018,CWC1/1962',
+ 'Athletic Club':'L8/1984,C24/2024','Valencia CF':'L6/2004,C8/2019,UEL1/2004,CWC1/1980,FC2/1963','Real Sociedad':'L2/1982,C3/2020','Sevilla FC':'L1/1946,C5/2010,UEL7/2023','Real Betis':'L1/1935,C3/2022',
+ 'Villarreal CF':'UEL1/2021','RCD Espanyol':'C4/2006','RCD Mallorca':'C1/2003','Real Zaragoza':'C6/2004,CWC1/1995,FC1/1964','Deportivo de La Coruña':'L1/2000,C2/2002',
+ 'Juventus':'L36/2020,C15/2024,UCL2/1996,UEL3/1993,CWC1/1984','Inter':'L20/2024,C9/2023,UCL3/2010,UEL3/1998','AC Milan':'L19/2022,C5/2003,UCL7/2007,CWC2/1973','Napoli':'L4/2025,C6/2020,UEL1/1989',
+ 'Roma':'L3/2001,C9/2008,UECL1/2022,FC1/1961','Lazio':'L2/2000,C7/2019,CWC1/1999','Atalanta':'C1/1963,UEL1/2024','Fiorentina':'L2/1969,C6/2001,CWC1/1961','Bologna':'L7/1964,C3/2025','Torino':'L7/1976,C5/1993',
+ 'Genoa':'L9/1924,C1/1937','Cagliari':'L1/1970','Hellas Verona':'L1/1985','Parma':'C3/2002,UEL2/1999,CWC1/1993','Sampdoria':'L1/1991,C4/1994,CWC1/1990','Venezia':'C1/1941',
+ 'FC Bayern München':'L34/2025,C20/2020,UCL6/2020,UEL1/1996,CWC1/1967','Borussia Dortmund':'L8/2012,C5/2021,UCL1/1997,CWC1/1966','Bayer 04 Leverkusen':'L1/2024,C2/2024,UEL1/1988','RB Leipzig':'C2/2023',
+ 'VfB Stuttgart':'L5/2007,C4/2025','Eintracht Frankfurt':'L1/1959,C5/2018,UEL2/2022','Borussia Mönchengladbach':'L5/1977,C3/1995,UEL2/1979','SV Werder Bremen':'L4/2004,C6/2009,CWC1/1992',
+ 'VfL Wolfsburg':'L1/2009,C1/2015','Hamburger SV':'L6/1983,C3/1987,UCL1/1983,CWC1/1977','1. FC Köln':'L3/1978,C4/1983','FC Schalke 04':'L7/1958,C5/2011,UEL1/1997','1. FC Kaiserslautern':'L4/1998,C2/1996',
+ '1. FC Nürnberg':'L9/1968,C4/2007','Hertha BSC':'L2/1931','Fortuna Düsseldorf':'L1/1933,C2/1980','Hannover 96':'L2/1954,C1/1992','Eintracht Braunschweig':'L1/1967','Karlsruher SC':'L1/1909,C2/1956',
+ 'Paris Saint-Germain':'L13/2025,C16/2025,UCL1/2025,CWC1/1996','Olympique de Marseille':'L9/2010,C10/1989,UCL1/1993','Olympique Lyonnais':'L7/2008,C5/2012','AS Monaco':'L8/2017,C5/1991','LOSC Lille':'L4/2021,C6/2011',
+ 'FC Nantes':'L8/2001,C4/2022','OGC Nice':'L4/1959,C3/1997','Stade Rennais':'C3/2019','RC Strasbourg':'L1/1979,C3/1966','RC Lens':'L1/1998','Toulouse FC':'C1/2023','AJ Auxerre':'L1/1996,C4/2005',
+ 'Stade de Reims':'L6/1962,C2/1958','AS Saint-Étienne':'L10/1981,C6/1977','Montpellier HSC':'L1/2012,C2/1990','EA Guingamp':'C2/2014','Le Havre AC':'C1/1959','FC Lorient':'C1/2002','FC Metz':'C2/1988','SC Bastia':'C1/1981','AS Nancy Lorraine':'C1/1978',
+ 'SL Benfica':'L38/2023,C26/2017,UCL2/1962','FC Porto':'L30/2022,C20/2024,UCL2/2004,UEL2/2011','Sporting CP':'L21/2025,C18/2025,CWC1/1964','SC Braga':'C3/2021','Vitória SC':'C1/2013','Leixões SC':'C1/1961',
+ 'AFC Ajax':'L36/2022,C20/2021,UCL4/1995,UEL1/1992,CWC1/1987','PSV':'L26/2025,C10/2023,UCL1/1988,UEL1/1978','Feyenoord':'L16/2023,C14/2024,UCL1/1970,UEL2/2002','AZ':'L2/2009,C4/2013','FC Twente':'L1/2010,C3/2011',
+ 'FC Utrecht':'C3/2003','Sparta Rotterdam':'L6/1959,C3/1966','Go Ahead Eagles':'L4/1933,C1/2025','PEC Zwolle':'C1/2014','FC Groningen':'C1/2015','SC Heerenveen':'C1/2009','NAC Breda':'L1/1921,C1/1973','Willem II':'L3/1955',
+ 'ADO Den Haag':'C2/1975','Roda JC':'C2/2000','Vitesse':'C1/2017',
+ 'Shamrock Rovers':'L21/2023,C25/2019','Dundalk':'L14/2019,C12/2020','Shelbourne':'L14/2024,C7/2000','Bohemians':'L11/2009,C7/2008',"St Patrick's Athletic":'L8/2013,C5/2023','Derry City':'L2/1997,C6/2022',
+ 'Cork City':'L3/2017,C4/2017','Sligo Rovers':'L3/2012,C5/2013','Drogheda United':'L1/2007,C2/2024','Galway United':'C1/1991','Waterford':'L6/1973,C2/1980','Athlone Town':'L2/1983','Bray Wanderers':'C2/1999',
+ 'Longford Town':'C2/2004','Finn Harps':'C1/1974','UCD':'C1/1984'};
+// Icons (i), legends (l). m = also managed the club. Retired or long-gone heroes; current stars show up as favoured personnel instead.
+const CLUB_LEG={
+ 'Arsenal':'Thierry Henry|i;Dennis Bergkamp|i;Arsène Wenger|im;Tony Adams|l;Patrick Vieira|l;Ian Wright|l;Robert Pirès|l','Aston Villa':'Paul McGrath|i;Gordon Cowans|l;Peter Withe|l;Dennis Mortimer|l',
+ 'Chelsea':'Frank Lampard|i;John Terry|i;Didier Drogba|i;Gianfranco Zola|l;Petr Čech|l;Peter Bonetti|l','Everton':'Dixie Dean|i;Neville Southall|i;Howard Kendall|lm;Kevin Ratcliffe|l;Tim Cahill|l;Leighton Baines|l',
+ 'Liverpool':'Kenny Dalglish|i;Steven Gerrard|i;Bill Shankly|im;Bob Paisley|lm;Ian Rush|l;Jamie Carragher|l;Jürgen Klopp|lm','Manchester City':'Sergio Agüero|i;Vincent Kompany|i;David Silva|l;Yaya Touré|l;Colin Bell|l;Kevin De Bruyne|l',
+ 'Manchester United':'Sir Bobby Charlton|i;Sir Alex Ferguson|im;Sir Matt Busby|im;Eric Cantona|l;Paul Scholes|l;Wayne Rooney|l;Roy Keane|l;Gary Neville|l','Newcastle United':'Alan Shearer|i;Jackie Milburn|i;Kevin Keegan|l;Peter Beardsley|l;Shay Given|l;Sir Bobby Robson|lm',
+ 'Tottenham Hotspur':'Jimmy Greaves|i;Bill Nicholson|im;Glenn Hoddle|l;Ledley King|l;Steve Perryman|l;Danny Blanchflower|l','West Ham United':'Bobby Moore|i;Trevor Brooking|l;Geoff Hurst|l;Billy Bonds|l;Mark Noble|l',
+ 'Leeds United':'Billy Bremner|i;Don Revie|im;Lucas Radebe|l;Jack Charlton|l;Eddie Gray|l;Peter Lorimer|l','Nottingham Forest':'Brian Clough|im;John Robertson|i;Stuart Pearce|l;Viv Anderson|l',
+ 'Wolverhampton Wanderers':'Billy Wright|i;Steve Bull|i;Derek Dougan|l;Kenny Hibbitt|l','Sunderland':'Charlie Hurley|i;Jim Montgomery|l;Kevin Phillips|l;Niall Quinn|l','Crystal Palace':'Julian Speroni|i;Ian Wright|l;Jim Cannon|l',
+ 'Fulham':'Johnny Haynes|i;George Cohen|l','Leicester City':'Jamie Vardy|i;Gary Lineker|l;Kasper Schmeichel|l','Southampton':'Matt Le Tissier|i;Mick Channon|l;Terry Paine|l','Ipswich Town':'Sir Bobby Robson|im;Kevin Beattie|l;John Wark|l;Mick Mills|l',
+ 'Derby County':'Steve Bloomer|i;Brian Clough|lm;Kevin Hector|l','Middlesbrough':'Juninho|i;George Camsell|l','Stoke City':'Sir Stanley Matthews|i','West Bromwich Albion':'Tony Brown|i;Cyrille Regis|l','Birmingham City':'Trevor Francis|i',
+ 'Real Madrid':'Alfredo Di Stéfano|i;Raúl|i;Iker Casillas|i;Cristiano Ronaldo|i;Ferenc Puskás|l;Zinedine Zidane|lm;Fernando Hierro|l;Paco Gento|l','FC Barcelona':'Johan Cruyff|im;Xavi Hernández|i;Andrés Iniesta|i;Lionel Messi|i;Carles Puyol|l;Ladislao Kubala|l',
+ 'Atlético de Madrid':'Luis Aragonés|im;Fernando Torres|i;Adelardo|l;Diego Godín|l','Athletic Club':'Telmo Zarra|i;José Ángel Iribar|i;Andoni Zubizarreta|l;Julen Guerrero|l;Aritz Aduriz|l;Iker Muniain|l',
+ 'Valencia CF':'Mario Kempes|i;David Albelda|l;David Villa|l;Santiago Cañizares|l;Fernando Gómez|l','Real Sociedad':'Luis Arconada|i;Xabi Prieto|l;Jesús María Zamora|l','Sevilla FC':'Jesús Navas|i;Frédéric Kanouté|l;Andrés Palop|l;Juan Arza|l',
+ 'Real Betis':'Joaquín|i;Rafael Gordillo|i;Alfonso|l','Villarreal CF':'Marcos Senna|i;Bruno Soriano|l;Juan Román Riquelme|l;Santi Cazorla|l','RCD Espanyol':'Raúl Tamudo|i;Thomas N\'Kono|l','RC Celta':'Iago Aspas|i;Aleksandr Mostovoi|l',
+ 'Deportivo de La Coruña':'Fran|i;Mauro Silva|l;Juan Carlos Valerón|l',
+ 'Juventus':'Alessandro Del Piero|i;Gianluigi Buffon|i;Michel Platini|l;Pavel Nedvěd|l;Giorgio Chiellini|l;Gaetano Scirea|l;Giovanni Trapattoni|lm','Inter':'Javier Zanetti|i;Giuseppe Meazza|i;Giacinto Facchetti|l;Diego Milito|l;Helenio Herrera|lm;José Mourinho|lm',
+ 'AC Milan':'Paolo Maldini|i;Franco Baresi|i;Marco van Basten|l;Andriy Shevchenko|l;Kaká|l;Arrigo Sacchi|lm','Napoli':'Diego Maradona|i;Marek Hamšík|l;Lorenzo Insigne|l;Dries Mertens|l;Careca|l',
+ 'Roma':'Francesco Totti|i;Daniele De Rossi|i;Bruno Conti|l;Giuseppe Giannini|l;Aldair|l','Lazio':'Giorgio Chinaglia|i;Silvio Piola|l;Alessandro Nesta|l;Giuseppe Signori|l;Ciro Immobile|l',
+ 'Atalanta':'Gian Piero Gasperini|im;Glenn Strömberg|l;Josip Iličić|l','Fiorentina':'Giancarlo Antognoni|i;Gabriel Batistuta|i;Kurt Hamrin|l;Rui Costa|l','Bologna':'Giacomo Bulgarelli|i;Angelo Schiavio|l',
+ 'Torino':'Valentino Mazzola|i;Paolo Pulici|l;Francesco Graziani|l','Udinese':'Antonio Di Natale|i','Cagliari':'Gigi Riva|i','Sampdoria':'Roberto Mancini|i;Gianluca Vialli|l',
+ 'FC Bayern München':'Franz Beckenbauer|i;Gerd Müller|i;Thomas Müller|i;Sepp Maier|l;Philipp Lahm|l;Bastian Schweinsteiger|l;Oliver Kahn|l','Borussia Dortmund':'Michael Zorc|i;Marco Reus|i;Jürgen Kohler|l;Roman Weidenfeller|l;Łukasz Piszczek|l;Jürgen Klopp|lm',
+ 'Bayer 04 Leverkusen':'Ulf Kirsten|i;Stefan Kießling|l;Bernd Schneider|l;Simon Rolfes|l;Xabi Alonso|lm','Eintracht Frankfurt':'Jürgen Grabowski|i;Bernd Hölzenbein|l;Charly Körbel|l;Alexander Meier|l',
+ 'Borussia Mönchengladbach':'Günter Netzer|i;Berti Vogts|i;Jupp Heynckes|l;Allan Simonsen|l;Hennes Weisweiler|lm','SV Werder Bremen':'Marco Bode|i;Otto Rehhagel|im;Dieter Burdenski|l;Johan Micoud|l;Claudio Pizarro|l',
+ 'VfB Stuttgart':'Karlheinz Förster|l;Guido Buchwald|l;Hansi Müller|l','VfL Wolfsburg':'Diego Benaglio|l;Marcel Schäfer|l;Grafite|l','Hamburger SV':'Uwe Seeler|i;Manfred Kaltz|l;Horst Hrubesch|l',
+ '1. FC Köln':'Wolfgang Overath|i;Hans Schäfer|l;Lukas Podolski|l','FC Schalke 04':'Ernst Kuzorra|i;Klaus Fischer|l;Gerald Asamoah|l','1. FC Kaiserslautern':'Fritz Walter|i','SC Freiburg':'Christian Streich|im','1. FSV Mainz 05':'Jürgen Klopp|lm',
+ 'Paris Saint-Germain':'Raí|i;Pauleta|l;Safet Sušić|l;Zlatan Ibrahimović|l;Marco Verratti|l;Thiago Silva|l','Olympique de Marseille':'Jean-Pierre Papin|i;Didier Deschamps|l;Chris Waddle|l;Josip Skoblar|l;Steve Mandanda|l',
+ 'Olympique Lyonnais':'Juninho Pernambucano|i;Sonny Anderson|l;Grégory Coupet|l;Sidney Govou|l','AS Monaco':'Jean-Luc Ettori|i;Ludovic Giuly|l;Delio Onnis|l;Arsène Wenger|lm','LOSC Lille':'Jean Baratte|i;Rio Mavuba|l;Eden Hazard|l',
+ 'AS Saint-Étienne':'Jean-Michel Larqué|i;Dominique Rocheteau|l;Hervé Revelli|l','FC Nantes':'Henri Michel|i;Mickaël Landreau|l','AJ Auxerre':'Guy Roux|im','Stade de Reims':'Raymond Kopa|i;Just Fontaine|l',
+ 'SL Benfica':'Eusébio|i;Mário Coluna|i;Rui Costa|l;Luisão|l;Nené|l','FC Porto':'Fernando Gomes|i;Vítor Baía|i;João Pinto|l;Deco|l;Pepe|l','Sporting CP':'Fernando Peyroteo|i;Manuel Fernandes|l;Luís Figo|l',
+ 'AFC Ajax':'Johan Cruyff|i;Sjaak Swart|i;Rinus Michels|lm;Marco van Basten|l;Frank Rijkaard|l;Jari Litmanen|l','PSV':'Willy van der Kuijlen|i;Phillip Cocu|l;Luc Nilis|l;Romário|l',
+ 'Feyenoord':'Coen Moulijn|i;Willem van Hanegem|i;Wim Jansen|l;Giovanni van Bronckhorst|l;Dirk Kuyt|l','AZ':'Kees Kist|i',
+ 'Shamrock Rovers':'Paddy Coad|i;Liam Tuohy|l;Pat Byrne|l','Dundalk':'Stephen Kenny|lm;Patrick Hoban|l;Chris Shields|l','Derry City':'Liam Coyle|i;Peter Hutton|l','Cork City':'John Caulfield|lm;Pat Morley|l'};
+// Past managers (most recent spells). Name|from|to|how|honours. how: s sacked, l left, r retired, n national team, p poached by another club, m mutual consent.
+const CLUB_MH={
+ 'Arsenal':'Arsène Wenger|1996|2018|l|3 Premier League, 7 FA Cup;Unai Emery|2018|2019|s|;Mikel Arteta|2019|||FA Cup',
+ 'Manchester City':'Roberto Mancini|2009|2013|s|Premier League, FA Cup;Manuel Pellegrini|2013|2016|l|Premier League, 2 League Cup;Pep Guardiola|2016|||6 Premier League, 2 FA Cup, 4 League Cup, Champions League',
+ 'Liverpool':'Rafael Benítez|2004|2010|m|Champions League, FA Cup;Roy Hodgson|2010|2011|s|;Kenny Dalglish|2011|2012|s|League Cup;Brendan Rodgers|2012|2015|s|;Jürgen Klopp|2015|2024|l|Premier League, Champions League, FA Cup, 2 League Cup;Arne Slot|2024|||Premier League',
+ 'Manchester United':'Sir Alex Ferguson|1986|2013|r|13 Premier League, 5 FA Cup, 4 League Cup, 2 Champions League;David Moyes|2013|2014|s|;Louis van Gaal|2014|2016|s|FA Cup;José Mourinho|2016|2018|s|League Cup, Europa League;Ole Gunnar Solskjær|2018|2021|s|;Erik ten Hag|2022|2024|s|League Cup, FA Cup;Ruben Amorim|2024|2026|s|;Michael Carrick|2026|||',
+ 'Chelsea':'José Mourinho|2013|2015|s|Premier League, League Cup;Antonio Conte|2016|2018|s|Premier League, FA Cup;Maurizio Sarri|2018|2019|p|Europa League;Frank Lampard|2019|2021|s|;Thomas Tuchel|2021|2022|s|Champions League;Graham Potter|2022|2023|s|;Mauricio Pochettino|2023|2024|m|;Enzo Maresca|2024|2026|l|Conference League, Club World Cup;Liam Rosenior|2026|||',
+ 'Tottenham Hotspur':'Mauricio Pochettino|2014|2019|s|;José Mourinho|2019|2021|s|;Nuno Espírito Santo|2021|2021|s|;Antonio Conte|2021|2023|m|;Ange Postecoglou|2023|2025|s|Europa League;Thomas Frank|2025|2026|s|;Igor Tudor|2026|||',
+ 'Newcastle United':'Rafael Benítez|2016|2019|l|;Steve Bruce|2019|2021|m|;Eddie Howe|2021|||League Cup','Aston Villa':'Dean Smith|2018|2021|s|;Steven Gerrard|2021|2022|s|;Unai Emery|2022|||',
+ 'Everton':'Carlo Ancelotti|2019|2021|p|;Rafael Benítez|2021|2022|s|;Frank Lampard|2022|2023|s|;Sean Dyche|2023|2025|s|;David Moyes|2025|||','West Ham United':'David Moyes|2019|2024|l|Conference League;Julen Lopetegui|2024|2025|s|;Graham Potter|2025|2025|s|;Nuno Espírito Santo|2025|||',
+ 'Nottingham Forest':'Steve Cooper|2021|2023|s|;Nuno Espírito Santo|2023|2025|s|;Ange Postecoglou|2025|2025|s|;Sean Dyche|2025|||','Crystal Palace':'Roy Hodgson|2017|2021|l|;Patrick Vieira|2021|2023|s|;Oliver Glasner|2024|||FA Cup',
+ 'Brighton & Hove Albion':'Graham Potter|2019|2022|p|;Roberto De Zerbi|2022|2024|m|;Fabian Hürzeler|2024|||','Brentford':'Thomas Frank|2018|2025|p|;Keith Andrews|2025|||','Bournemouth':'Gary O\'Neil|2022|2023|s|;Andoni Iraola|2023|||','Fulham':'Marco Silva|2021|||',
+ 'Real Madrid':'Zinedine Zidane|2016|2018|l|3 Champions League, LaLiga;Julen Lopetegui|2018|2018|s|;Zinedine Zidane|2019|2021|l|LaLiga;Carlo Ancelotti|2021|2025|n|2 Champions League, 2 LaLiga, Copa del Rey;Xabi Alonso|2025|2026|s|;Álvaro Arbeloa|2026|||',
+ 'FC Barcelona':'Pep Guardiola|2008|2012|l|3 LaLiga, 2 Champions League, 2 Copa del Rey;Luis Enrique|2014|2017|l|2 LaLiga, Champions League, 3 Copa del Rey;Ernesto Valverde|2017|2020|s|2 LaLiga, Copa del Rey;Ronald Koeman|2020|2021|s|Copa del Rey;Xavi Hernández|2021|2024|s|LaLiga;Hansi Flick|2024|||LaLiga, Copa del Rey',
+ 'Atlético de Madrid':'Diego Simeone|2011|||2 LaLiga, 2 Europa League, Copa del Rey','Athletic Club':'Marcelino|2021|2022|l|;Ernesto Valverde|2022|||Copa del Rey','Sevilla FC':'Julen Lopetegui|2019|2022|s|Europa League;José Luis Mendilibar|2023|2023|s|Europa League;Matías Almeyda|2025|||',
+ 'Valencia CF':'Rubén Baraja|2023|2024|s|;Carlos Corberán|2024|||','Villarreal CF':'Unai Emery|2020|2022|p|Europa League;Marcelino|2024|||','Real Betis':'Manuel Pellegrini|2020|||Copa del Rey',
+ 'Real Sociedad':'Imanol Alguacil|2018|2025|l|Copa del Rey;Sergio Francisco|2025|2025|s|;Pellegrino Matarazzo|2025|||',
+ 'Juventus':'Antonio Conte|2011|2014|l|3 Serie A;Massimiliano Allegri|2014|2019|l|5 Serie A, 4 Coppa Italia;Maurizio Sarri|2019|2020|s|Serie A;Andrea Pirlo|2020|2021|s|Coppa Italia;Massimiliano Allegri|2021|2024|s|Coppa Italia;Thiago Motta|2024|2025|s|;Igor Tudor|2025|2025|s|;Luciano Spalletti|2025|||',
+ 'Inter':'José Mourinho|2008|2010|p|2 Serie A, Champions League, Coppa Italia;Antonio Conte|2019|2021|l|Serie A;Simone Inzaghi|2021|2025|l|Serie A, 2 Coppa Italia;Cristian Chivu|2025|||',
+ 'AC Milan':'Carlo Ancelotti|2001|2009|l|2 Champions League, Serie A, Coppa Italia;Stefano Pioli|2019|2024|l|Serie A;Paulo Fonseca|2024|2024|s|;Sérgio Conceição|2024|2025|l|;Massimiliano Allegri|2025|||',
+ 'Napoli':'Maurizio Sarri|2015|2018|l|;Carlo Ancelotti|2018|2019|s|;Gennaro Gattuso|2019|2021|l|Coppa Italia;Luciano Spalletti|2021|2023|l|Serie A;Antonio Conte|2024|||Serie A',
+ 'Roma':'José Mourinho|2021|2024|s|Conference League;Daniele De Rossi|2024|2024|s|;Claudio Ranieri|2024|2025|r|;Gian Piero Gasperini|2025|||','Atalanta':'Gian Piero Gasperini|2016|2025|l|Europa League;Ivan Jurić|2025|2025|s|;Raffaele Palladino|2025|||',
+ 'Lazio':'Simone Inzaghi|2016|2021|l|Coppa Italia;Maurizio Sarri|2021|2024|l|;Marco Baroni|2024|2025|l|;Maurizio Sarri|2025|||','Fiorentina':'Vincenzo Italiano|2021|2024|l|;Raffaele Palladino|2024|2025|l|;Stefano Pioli|2025|2025|s|;Paolo Vanoli|2025|||',
+ 'Bologna':'Thiago Motta|2022|2024|l|;Vincenzo Italiano|2024|||Coppa Italia',
+ 'FC Bayern München':'Jupp Heynckes|2011|2013|r|Bundesliga, DFB-Pokal, Champions League;Pep Guardiola|2013|2016|l|3 Bundesliga, 2 DFB-Pokal;Carlo Ancelotti|2016|2017|s|Bundesliga;Niko Kovač|2018|2019|s|Bundesliga, DFB-Pokal;Hansi Flick|2019|2021|n|Champions League, 2 Bundesliga, DFB-Pokal;Julian Nagelsmann|2021|2023|s|Bundesliga;Thomas Tuchel|2023|2024|l|Bundesliga;Vincent Kompany|2024|||Bundesliga',
+ 'Borussia Dortmund':'Jürgen Klopp|2008|2015|l|2 Bundesliga, DFB-Pokal;Thomas Tuchel|2015|2017|m|DFB-Pokal;Lucien Favre|2018|2020|s|;Edin Terzić|2020|2021|l|DFB-Pokal;Marco Rose|2021|2022|s|;Edin Terzić|2022|2024|l|;Nuri Şahin|2024|2025|s|;Niko Kovač|2025|||',
+ 'Bayer 04 Leverkusen':'Gerardo Seoane|2021|2022|s|;Xabi Alonso|2022|2025|p|Bundesliga, DFB-Pokal;Erik ten Hag|2025|2025|s|;Kasper Hjulmand|2025|||','RB Leipzig':'Julian Nagelsmann|2019|2021|p|;Domenico Tedesco|2021|2022|s|DFB-Pokal;Marco Rose|2022|2025|s|DFB-Pokal;Ole Werner|2025|||',
+ 'VfB Stuttgart':'Sebastian Hoeneß|2023|||DFB-Pokal','Eintracht Frankfurt':'Oliver Glasner|2021|2023|l|Europa League;Dino Toppmöller|2023|||','Borussia Mönchengladbach':'Gerardo Seoane|2023|2025|s|;Eugen Polanski|2025|||',
+ 'SV Werder Bremen':'Ole Werner|2021|2025|l|;Horst Steffen|2025|||','SC Freiburg':'Christian Streich|2011|2024|l|;Julian Schuster|2024|||',
+ 'Paris Saint-Germain':'Laurent Blanc|2013|2016|s|3 Ligue 1;Unai Emery|2016|2018|l|Ligue 1;Thomas Tuchel|2018|2020|s|2 Ligue 1;Mauricio Pochettino|2021|2022|s|Ligue 1;Christophe Galtier|2022|2023|s|Ligue 1;Luis Enrique|2023|||Champions League, 2 Ligue 1, 2 Coupe de France',
+ 'Olympique de Marseille':'Jorge Sampaoli|2021|2022|l|;Igor Tudor|2022|2023|l|;Marcelino|2023|2023|l|;Gennaro Gattuso|2023|2024|s|;Roberto De Zerbi|2024|||','Olympique Lyonnais':'Pierre Sage|2023|2024|s|;Paulo Fonseca|2025|||',
+ 'AS Monaco':'Adi Hütter|2023|2025|s|;Sébastien Pocognoli|2025|||','LOSC Lille':'Christophe Galtier|2017|2021|l|Ligue 1;Paulo Fonseca|2022|2024|l|;Bruno Génésio|2024|||',
+ 'SL Benfica':'Jorge Jesus|2009|2015|l|3 Primeira Liga;Bruno Lage|2019|2020|l|Primeira Liga;Roger Schmidt|2022|2024|s|Primeira Liga;Bruno Lage|2024|2025|s|;José Mourinho|2025|||',
+ 'FC Porto':'Sérgio Conceição|2017|2024|l|3 Primeira Liga, 4 Taça de Portugal;Vítor Bruno|2024|2025|s|;Martín Anselmi|2025|2025|s|;Francesco Farioli|2025|||','Sporting CP':'Rúben Amorim|2020|2024|p|2 Primeira Liga;João Pereira|2024|2024|s|;Rui Borges|2024|||Primeira Liga, Taça de Portugal',
+ 'AFC Ajax':'Erik ten Hag|2017|2022|p|3 Eredivisie, 2 KNVB Cup;Alfred Schreuder|2022|2023|s|;Francesco Farioli|2024|2025|l|;John Heitinga|2025|2025|s|;Fred Grim|2025|||','PSV':'Roger Schmidt|2020|2022|l|KNVB Cup;Ruud van Nistelrooy|2022|2023|l|KNVB Cup;Peter Bosz|2023|||2 Eredivisie',
+ 'Feyenoord':'Arne Slot|2021|2024|p|Eredivisie, KNVB Cup;Brian Priske|2024|2025|s|;Robin van Persie|2025|||',
+ 'Shamrock Rovers':'Stephen Bradley|2016|||4 League titles, FAI Cup','Dundalk':'Stephen Kenny|2013|2018|n|4 League titles, 2 FAI Cup','Shelbourne':'Damien Duff|2021|||League title',"St Patrick's Athletic":'Stephen Kenny|2024|||',
+ 'Derry City':'Ruaidhrí Higgins|2021|2024|l|FAI Cup;Tiernan Lynch|2025|||'};
+// Managers: nationality, year of birth, reputation (0-100)
+const MG_REAL={
+ 'Pep Guardiola':['ESP',1971,96],'Luis Enrique':['ESP',1970,94],'Hansi Flick':['GER',1965,92],'Diego Simeone':['ARG',1970,91],'Carlo Ancelotti':['ITA',1959,95],'Arne Slot':['NED',1978,90],'Mikel Arteta':['ESP',1982,90],
+ 'Antonio Conte':['ITA',1969,90],'Vincent Kompany':['BEL',1986,88],'José Mourinho':['POR',1963,87],'Unai Emery':['ESP',1971,87],'Massimiliano Allegri':['ITA',1967,87],'Luciano Spalletti':['ITA',1959,87],
+ 'Gian Piero Gasperini':['ITA',1958,86],'Roberto De Zerbi':['ITA',1979,86],'Xabi Alonso':['ESP',1981,89],'Eddie Howe':['ENG',1977,84],'Oliver Glasner':['AUT',1974,83],'Andoni Iraola':['ESP',1982,82],
+ 'Marcelino':['ESP',1965,81],'Ernesto Valverde':['ESP',1964,82],'Maurizio Sarri':['ITA',1959,83],'Manuel Pellegrini':['CHI',1953,82],'Niko Kovač':['CRO',1971,82],'Cristian Chivu':['ROU',1980,80],
+ 'Álvaro Arbeloa':['ESP',1983,79],'Michael Carrick':['ENG',1981,77],'Liam Rosenior':['ENG',1984,78],'Igor Tudor':['CRO',1978,78],'David Moyes':['SCO',1963,80],'Marco Silva':['POR',1977,81],
+ 'Cesc Fàbregas':['ESP',1987,80],'Fabian Hürzeler':['GER',1993,78],'Peter Bosz':['NED',1963,79],'Francesco Farioli':['ITA',1989,81],'Paulo Fonseca':['POR',1973,79],'Vincenzo Italiano':['ITA',1977,79],
+ 'Sebastian Hoeneß':['GER',1982,82],'Raffaele Palladino':['ITA',1984,78],'Robin van Persie':['NED',1983,75],'Nuno Espírito Santo':['POR',1974,79],'Sean Dyche':['ENG',1971,77],'Keith Andrews':['IRL',1980,72],
+ "Gary O'Neil":['ENG',1983,72],'Kasper Hjulmand':['DEN',1972,79],'Ole Werner':['GER',1988,78],'Dino Toppmöller':['GER',1980,77],'Julian Schuster':['GER',1985,75],'Rui Borges':['POR',1981,80],
+ 'Bruno Génésio':['FRA',1966,77],'Sébastien Pocognoli':['BEL',1987,74],'Matías Almeyda':['ARG',1973,75],'Carlos Corberán':['ESP',1983,75],'Pellegrino Matarazzo':['USA',1977,75],'Fred Grim':['NED',1965,70],
+ 'Stephen Bradley':['IRL',1984,60],'Damien Duff':['IRL',1979,58],'Stephen Kenny':['IRL',1971,62],'John Caulfield':['IRL',1964,52],'Tiernan Lynch':['NIR',1980,52],'Alan Reynolds':['IRL',1974,52],
+ 'Xavi Hernández':['ESP',1980,84],'Ruben Amorim':['POR',1985,84],'Enzo Maresca':['ITA',1980,84],'Erik ten Hag':['NED',1970,80],'Thomas Frank':['DEN',1973,80],'Ange Postecoglou':['AUS',1965,76],
+ 'Edin Terzić':['GER',1982,78],'Thiago Motta':['ITA',1982,78],'Stefano Pioli':['ITA',1965,77],'Gareth Southgate':['ENG',1970,80],'Roberto Mancini':['ITA',1964,81],'Ruud van Nistelrooy':['NED',1976,70],
+ 'Ole Gunnar Solskjær':['NOR',1973,74],'Adi Hütter':['AUT',1970,74],'Gerardo Seoane':['SUI',1978,72],'Nuri Şahin':['TUR',1988,70],'Ivan Jurić':['CRO',1975,72],'Marco Rose':['GER',1976,77]};
+// Out of work at the start of the save
+const MG_FREE=['Xabi Alonso','Xavi Hernández','Ruben Amorim','Enzo Maresca','Erik ten Hag','Thomas Frank','Ange Postecoglou','Edin Terzić','Thiago Motta','Stefano Pioli','Gareth Southgate','Roberto Mancini','Ruud van Nistelrooy','Ole Gunnar Solskjær','Adi Hütter','Gerardo Seoane','Nuri Şahin','Ivan Jurić','Marco Rose'];
+// How likely a direct move between two rivals is (1 = no issue). Some divides get crossed now and then, some almost never.
+const RIVAL_CROSS={
+ 'Manchester United|Manchester City':.02,'Manchester United|Liverpool':.02,'Arsenal|Tottenham Hotspur':.04,'Real Madrid|FC Barcelona':.05,'Roma|Lazio':.03,'Paris Saint-Germain|Olympique de Marseille':.05,
+ 'Olympique Lyonnais|AS Saint-Étienne':.04,'Borussia Dortmund|FC Schalke 04':.04,'Newcastle United|Sunderland':.03,'Liverpool|Everton':.1,'AFC Ajax|Feyenoord':.08,'Sevilla FC|Real Betis':.06,
+ 'SL Benfica|FC Porto':.12,'Shamrock Rovers|Bohemians':.2,'Bohemians|Shelbourne':.25,"Shamrock Rovers|St Patrick's Athletic":.3,'Dundalk|Drogheda United':.25,'Derry City|Finn Harps':.25,
+ 'Inter|AC Milan':.4,'Inter|Juventus':.22,'AC Milan|Juventus':.3,'Napoli|Juventus':.12,'Fiorentina|Juventus':.1,'Juventus|Torino':.1,'Napoli|Roma':.3,'Real Madrid|Atlético de Madrid':.3,
+ 'FC Barcelona|Atlético de Madrid':.4,'Valencia CF|Real Madrid':.35,'FC Barcelona|RCD Espanyol':.15,'Athletic Club|Real Sociedad':.2,'Arsenal|Chelsea':.45,'Chelsea|Tottenham Hotspur':.3,
+ 'West Ham United|Tottenham Hotspur':.3,'Leeds United|Manchester United':.06,'FC Bayern München|Borussia Dortmund':.4,'FC Bayern München|Bayer 04 Leverkusen':.45,'Hamburger SV|SV Werder Bremen':.15,
+ 'SL Benfica|Sporting CP':.2,'FC Porto|Sporting CP':.2,'AFC Ajax|PSV':.35,'PSV|Feyenoord':.35,'RC Lens|LOSC Lille':.15,'OGC Nice|AS Monaco':.3,'Olympique de Marseille|Olympique Lyonnais':.35};
+
+// ===================== v47: managers (careers, pressure, sackings, appointments), club history, rival moves =====================
+function mgYr(){ try{ return gameDate().getUTCFullYear(); }catch(e){ return S.year; } }
+function mgClubByName(n){ const c=S.clubs.find(x=>x.name===n); return c?c.id:null; }
+function rivalCross(a,b){ if(a==null||b==null||a===b) return 1; const A=club(a), B=club(b); if(!A||!B) return 1; const k1=A.name+'|'+B.name, k2=B.name+'|'+A.name;
+  if(RIVAL_CROSS[k1]!=null) return RIVAL_CROSS[k1]; if(RIVAL_CROSS[k2]!=null) return RIVAL_CROSS[k2]; const r=rivalry(a,b); return r===2?.15:r===1?.7:1; }
+function mgWonCount(txt){ if(!txt) return 0; return txt.split(',').reduce((s,x)=>{ const m=x.trim().match(/^(\d+)\s/); return s+(m?+m[1]:x.trim()?1:0); },0); }
+function mgRealHist(cname){ const s=CLUB_MH[cname]; if(!s) return []; return s.split(';').map(x=>{ const [n,f,t,how,won]=x.split('|'); return {n,f:+f,t:t?+t:null,how:how||'',won:won||''}; }); }
+// every real spell for a manager across the database: [{club,f,t,how,won}]
+let _mgSpells=null;
+function mgRealSpells(n){ if(!_mgSpells){ _mgSpells={}; for(const cn in CLUB_MH) mgRealHist(cn).forEach(h=>{ (_mgSpells[h.n]=_mgSpells[h.n]||[]).push({club:cn,f:h.f,t:h.t,how:h.how,won:h.won}); }); for(const k in _mgSpells) _mgSpells[k].sort((a,b)=>a.f-b.f); } return _mgSpells[n]||[]; }
+function mgAge(e){ return e&&e.b?mgYr()-e.b:null; }
+function mgNew(n,o){ const G=S.mg; o=o||{}; const R=MG_REAL[n]; const now=absWk();
+  const e={n,nat:R?R[0]:(o.nat||o.country||'ENG'),b:R?R[1]:mgYr()-ri(36,60),rep:R?R[2]:clamp(Math.round((o.clubRep||55)-ri(0,7)),20,88),real:R?1:0,club:o.club!=null?o.club:null,since:now,out:o.club!=null?null:now-ri(4,40),cool:o.club!=null?0:now+ri(0,6),ret:0,nt:null,hist:[],bb:Math.round(rnd(55,92)),feud:0,pr:0,tro:0};
+  if(R){ const sp=mgRealSpells(n); e.tro=sp.reduce((s,x)=>s+mgWonCount(x.won),0); }
+  if(o.interim) e.interim=1; if(o.user) e.user=1;
+  if(o.club!=null){ const c=club(o.club); const rs=c?mgRealHist(c.name).filter(h=>h.n===n&&h.t==null)[0]:null; const yrs=rs?Math.max(0,S.year-rs.f):(o.fresh?0:ri(0,3)); e.since=now-yrs*WEEKS-(o.fresh?0:ri(0,10)); e.hist.push({c:o.club,f:rs?Math.min(rs.f,S.year):mgYr()-(o.fresh?0:yrs),t:null,how:'',won:[]}); }
+  G.db[n]=e; return e; }
+function mgEnsure(){ if(!S||!S.clubs) return null; if(S.mg&&S.mg.v===1) return S.mg; const G=S.mg={v:1,db:{},moves:[],nt:{},pend:[]};
+  S.clubs.forEach(c=>{ if(!c.mgr||c.ext||c.league==='EUR') return; if(G.db[c.mgr]){ let nn=c.mgr, k=0; while(G.db[nn]&&k++<20) nn=nameFor(c.country&&NAMES[c.country]?c.country:'ENG'); c.mgr=nn; }
+    if(S.mode==='mgr'&&S.M&&c.mgr===S.M.name){ mgNew(c.mgr,{club:c.id,clubRep:S.M.rep||50,user:1,fresh:1}); }
+    else mgNew(c.mgr,{club:c.id,clubRep:c.rep,country:c.country}); const e=G.db[c.mgr]; c.mh=[{n:c.mgr,f:e.hist[0]?e.hist[0].f:S.year,t:null,how:'',won:[]}]; });
+  MG_FREE.forEach(n=>{ if(!G.db[n]) mgNew(n,{}); });
+  return G; }
+function mgOf(c){ const G=mgEnsure(); return G&&c&&c.mgr?G.db[c.mgr]||null:null; }
+function mgVisible(c){ if(!c) return false; const my=S.mode==='mgr'?mgrClub():myClubObj(); if(my&&(my.id===c.id||my.league===c.league)) return true; if(c.rep>=78) return true;
+  if(S.me&&S.mode!=='mgr'){ if((S.me.history||[]).some(h=>h.from===c.id)) return true; if(S.me.loan&&S.me.loan.parent===c.id) return true; }
+  return !!(my&&my.country===c.country&&c.rep>=66); }
+function mgNews(c,title,body,o){ o=o||{}; const vis=o.force||mgVisible(c); if(!vis) return; const mine=S.mode!=='mgr'&&S.me&&S.me.club===c.id; if(mine) news('bad',title,body); else news('world',title,body,true);
+  try{ const n=S.news&&S.news[0]; if(n&&n.title===title){ n.nc='mgr'; if(!n.cl||!n.cl.includes(c.id)) n.cl=[c.id].concat((n.cl||[]).filter(x=>x!==c.id)); } }catch(e){} }
+function mgStarsTxt(e){ return e.rep>=90?'world-class':e.rep>=82?'elite':e.rep>=74?'highly rated':e.rep>=64?'respected':e.rep>=52?'experienced':'up-and-coming'; }
+function mgPrevTxt(e){ const h=e.hist.filter(x=>x.t!=null).slice(-1)[0]; if(h){ const c=club(h.c); return c?`${c.name}`:''; } const sp=mgRealSpells(e.n).filter(x=>x.t).slice(-1)[0]; return sp?sp.club:''; }
+
+// ---------- expectations and pressure ----------
+function mgExpRanks(ids){ const s=ids.slice().sort((a,b)=>club(b).rep-club(a).rep); const r={}; s.forEach((id,i)=>r[id]=i+1); return r; }
+function mgHereWins(c,e){ const h=(c.mh||[]).find(x=>x.t==null&&x.n===e.n); let n=h&&h.won?h.won.length:0; const rs=mgRealHist(c.name).find(x=>x.n===e.n&&x.t==null); if(rs) n+=mgWonCount(rs.won); return n; }
+function mgPressure(c,e,ctx){ const lid=c.league; const T=ctx.T[c.id]; if(!T) return 0; const gp=T[0]; if(gp<5) return 0; const N=ctx.N; const pos=ctx.order.indexOf(c.id)+1; const exp=ctx.exp[c.id]||Math.ceil(N/2);
+  const L=LMETA(lid)||{}; const down=L.down||0; const R=(S.runs||{})[c.id]||{}; const tw=absWk()-e.since; let p=0;
+  const gap=(pos-exp)/N; p+=gap>0?gap*95:gap*45;
+  p+=(R.nowin||0)*3.4+(R.lose||0)*2.4;
+  if(down&&pos>N-down&&exp<=N-down) p+=12+Math.min(12,(N-down-exp)*1.3);
+  if(exp<=2&&pos>4&&gp>=10) p+=10; if(exp<=4&&pos>8&&gp>=12) p+=8; if(c.rep>=84&&pos>exp) p+=Math.min(16,(pos-exp)*3.5);
+  p-=tw<8?32:tw<16?14:tw<24?5:0;
+  p-=Math.min(30,mgHereWins(c,e)*6+(tw>=WEEKS*4?6:0));
+  p+=(e.feud||0)*.35; p-=((e.bb||70)-70)*.55;
+  if(c.rep>=86) p+=6; if(c.trig) p+=7; if(c.heat) p+=Math.min(15,c.heat*.3);
+  return clamp(Math.round(p),0,100); }
+function mgSecLabel(pr){ return pr<20?['Secure','g']:pr<38?['Stable','']:pr<55?['Under pressure','y']:['Precarious','r']; }
+
+// ---------- leaving ----------
+const MG_HOW={sacked:'Sacked',left:'Left',resigned:'Resigned',mutual:'Left by mutual consent',poached:'Poached',national:'Took a national team job',personal:'Stepped down',retired:'Retired',interim:'Interim spell',replaced:'Replaced'};
+function mgDepart(c,how,o){ const G=mgEnsure(); o=o||{}; const old=c.mgr; const e=G.db[old]; const now=absWk(); const y=mgYr();
+  const cur=(c.mh=c.mh||[]).find(h=>h.t==null); if(cur){ cur.t=y; cur.how=how; if(o.to!=null) cur.to=o.to; if(o.nt) cur.nt=o.nt; }
+  if(e){ const eh=e.hist[e.hist.length-1]; if(eh&&eh.t==null){ eh.t=y; eh.how=how; }
+    e.club=null; e.out=now; e.pr=0; e.feud=0;
+    if(how==='retired'||e.interim) e.ret=1;
+    e.cool=now+(how==='sacked'?ri(6,22)+(e.rep>=84?ri(8,26):0):how==='resigned'||how==='personal'?ri(18,60):how==='mutual'?ri(6,20):how==='left'?ri(4,16):0);
+    if(how==='sacked') e.rep=clamp(e.rep-2,20,97); }
+  if(how!=='interim'){ G.moves.unshift({s:S.season,w:S.week,y,n:old,from:c.id,how,to:o.to!=null?o.to:null,nt:o.nt||null,why:o.why||''}); if(G.moves.length>200) G.moves.length=200; }
+  c.press=null; c.heat=0; G.pend=G.pend.filter(p=>p.c!==c.id); return e; }
+function mgOpen(c,n,o){ const G=mgEnsure(); o=o||{}; const e=G.db[n]||mgNew(n,{country:c.country,clubRep:c.rep}); const now=absWk(); const y=mgYr();
+  e.club=c.id; e.since=now; e.out=null; e.cool=0; e.bb=Math.round(rnd(66,94)); e.feud=0; e.pr=0; e.hist.push({c:c.id,f:y,t:null,how:'',won:[]});
+  c.mgr=n; (c.mh=c.mh||[]).push({n,f:y,t:null,how:'',won:[],interim:o.interim?1:0});
+  if(!o.interim) G.moves.unshift({s:S.season,w:S.week,y,n,from:o.from!=null?o.from:null,to:c.id,how:'hired',cross:o.cross||null}); return e; }
+
+// ---------- who gets the job (common sense: fit, rivalries, a cooling-off period) ----------
+function mgBarred(e,c){ const y=mgYr();
+  for(const h of e.hist){ if(h.c===c.id&&h.how==='sacked'&&h.t!=null&&y-h.t<4) return 'sacked here'; const strong=((h.t==null?y:h.t)-h.f>=2)||(h.won&&h.won.length);
+    if(strong&&h.c!==c.id&&rivalry(h.c,c.id)===2&&Math.random()>=rivalCross(h.c,c.id)*.6) return 'rival'; }
+  for(const sp of mgRealSpells(e.n)){ const id=mgClubByName(sp.club); if(id==null) continue; if(id===c.id){ if(sp.how==='s'&&y-(sp.t||y)<4) return 'sacked here'; continue; } const strong=((sp.t||y)-sp.f>=2)||sp.won;
+    if(strong&&rivalry(id,c.id)===2&&Math.random()>=rivalCross(id,c.id)*.6) return 'rival'; }
+  const leg=CLUB_LEG; for(const cn in leg){ if(!leg[cn].includes(e.n+'|')) continue; const id=mgClubByName(cn); if(id!=null&&id!==c.id&&rivalry(id,c.id)===2&&Math.random()>rivalCross(id,c.id)*.4) return 'legend'; }
+  return null; }
+function mgCrossFrom(e,c){ for(const h of e.hist.slice().reverse()) if(h.c!==c.id&&rivalry(h.c,c.id)===2) return h.c; for(const sp of mgRealSpells(e.n)){ const id=mgClubByName(sp.club); if(id!=null&&id!==c.id&&rivalry(id,c.id)===2) return id; } return null; }
+function mgScore(e,c){ let s=e.rep-Math.abs(e.rep-(c.rep+3))*.9; s+=e.nat===c.country?(c.rep<60?10:c.rep<75?6:c.rep<84?3:1):(c.rep<55?-8:c.rep<68?-3:0);
+  s+=Math.min(8,(e.tro||0)*1.2)+(e.real?2:0)+rnd(0,9); const back=e.hist.find(h=>h.c===c.id&&['left','national','poached','personal'].includes(h.how)&&h.won&&h.won.length); if(back) s+=6; return s; }
+function mgCands(c,o){ const G=mgEnsure(), now=absWk(), R=c.rep, out=[]; const summer=!!o.summer;
+  for(const n in G.db){ const e=G.db[n]; if(e.ret||e.nt||e.interim||e.user) continue;
+    if(e.club==null){ if(e.cool>now) continue; const wOut=now-(e.out||now); const up=5+Math.min(16,wOut/5); if(e.rep-R>up) continue; if(R-e.rep>(R>=85?8:R>=70?12:16)) continue; const bar=mgBarred(e,c); if(bar) continue; out.push({e,s:mgScore(e,c),poach:0}); }
+    else if(e.club!==c.id&&Math.random()<(summer?.55:.2)){ const d=club(e.club); if(!d||!S.leagues[d.league]||d.rep>R-4) continue; if(S.mode==='mgr'&&d.id===myClubId()) continue; if(now-e.since<WEEKS*.6) continue; if((e.pr||0)>32) continue; if(e.rep<R-10) continue;
+      if(G.pend.some(p=>p.c===d.id)) continue; const bar=mgBarred(e,c); if(bar) continue; out.push({e,s:mgScore(e,c)+2,poach:1}); } }
+  return out.sort((a,b)=>b.s-a.s); }
+let _mgPN=null, _mgPNk=0;
+function mgNameFree(n){ const G=S.mg; if(G&&G.db[n]) return false; if(!_mgPN||_mgPNk!==S.players.length){ _mgPN=new Set(S.players.map(p=>p.n)); _mgPNk=S.players.length; } return !_mgPN.has(n)&&!(S.me&&`${S.me.first} ${S.me.last}`===n); }
+function mgGenName(nat){ let n, k=0; do{ n=nameFor(nat); }while(!mgNameFree(n)&&k++<25); return n; }
+function mgFreshName(c){ const nat=Math.random()<.85?c.country:natFor(c.country); return {n:mgGenName(NAMES[nat]?nat:c.country&&NAMES[c.country]?c.country:'ENG'),nat}; }
+function mgAppoint(c,o){ const G=mgEnsure(); o=o||{}; const depth=o.depth||0; const prev=o.prevName||null;
+  const fresh=c.rep<50?.42:c.rep<66?.26:c.rep<80?.14:.06; const cs=mgCands(c,o); let pickd=null;
+  if(cs.length&&Math.random()>fresh) pickd=cs[Math.min(cs.length-1,Math.random()<.65?0:Math.random()<.6?1:2)];
+  let e, fromId=null, how='free', cross=null;
+  if(pickd){ e=pickd.e; cross=mgCrossFrom(e,c);
+    if(pickd.poach){ const d=club(e.club); fromId=d.id; how='poach'; mgDepart(d,'poached',{to:c.id}); mgOpen(c,e.n,{from:d.id,cross});
+      mgNews(d,pick([`${e.n} leaves ${d.name} for ${c.name}`,`${c.name} prise ${e.n} away from ${d.name}`,`${e.n} quits ${d.name} to take the ${c.name} job`]),pick([`${c.name} have agreed compensation with ${d.name}. ${d.name} must find a replacement quickly.`,`${d.name} fans are gutted but not surprised. He'd done too well to stay hidden.`,`A step up for ${e.n.split(' ').slice(-1)[0]}. ${d.name} are already drawing up a shortlist.`]),{force:mgVisible(c)||mgVisible(d)});
+      if(depth<2) mgAppoint(d,{summer:o.summer,depth:depth+1,prevName:e.n}); else mgInterim(d,e.n,'left'); }
+    else mgOpen(c,e.n,{cross}); }
+  else { const f=mgFreshName(c); e=mgNew(f.n,{nat:f.nat,clubRep:c.rep-ri(4,12)}); e.cool=0; how='fresh'; mgOpen(c,e.n,{}); }
+  const nm=e.n, ln=nm.split(' ').slice(-1)[0]; const prevJob=how==='poach'?club(fromId).name:mgPrevTxt(e); const age=mgAge(e);
+  const bodyA=how==='fresh'?pick([`The ${age}-year-old steps up from the club's coaching staff. A low-key appointment, but the board say he knows the place inside out.`,`${nm} arrives with a good reputation from the lower levels. Not a household name, and fans want to know more.`,`A surprise choice. ${nm} has never managed at this level before.`])
+    :how==='poach'?`${nm} had been doing an excellent job at ${prevJob}. He signs a ${ri(2,4)}-year deal.`
+    :pick([`The ${mgStarsTxt(e)} ${age?age+'-year-old ':''}${prevJob?`has been out of work since leaving ${prevJob}`:'returns to the dugout'}. He signs a ${ri(2,3)}-year deal.`,`${ln} was the board's ${Math.random()<.6?'first':'second'} choice. ${prevJob?`His last job was at ${prevJob}.`:''}`,`${nm} is back in management${prevJob?` after leaving ${prevJob}`:''}. "This is a club with huge potential," he says.`]);
+  if(cross!=null){ const rc=club(cross); mgNews(c,`Controversy as ${nm} takes the ${c.name} job`,`${nm} used to manage ${rc.name}, and now he's in charge of their bitter rivals. ${rc.name} fans are furious. Some at ${c.name} aren't happy either. "He'll have to win them over," says ${outlet()}.`,{force:true}); }
+  else if(how!=='poach') mgNews(c,pick([`${c.name} appoint ${nm}`,`${nm} named ${c.name} ${Math.random()<.5?'head coach':'manager'}`,`${nm} is the new ${c.name} boss`]),bodyA);
+  mgAfterChange(c,prev||o.old||null,nm,o.reason||'left'); mgJobGone(c);
+  return e; }
+function mgInterim(c,old,reason){ const G=mgEnsure(); const f=mgFreshName(c); const e=mgNew(f.n,{nat:f.nat,clubRep:c.rep-ri(10,18),interim:1}); e.cool=0; mgOpen(c,e.n,{interim:1});
+  G.pend.push({c:c.id,at:absWk()+ri(1,3),interim:e.n}); mgNews(c,pick([`${e.n} takes interim charge of ${c.name}`,`${c.name}: ${e.n} in temporary charge`]),pick([`The ${c.country==='ENG'?'under-21s':'youth'} coach will lead the team until a permanent appointment is made.`,`${e.n} steps up from the backroom staff while the board search for a new manager.`]));
+  mgAfterChange(c,old,e.n,reason||'sacked'); mgJobOffer(c); return e; }
+// my club / my career reacts
+function mgAfterChange(c,oldN,newN,reason){ try{ if(S.mode==='mgr'||!S.me||!newN) return; const m=S.me;
+  if(m.club===c.id&&!m.loan||m.loan&&m.loan.club===c.id){ const prevRel=m.rel.manager; if(typeof managerChange==='function') managerChange(c.id,oldN||'The old manager',newN,reason==='sacked'?'sacked':'left',prevRel);
+    m.rel.manager=50; m.rel.tactical=Math.round(m.rel.tactical*.4); m.promises=[]; m.griev=[]; m.mrole=null; if(m.age<=21&&m.dplan&&typeof planFor==='function'){ const k=planFor(m.club); if(k&&k!==m.dplan.k) planSet(k,'club'); } }
+  const om=m.oldMgr; if(om&&om.name===newN&&om.rel>=65&&m.club!==c.id&&c.rep>=(myClubObj()?myClubObj().rep-6:0)){ m.watch=m.watch||[]; if(!m.watch.some(w=>w.club===c.id)){ m.watch.push({club:c.id,since:absWk(),until:absWk()+ri(14,24),why:'mgr'}); news('you',`${newN} takes over at ${c.name}`,`${newN.split(' ').slice(-1)[0]} rated you when he managed you. Word is he's already asked ${c.name}'s scouts about you.`); } } }catch(e){ console.warn('mg47 after',e); } }
+function mgJobOffer(c){ try{ if(S.mode!=='mgr'||!S.M||!S.M.unemployed) return; const M=S.M; if(c.rep>M.rep+22||c.rep<M.rep-25||(M.jobs||[]).some(j=>j.club===c.id)) return; (M.jobs=M.jobs||[]).push({club:c.id,exp:S.week+3}); news('you',`Job offer: ${c.name}`,`${c.name} want to talk to you about their vacancy. Check Club, Jobs. They won't wait long.`); }catch(e){} }
+function mgJobGone(c){ try{ if(S.mode==='mgr'&&S.M&&S.M.jobs) S.M.jobs=S.M.jobs.filter(j=>j.club!==c.id); }catch(e){} }
+function mgSack(c,why,summer){ const old=c.mgr; const e=mgOf(c); const R=(S.runs||{})[c.id]||{}; const pos=leaguePos(c.id);
+  mgDepart(c,'sacked',{why});
+  const big=c.rep>=85; const t=big&&mgVisible(c)?pick([`BREAKING: ${c.name} sack ${old}`,`${old} sacked by ${c.name}`]):pick([`${c.name} sack ${old}`,`${old} sacked`,`${c.name} part company with ${old}`]);
+  const b=why==='feud'?pick([`${c.name} have dismissed ${old} after a breakdown in his relationship with the board.`,`The board and ${old.split(' ').slice(-1)[0]} had stopped speaking. Results weren't the problem. Trust was.`])
+    :why==='season'?pick([`${old} pays the price for a disappointing ${pos?ordinal(pos)+'-place':''} finish.`,`The ${c.name} board have decided a fresh start is needed after a season that fell well short.`])
+    :pick([`${old} leaves after ${R.nowin>=4?R.nowin+' games without a win':'a poor run of results'}.${pos?` ${c.name} are ${ordinal(pos)}.`:''}`,`The board ran out of patience.${pos?` ${c.name} sit ${ordinal(pos)}, well below where they expected to be.`:''}`,`${c.name} have sacked ${old}${e&&absWk()-e.since<WEEKS?' less than a year into the job':''}. ${R.lose>=3?`${R.lose} straight defeats proved the final straw.`:''}`]);
+  mgNews(c,t,b,{force:big});
+  if(summer) mgAppoint(c,{summer:1,old,reason:'sacked'}); else mgInterim(c,old,'sacked'); }
+function mgLeave(c,how,o){ o=o||{}; const old=c.mgr; const e=mgOf(c); mgDepart(c,how,o); const ln=old.split(' ').slice(-1)[0];
+  const t=how==='retired'?`${old} retires`:how==='personal'?`${old} steps down at ${c.name}`:how==='resigned'?`${old} resigns as ${c.name} manager`:how==='mutual'?`${c.name} and ${old} part ways`:how==='national'?`${old} named ${o.ntName} manager`:`${old} leaves ${c.name}`;
+  const b=how==='retired'?pick([`After ${e&&e.b?mgYr()-e.b-30:'many'} years in the game, ${ln} calls time on his career.`,`${ln} says it's time to spend more time with his family. A great career comes to an end.`]):how==='personal'?pick([`${ln} is stepping away for personal reasons. The club ask for privacy.`,`${ln} says family must come first right now. ${c.name} wish him well.`])
+    :how==='resigned'?pick([`${ln} says he can no longer work with the people above him.`,`A surprise resignation. Sources close to ${ln} talk about broken promises over transfers.`]):how==='mutual'?pick([`Both sides felt it was the right time for a change.`,`After ${e?Math.max(1,Math.round((absWk()-e.since)/WEEKS)):'a few'} seasons, ${c.name} and ${ln} agree it's time to move on.`])
+    :how==='national'?`${ln} leaves ${c.name} to take charge of ${o.ntName}. A dream job, he says.`:pick([`${ln} feels he has taken the club as far as he can.`,`${ln} says he needs a new challenge. ${c.name} begin the search for a replacement.`,`"I'm tired. I need a break from football," says ${ln}. He leaves on good terms.`]);
+  mgNews(c,t,b,{force:how==='national'&&mgVisible(c)});
+  if(o.summer) mgAppoint(c,{summer:1,old,reason:'left'}); else mgInterim(c,old,'left'); }
+
+// ---------- the weekly beat ----------
+const MG_FEUDS=[c=>`The board blocked his top transfer target`,c=>`He wants a bigger budget and hasn't been given it`,c=>`The club sold a key player against his wishes`,c=>`The owners have been picking the team, according to reports`,c=>`Contract talks have stalled`,c=>`He's unhappy with the state of the training ground`,c=>`The board want more young players in the team`];
+function mgWeek(){ const G=mgEnsure(); if(!G) return; const now=absWk();
+  const due=(G.pend||[]).filter(p=>p.at<=now); G.pend=(G.pend||[]).filter(p=>p.at>now);
+  due.forEach(p=>{ const c=club(p.c); if(!c||c.mgr!==p.interim) return; const R=(S.runs||{})[c.id]||{};
+    if(R.win>=2&&Math.random()<.35){ const e=G.db[p.interim]; if(e){ e.interim=0; e.ret=0; e.rep=clamp(e.rep+4,20,90); } const h=(c.mh||[]).find(x=>x.t==null); if(h) h.interim=0; G.moves.unshift({s:S.season,w:S.week,y:mgYr(),n:p.interim,from:null,to:c.id,how:'hired'}); mgNews(c,`${p.interim} gets the ${c.name} job permanently`,`He won them over. The interim boss has done enough to earn the job full time.`); mgJobGone(c); return; }
+    mgDepart(c,'interim',{}); mgAppoint(c,{old:p.interim,reason:'left'}); });
+  if(S.week<3||S.week>WEEKS) return;
+  for(const lid in S.leagues){ const ids=S.leagues[lid].clubs; const T=tbl(lid); const order=sortedTable(lid); const exp=mgExpRanks(ids); const ctx={T,order,exp,N:ids.length};
+    for(const cid of ids){ const c=club(cid); if(!c||c.b||!c.mgr) continue; if(S.mode==='mgr'&&cid===myClubId()) continue; if(G.pend.some(p=>p.c===cid)) continue; const e=G.db[c.mgr]; if(!e||e.user) continue;
+      if(e.feud>0) e.feud=Math.max(0,e.feud-1.5);
+      if(Math.random()<(c.rep>=80?.006:.004)){ const was=e.feud; e.feud=clamp(e.feud+ri(14,30),0,100); if(was<35&&e.feud>=35&&wcd('feud'+cid,12)) mgNews(c,pick([`Rift between ${c.mgr} and the ${c.name} board`,`Tension behind the scenes at ${c.name}`,`${c.mgr} unhappy at ${c.name}`]),`${pick(MG_FEUDS)(c)}. ${pick(['Relations are said to be strained.','Friends of the manager say he\'s frustrated.','It\'s the talk of the dressing room.'])}`); }
+      const pr=mgPressure(c,e,ctx); e.pr=pr;
+      if(pr>=52&&!c.press&&wcd('pr'+cid,7)){ c.press=now; const R=(S.runs||{})[cid]||{}; mgNews(c,pick([`${c.mgr} under pressure at ${c.name}`,`${c.mgr}'s job on the line`,`Big week for ${c.mgr}`]),pick([`${R.nowin>=3?R.nowin+' games without a win. ':''}The board are said to be "monitoring the situation".`,`Fans chanted for ${c.mgr} to go after another bad result.`,`Reports say ${c.name} have already sounded out possible replacements.`,`${c.mgr} insists he's the right man. Not everyone at ${c.name} agrees.`])); }
+      else if(pr<30&&c.press) c.press=null;
+      const late=S.week>WEEKS-3; const pos=order.indexOf(cid)+1; const L=LMETA(lid)||{}; const inDrop=L.down&&pos>ids.length-L.down;
+      if(pr>=57&&(!late||inDrop&&pr>=74)&&now-e.since>=6&&Math.random()<(pr-52)/88){ mgSack(c,'results'); continue; }
+      if(e.feud>=70&&Math.random()<.07){ if(Math.random()<.5) mgLeave(c,'resigned'); else mgSack(c,'feud'); continue; }
+      if(Math.random()<.0005){ mgLeave(c,'personal'); continue; } } }
+  mgRivalMoves(); }
+// ---------- the summer: reviews, retirements, national teams, the merry-go-round ----------
+function mgSummer(A){ const G=mgEnsure(); if(!G||!A) return; const vac=[]; const y=mgYr();
+  // reputations move with results
+  for(const lid in A.leagues){ const rows=A.leagues[lid].rows; const ids=rows.map(r=>r[0]); const exp=mgExpRanks(ids); const N=ids.length; const L=LMETA(lid)||{};
+    ids.forEach((cid,i)=>{ const c=club(cid); if(!c||!c.mgr) return; const e=G.db[c.mgr]; if(!e||e.user) return; const pos=i+1; const gap=(pos-(exp[cid]||pos))/N; e.rep=clamp(e.rep-gap*9+(L.tier===1?0:-.5),20,97);
+      if(S.mode==='mgr'&&cid===myClubId()) return; if(G.pend.some(p=>p.c===cid)) return; if(e.interim) return;
+      const yrs=(absWk()-e.since)/WEEKS; const won=(c.mh||[]).find(h=>h.t==null&&h.won&&h.won.some(w=>w[1]===A.year+1));
+      let sk=0; const relegated=L.down&&pos>N-L.down; const gp=pos-(exp[cid]||pos); if(relegated&&exp[cid]<=N-L.down) sk=.65; else if(gap>=.3) sk=.55; else if(gap>=.2) sk=.38; else if(gap>=.12) sk=.2; else if(gap>=.06) sk=.07;
+      if(c.rep>=84&&L.tier===1){ sk=Math.max(sk,gp>=4?.6:gp>=2?.32:gp>=1?.14:0); if(!won&&(exp[cid]||9)<=2&&pos>=3) sk+=.1; } if(won) sk*=.35;
+      const hw=mgHereWins(c,e); sk*=hw>=8?.2:hw>=4?.4:hw>=2?.7:1; if(yrs>=8&&hw) sk*=.6; if(yrs<.6) sk*=.4; if(yrs>=5&&gap>0) sk+=.1; sk+=(e.feud||0)/250;
+      const age=mgAge(e)||50; let lv=age>=70?.5:age>=67?.28:age>=64?.08:0; let lvHow='retired';
+      if(!lv&&yrs>=7&&e.rep>=84&&Math.random()<.5){ lv=.1; lvHow='left'; } if(!lv){ lv=.012; lvHow='personal'; }
+      if(Math.random()<sk) vac.push({c,k:hw>=6?'mutual':'sack',n:c.mgr}); else if(Math.random()<lv) vac.push({c,k:lvHow,n:c.mgr}); else if(gap<=-.25&&yrs>=1&&Math.random()<.05) vac.push({c,k:'left',n:c.mgr}); }); }
+  // national teams change hands, mostly after tournaments
+  const tourYr=(S.year+1)%2===0; NATIONS.forEach(n=>{ if(Math.random()>(tourYr?.16:.06)) return; const code=n[0]; const cur=G.nt[code]||n[4]; const ce=G.db[cur]||(cur?mgNew(cur,{nat:code,clubRep:n[2]}):null); if(ce){ ce.nt=null; ce.club=null; ce.out=absWk(); ce.cool=absWk()+ri(6,20); }
+    let cand=null; const pool=Object.values(G.db).filter(e=>!e.ret&&!e.nt&&!e.interim&&!e.user&&e.n!==cur&&e.nat===code&&e.rep>=n[2]-14);
+    const free=pool.filter(e=>e.club==null&&e.cool<=absWk()).sort((a,b)=>b.rep-a.rep); const emp=pool.filter(e=>e.club!=null&&!(S.mode==='mgr'&&e.club===myClubId())).sort((a,b)=>b.rep-a.rep);
+    if(emp.length&&Math.random()<.35) cand=emp[0]; else if(free.length) cand=free[Math.min(free.length-1,ri(0,1))]; else if(emp.length) cand=emp[0];
+    const name=cand?cand.n:mgGenName(code); G.nt[code]=name;
+    if(cand&&cand.club!=null){ const c=club(cand.club); cand.nt=code; vac.push({c,k:'national',nt:n[1],code,n:cand.n}); return; } G.moves.unshift({s:S.season,w:S.week,y,n:name,from:null,to:null,nt:n[1],how:'national'}); { if(cand){ cand.nt=code; } news('world',`${name} named ${n[1]} manager`,cur?`He replaces ${cur}.`:'',true); try{ S.news[0].nc='mgr'; S.news[0].intl=1; }catch(e){} } });
+  vac.sort((a,b)=>(b.k==='national')-(a.k==='national')||b.c.rep-a.c.rep).forEach(v=>{ const c=v.c; if(!c.mgr||G.pend.some(p=>p.c===c.id)) return;
+    if(c.mgr!==v.n){ if(v.k==='national'){ const e=G.db[v.n]; if(e){ e.nt=v.code; e.club=null; } news('world',`${v.n} named ${v.nt} manager`,'',true); } return; } if(v.k==='sack') mgSack(c,'season',true); else if(v.k==='national'){ const e=G.db[c.mgr]; if(e) e.nt=v.code; mgLeave(c,'national',{summer:1,ntName:v.nt,nt:v.nt}); if(e){ e.nt=v.code; e.club=null; } } else mgLeave(c,v.k,{summer:1}); });
+  // tidy the pool
+  const now=absWk(); for(const n in G.db){ const e=G.db[n]; if(e.club!=null||e.user) continue; if(e.ret||e.interim){ if(!e.real) delete G.db[n]; continue; } if(!e.real&&now-(e.out||now)>WEEKS*3&&e.rep<72) delete G.db[n]; else if(e.real&&!e.nt&&now-(e.out||now)>WEEKS*5) delete G.db[n]; } }
+// trophies go on the manager's record
+function mgCredit(A){ const G=mgEnsure(); if(!G) return; const y=A.year+1; const give=(cid,name,w)=>{ const c=club(cid); if(!c||!c.mgr) return; const h=(c.mh||[]).find(x=>x.t==null); if(h) (h.won=h.won||[]).push([name,y]); const e=G.db[c.mgr]; if(e){ e.tro=(e.tro||0)+1; const eh=e.hist[e.hist.length-1]; if(eh&&eh.c===cid) (eh.won=eh.won||[]).push([name,y]); e.rep=clamp(e.rep+w,20,97); e.bb=clamp((e.bb||70)+6,40,100); } };
+  for(const lid in A.leagues){ const ch=A.leagues[lid].champion; const L=LMETA(lid); if(ch!=null&&L) give(ch,L.name,L.tier===1?3:1.5); }
+  for(const k in A.cups) if(A.cups[k].winner!=null) give(A.cups[k].winner,A.cups[k].name,1.5);
+  for(const k in A.euro) if(A.euro[k].winner!=null) give(A.euro[k].winner,A.euro[k].name,k==='UCL'?4:2); }
+// players crossing a rivalry make the news
+function mgRivalMoves(){ const T=S.transfers||[]; for(const t of T.slice(0,30)){ if(t.cx) continue; t.cx=1; if(t.loan||t.from==null||t.to==null) continue; if(rivalry(t.from,t.to)!==2) continue; const a=club(t.from), b=club(t.to); if(!a||!b) continue; if(!(mgVisible(a)||mgVisible(b))) continue;
+    news('world',pick([`${t.n} crosses the divide`,`Controversial: ${t.n} joins ${b.name}`,`${a.name} fans furious as ${t.n} joins ${b.name}`]),pick([`Moves between ${a.name} and ${b.name} don't happen often. This one will be talked about for years.`,`${a.name} supporters won't forget this. ${b.name} fans aren't sure what to make of it either.`,`"He knew what he was doing," says one ${a.name} fan. Expect a hostile welcome when he goes back.`]),true); try{ S.news[0].nc='tr'; }catch(e){} } }
+
+// ---------- national team coaches follow the save ----------
+{ const _nr47=nationRow; nationRow=function(code){ const r=_nr47.apply(this,arguments); try{ const o=S&&S.mg&&S.mg.nt&&S.mg.nt[code]; if(r&&o){ const c=r.slice(); c[4]=o; return c; } }catch(e){} return r; }; }
+
+// ---------- hooks ----------
+// the old "heat" sacking for my club now feeds the pressure model instead
+mgrHeatWeek=function(){ const m=S.me, c=myClubObj(); if(!c||m.club==null) return; const f=clubForm(); c.heat=Math.max(0,(c.heat||0)*.85+f.filter(x=>x==='L').length*4-f.filter(x=>x==='W').length*3); };
+storySack=function(){ return null; };
+{ const _as47=archiveSeason; archiveSeason=function(){ const A=_as47.apply(this,arguments); try{ mgCredit(A); }catch(e){ console.warn('mg47 credit',e); } return A; }; }
+{ const _pw47=planWeek; planWeek=function(){ const r=_pw47.apply(this,arguments); try{ if(S.week>1&&S.week<=WEEKS) mgWeek(); }catch(e){ console.warn('mg47 week',e); } return r; }; }
+// manager mode: the user is part of the history too
+if(typeof mgrJoin==='function'){ const _mj47=mgrJoin; mgrJoin=function(cid,first){ const c=club(cid); let G=null; try{ G=mgEnsure(); if(c&&c.mgr&&G&&G.db[c.mgr]&&!G.db[c.mgr].user){ const old=c.mgr; mgDepart(c,first?'replaced':'sacked',{why:'replaced'}); c.mgr=old; } }catch(e){ console.warn('mg47 join',e); }
+  const r=_mj47.apply(this,arguments); try{ if(G&&S.M){ const e=G.db[S.M.name]||mgNew(S.M.name,{user:1,clubRep:S.M.rep||50,country:c.country}); e.user=1; mgOpen(c,S.M.name,{}); e.rep=S.M.rep||e.rep; mgJobGone(c); } }catch(e){ console.warn('mg47 join2',e); } return r; }; }
+if(typeof sackMe==='function'){ const _sm47=sackMe; sackMe=function(why){ const c=typeof mgrClub==='function'?mgrClub():null; const r=_sm47.apply(this,arguments); try{ if(c&&S.M){ const G=mgEnsure(); c.mgr=S.M.name; if(!G.db[S.M.name]) mgNew(S.M.name,{user:1,club:c.id,clubRep:S.M.rep||50}); mgDepart(c,'sacked',{why:'board'}); mgInterim(c,S.M.name); } }catch(e){ console.warn('mg47 sack',e); } return r; }; }
+// season-end review of every dugout (runs after the season is archived)
+developWorld=(function(_dw){ return function(){ const r=_dw.apply(this,arguments); try{ mgSummer(S.archive&&S.archive[S.archive.length-1]); }catch(e){ console.warn('mg47 summer',e); } return r; }; })(developWorld);
+// ---------- crossing the divide as a player ----------
+{ const _jc47=joinClub; joinClub=function(cid){ const m=S.me; const before=m?m.club:null; const r=_jc47.apply(this,arguments); try{ if(S.mode==='mgr'||!m||!m.bond) return r; const nc=club(cid);
+    for(const k in m.bond){ const fid=+k; if(fid===cid) continue; const b=m.bond[k]; if(!b||(b.apps||0)<8) continue; if(rivalry(fid,cid)!==2) continue; const fc=club(fid); if(!fc) continue;
+      b.left=b.left||{how:'sold',s:S.season}; b.left.rival=cid; b.love=Math.min(b.love!=null?b.love:50,(b.apps>=60?14:20));
+      news('bad',pick([`You've crossed the divide`,`${fc.name} fans feel betrayed`,`From ${fc.name} to ${nc.name}`]),pick([`${b.apps} games for ${fc.name}, and now you've joined ${nc.name}. Their fans will never let you forget it.`,`Shirts with your name on are being returned to the ${fc.name} club shop. Expect a hostile reception in the derby.`,`"Judas" trends online within the hour. ${nc.name} fans are curious, but you'll have to win them over too.`]));
+      m.rel.fans=clamp(m.rel.fans-8,0,100); } }catch(e){ console.warn('mg47 rival join',e); } return r; }; }
+{ const _lt47=legacyTier; legacyTier=function(cid){ try{ const b=bondOf(cid); if(b&&b.left&&b.left.rival!=null&&bondLove(cid)<40) return {k:'traitor',n:'Judas',d:`You left for ${club(b.left.rival)?club(b.left.rival).name:'their rivals'}. Plenty of fans will never forgive that.`}; }catch(e){} return _lt47.apply(this,arguments); }; }
+{ const _ll47=legacyLeave; legacyLeave=function(cid){ const b=S.me&&S.me.bond?S.me.bond[cid]:null; const rv=b&&b.left?b.left.rival:null; const lv=b?b.love:null; const r=_ll47.apply(this,arguments); try{ if(rv!=null&&b&&b.left){ b.left.rival=rv; b.love=Math.min(b.love,lv!=null?lv:20); } }catch(e){} return r; }; }
+// ---------- development plans follow the depth chart (no more "first choice" but "limited minutes") ----------
+{ const _pf47=planFor; planFor=function(cid){ const k=_pf47.apply(this,arguments); try{ if(!k) return k; const m=S.me, c=club(cid); if(!c) return k; const lv=clubLevel(c), o=ovr(); const slots=(typeof SEL_SLOTS!=='undefined'&&SEL_SLOTS[m.pos])||1; const ahead=squadAt(cid).filter(p=>p.o>o).length;
+    if(ahead<slots&&o>=lv-3) return m.age<16?(DORDER.indexOf(k)<DORDER.indexOf('fl')?'fl':k):'fr';
+    if(ahead<slots+2&&o>=lv-6&&m.age>=16&&(k==='yy'||k==='fy'||k==='loan')) return 'fl';
+    if(ahead>=slots+3&&k==='fr') return 'fl';
+  }catch(e){} return k; }; }
+{ const _sel47=selection; selection=function(fx){ const s=_sel47.apply(this,arguments); try{ const m=S.me, D=m&&m.dplan; if(S.mode==='mgr'||!D||m.loan||!fx||fx.comp==='Y'||s.status!=='youth'||m.age<16) return s;
+    if(D.k==='fr') return Math.random()<.72?{status:'start'}:{status:'bench',on:ri(55,75)}; if(D.k==='fl'&&Math.random()<.45) return {status:'bench',on:ri(60,82)}; }catch(e){} return s; }; }
+// ---------- more real names in existing saves (other clubs only, once) ----------
+function kpUpgrade(){ if(!S||!S.players||!S.clubs||S.kp2v) return; S.kp2v=1; if(typeof KEYPLAYERS2==='undefined') return; const have=new Set(S.players.map(p=>p.n)); const mine=S.mode==='mgr'?[myClubId()]:(S.me?[S.me.club,S.me.loan&&S.me.loan.club]:[]); const yrs=Math.max(0,(S.season||1)-1);
+  for(const k in KEYPLAYERS2){ const c=S.clubs.find(x=>x.name===k); if(!c||!c.squad||mine.includes(c.id)) continue;
+    KEYPLAYERS2[k].split(';').filter(Boolean).forEach(x=>{ const [n,p,a,o,nt]=x.split('|'); if(have.has(n)) return; const grp=SEL_GROUP[p]||[p]; const q=c.squad.map(id=>P(id)).filter(z=>z&&!z.real&&(z.p===p||grp.includes(z.p))).sort((u,v)=>u.o-v.o)[0]; if(!q) return;
+      q.n=n; q.nt=nt; q.p=p; q.a=+a+yrs; q.o=Math.round(clamp(+o-(+a+yrs>30?yrs*1.5:0),40,94)); q.pt=Math.max(q.o,+o+(+a<24?ri(2,6):0)); q.real=1; have.add(n); }); } }
+{ const _pw47k=planWeek; planWeek=function(){ try{ kpUpgrade(); }catch(e){ console.warn('kp2',e); } return _pw47k.apply(this,arguments); }; }
+
+// ===================== v47: training overhaul — new positions, FM roles, learning PlayStyles =====================
+// ---------- positions ----------
+const POS_SIM={ST:{CAM:.62,LW:.72,RW:.72,CM:.32,CDM:.15,CB:.12,LB:.12,RB:.12},LW:{RW:.85,CAM:.6,ST:.72,LB:.42,CM:.38,RB:.3,CDM:.18,CB:.1},RW:{LW:.85,CAM:.6,ST:.72,RB:.42,CM:.38,LB:.3,CDM:.18,CB:.1},
+ CAM:{CM:.75,ST:.62,LW:.6,RW:.6,CDM:.45,CB:.12,LB:.15,RB:.15},CM:{CDM:.78,CAM:.75,LW:.38,RW:.38,ST:.32,CB:.35,LB:.3,RB:.3},CDM:{CM:.78,CB:.58,CAM:.45,LB:.32,RB:.32,LW:.18,RW:.18,ST:.15},
+ CB:{CDM:.58,LB:.5,RB:.5,CM:.35,CAM:.12,LW:.1,RW:.1,ST:.12},LB:{RB:.8,CB:.5,LW:.42,CDM:.32,CM:.3,RW:.3,CAM:.15,ST:.12},RB:{LB:.8,CB:.5,RW:.42,CDM:.32,CM:.3,LW:.3,CAM:.15,ST:.12},GK:{}};
+function posSim(a,b){ if(a===b) return 1; if(a==='GK'||b==='GK') return .02; return (POS_SIM[a]&&POS_SIM[a][b])||(POS_SIM[b]&&POS_SIM[b][a])||.1; }
+const FAM_LBL=[[18,'Natural','g'],[15,'Accomplished','g'],[12,'Competent','b'],[9,'Unconvincing','y'],[5,'Awkward','r'],[0,'Ineffectual','r']];
+function famLbl(f){ return FAM_LBL.find(x=>f>=x[0]); }
+function posInit(){ const m=S.me; if(!m) return {}; if(!m.posF){ m.posF={}; POSITIONS.forEach(p=>{ m.posF[p]=p===m.pos?20:clamp(Math.round(posSim(m.pos,p)*15),1,14); }); } if(m.posF[m.pos]==null) m.posF[m.pos]=20; return m.posF; }
+function posFam(p){ return posInit()[p]||1; }
+function ovrAt(p){ const m=S.me; return ovr({attrs:m.attrs,pos:p}); }
+function famPen(f){ return f>=18?0:f>=15?1.5:f>=12?3.5:f>=9?6:9; }
+function trainAgeF(){ const a=S.me.age; return a<=18?1.2:a<=21?1.1:a<=25?1:a<=29?.85:.7; }
+function trainProF(){ if(!S.me.psy&&typeof persInit==='function') try{ persInit(); }catch(e){} const P=S.me.psy; const pro=P?P.pro:12; return clamp(.78+(pro-10)*.045,.7,1.25); }
+function posRate(p){ const m=S.me; const f=posFam(p); const sim=Math.max(...Object.keys(posInit()).filter(k=>posFam(k)>=15).map(k=>posSim(k,p)),posSim(m.pos,p));
+  const suit=clamp(1+(ovrAt(p)-ovr())/12,.55,1.3); const slow=f<9?1.25:f<12?1.1:f<15?1:f<18?.55:.3;
+  return .6*Math.pow(.25+sim,1.2)*suit*trainAgeF()*trainProF()*slow*(m.ptrain&&m.ptrain.mgr?1.2:1); }
+function posWeeksTo(p,target){ let f=posFam(p), w=0, g=0; const m=S.me; const base=posRate(p)/((f<9?1.25:f<12?1.1:f<15?1:f<18?.55:.3)); const extras=(m.plan&&m.plan.extra==='position')?Math.min(5,+m.plan.count||0):0; const per=.6+.2*extras;
+  while(f<target&&g++<400){ const slow=f<9?1.25:f<12?1.1:f<15?1:f<18?.55:.3; f+=base*slow*per; w++; } return w; }
+function posGain(amt,why){ const m=S.me; const T=m.ptrain; if(!T||!T.pos) return; posInit(); const before=m.posF[T.pos]; const f=Math.min(20,before+posRate(T.pos)*amt*rnd(.8,1.2)); m.posF[T.pos]=Math.round(f*100)/100;
+  const L0=famLbl(before), L1=famLbl(f); if(L1[0]>L0[0]){ news('good',`${POS_NAME[T.pos]}: ${L1[1].toLowerCase()}`,L1[0]>=15?`The coaches say you're now ${L1[1].toLowerCase()} at ${T.pos}. ${T.pos!==m.pos?'You can make it your main position in Training, Positions & roles.':''}`:`You're getting there. You're now ${L1[1].toLowerCase()} at ${T.pos}.`,true); toast(`${T.pos}: ${L1[1]}`);
+    if(L1[0]>=15&&T.mgr&&T.pos!==m.pos) mail('you',`${mgrName()}: "You're ready at ${T.pos}"`,`"The work's paid off. I see you as a ${POS_NAME[T.pos].toLowerCase()} now. Make the switch and you'll get your chance there."`,{from:mgrName(),role:'Manager',cat:'club',go:'training:4',goLbl:'Positions & roles'}); }
+  if(f>=20){ m.ptrain=null; news('good',`Natural at ${T.pos}`,`It's second nature now. You're as comfortable at ${T.pos} as anywhere.`,true); } }
+function posSwitch(p){ const m=S.me; posInit(); if(p===m.pos) return {ok:false}; if(posFam(p)<15) return {ok:false,txt:'You need to be at least accomplished there first.'}; const old=m.pos; const req=m.ptrain&&m.ptrain.mgr&&m.ptrain.pos===p;
+  m.pos=p; m.mrole=null; m.prole=null; if(m.posF[old]==null) m.posF[old]=20; if(req) m.rel.manager=clamp(m.rel.manager+3,0,100);
+  (m.posLog=m.posLog||[]).push({s:S.season,w:S.week,from:old,to:p}); if(m.ptrain&&m.ptrain.pos===p&&posFam(p)>=18) m.ptrain=null;
+  news('good',`You're now a ${POS_NAME[p].toLowerCase()}`,`${req?`${mgrName()} gets what he wanted. `:''}Your main position is now ${p}. You're still ${famLbl(posFam(old))[1].toLowerCase()} at ${old} if you're ever needed there.`); return {ok:true}; }
+// ---------- roles (Football Manager roles) ----------
+const POS_FAMILY={GK:'GK',CB:'DC',LB:'DL',RB:'DR',CDM:'DM',CM:'MC',CAM:'AMC',LW:'AML',RW:'AMR',ST:'ST'};
+const RDEM_MAP={'Advanced Forward':'AF','Deep-Lying Forward':'DLF','Target Man':'TF','Pressing Forward':'PF','False Nine':'F9','Inverted Winger':'IW','Touchline Winger':'W','Inside Forward':'IF','Shadow Striker':'SS','Advanced Playmaker':'AP','Box-to-Box':'B2B','Deep-Lying Playmaker':'DLP','Mezzala':'MEZ','Anchor':'ANC','Ball-Winner':'BWM','Regista':'REG','Ball-Playing Defender':'BPD','Stopper':'CD','Covering Defender':'CD','Wing-Back':'WB','Inverted Full-Back':'IFB','Defensive Full-Back':'FB'};
+function rolesFor(p){ const fam=POS_FAMILY[p||S.me.pos]; return Object.keys(MROLES).filter(k=>MROLES[k].f.includes(fam)&&(fam==='GK')===(k==='GK'||k==='SK')); }
+function roleSuit(k){ const m=S.me; const ks=MROLES[k].a; return avg(ks.map(a=>m.attrs[a]!=null?m.attrs[a]:50)); }
+function roleStars(k){ return clamp((roleSuit(k)-ovr()+14)/5,.5,5); }
+function roleUInit(k){ const m=S.me; m.roleU=m.roleU||{}; if(m.roleU[k]==null) m.roleU[k]=Math.round(clamp((roleSuit(k)-ovr()+8)*2.5+22,5,58)); return m.roleU[k]; }
+function roleULbl(u){ return u>=90?['Mastered','g']:u>=75?['Accomplished','g']:u>=50?['Comfortable','b']:u>=25?['Learning','y']:['New to it','r']; }
+function mgrWantsRole(){ const m=S.me; if(!m.mrole||typeof roleDemandOn!=='function'||!roleDemandOn()) return null; const k=RDEM_MAP[m.mrole.name]; return k&&rolesFor(m.pos).includes(k)?k:null; }
+function myRole(){ const m=S.me; const rs=rolesFor(m.pos); if(m.prole&&rs.includes(m.prole)) return m.prole; const want=mgrWantsRole(); if(want) return want; return rs.slice().sort((a,b)=>roleSuit(b)-roleSuit(a))[0]||null; }
+function roleGain(amt){ const m=S.me; const k=myRole(); if(!k) return; const u0=roleUInit(k); const suit=clamp(1+(roleSuit(k)-ovr())/15,.6,1.3); const u=Math.min(100,u0+amt*1.6*suit*trainAgeF()*trainProF()*(u0>=75?.55:1)*rnd(.8,1.2)); m.roleU[k]=Math.round(u*10)/10;
+  const a=roleULbl(u0)[0], b=roleULbl(u)[0]; if(a!==b) news('good',`${MROLES[k].n}: ${b.toLowerCase()}`,`Your understanding of the ${MROLES[k].n.toLowerCase()} role keeps growing. ${b==='Mastered'?'Few players know it better.':''}`,true);
+  // the role's key attributes get extra attention
+  const ks=MROLES[k].a; for(let i=0;i<2;i++){ const at=pick(ks); if(m.attrs[at]!=null&&typeof addTXP==='function') addTXP(at,1.6*amt*(typeof growthMult==='function'?growthMult():1)); } }
+function roleSelBonus(){ const m=S.me; const want=mgrWantsRole(); if(!want) return 0; const u=(m.roleU&&m.roleU[want])||roleUInit(want); return myRole()===want?clamp((u-50)/12,-3,4):-2.5; }
+// ---------- PlayStyles (traits): up to two at once, attribute fit decides how long, you can fail and try again ----------
+function traitFit(t){ const tr=TRAITS.find(x=>x[0]===t); if(!tr) return -20; const m=S.me; let s=0, w=0; Object.entries(tr[2]).forEach(([k,v],i)=>{ const ww=i===0?2:1; s+=((m.attrs[k]!=null?m.attrs[k]:50)-v)*ww; w+=ww; }); return w?s/w:0; }
+function traitFitLbl(f){ return f>=6?['Natural fit','g']:f>=0?['Good fit','g']:f>=-6?['Possible','b']:f>=-12?['Hard','y']:['Very hard','r']; }
+function traitRate(t){ const m=S.me; const f=traitFit(t); const two=(m.tlearn||[]).length>=2?.8:1; return clamp(6.5+f*.55,1.5,13)*trainAgeF()*trainProF()*two*(m.injury?.4:1); }
+function traitWeeks(t){ const m=S.me; const L=(m.tlearn||[]).find(x=>x.t===t); const p=L?L.p:((m.traitProg||{})[t]||0); const extras=(m.plan&&m.plan.extra==='trait')?Math.min(5,+m.plan.count||0):0; const r=traitRate(t)+extras*traitSess(t); return Math.max(1,Math.ceil((100-p)/Math.max(1,r))); }
+function traitSess(t){ return clamp(3.5+traitFit(t)*.2,1.2,6)*trainAgeF(); }
+function traitChance(t){ const P=S.me.psy; return clamp(.62+traitFit(t)*.025+((P?P.pro:12)-12)*.02,.3,.95); }
+function traitInit(){ const m=S.me; m.tlearn=m.tlearn||[]; m.tcool=m.tcool||{}; m.traitProg=m.traitProg||{}; if(m.traitTarget&&!m.traits.includes(m.traitTarget)&&!m.tlearn.some(x=>x.t===m.traitTarget)&&m.tlearn.length<2) m.tlearn.push({t:m.traitTarget,p:Math.min(90,m.traitProg[m.traitTarget]||0),since:absWk()}); m.traitTarget=null; return m.tlearn; }
+function traitStart(t){ const m=S.me; traitInit(); if(m.traits.includes(t)) return {ok:false,txt:'You already have it.'}; if(m.tlearn.some(x=>x.t===t)) return {ok:false,txt:'Already learning it.'}; if(m.tlearn.length>=2) return {ok:false,txt:'You can only learn two PlayStyles at a time.'};
+  if((m.tcool[t]||0)>absWk()) return {ok:false,txt:`The coaches want you to leave it for ${m.tcool[t]-absWk()} more week${m.tcool[t]-absWk()>1?'s':''} before trying again.`};
+  m.tlearn.push({t,p:Math.min(60,m.traitProg[t]||0),since:absWk()}); return {ok:true}; }
+function traitStop(t){ const m=S.me; traitInit(); const L=m.tlearn.find(x=>x.t===t); if(!L) return; m.traitProg[t]=Math.round(L.p*.6); m.tlearn=m.tlearn.filter(x=>x!==L); }
+function traitAdd(t,amt){ const m=S.me; const L=(m.tlearn||[]).find(x=>x.t===t); if(!L) return; L.p=Math.min(100,L.p+amt*rnd(.8,1.2)); if(L.p<100) return;
+  m.tlearn=m.tlearn.filter(x=>x!==L); const ch=traitChance(t); if(Math.random()<ch){ m.traits.push(t); delete m.traitProg[t]; (m.learnt=m.learnt||[]).push({t,from:'Training',s:S.season}); news('good',`New PlayStyle: ${t}`,pick([`It's clicked. ${t} is part of your game now, and you'll see it in matches.`,`Weeks of extra work pay off. ${t} is yours.`,`The coaches are delighted. ${t} comes naturally to you now.`])); toast(`PlayStyle learned: ${t}`); }
+  else { const wk=ri(6,10); m.tcool[t]=absWk()+wk; m.traitProg[t]=35; news('you',`${t} didn't stick`,pick([`You've put the work in, but it isn't quite there yet. The coaches want you to leave it for ${wk} weeks and try again.`,`It works in training but not when it matters. Give it ${wk} weeks and go again. Some of what you learned will stay with you.`]),true); } }
+// ---------- weekly training beat ----------
+function trainWeek47(){ const m=S.me; if(!m||S.mode==='mgr'||m.retired) return; posInit(); traitInit(); const inClub=m.club!=null; const inj=m.injury?.3:1;
+  if(m.ptrain&&m.ptrain.pos){ if(m.ptrain.pos===m.pos&&posFam(m.pos)>=20) m.ptrain=null; else posGain((inClub?.6:.3)*inj); }
+  if(inClub) roleGain(.55*inj);
+  m.tlearn.slice().forEach(L=>traitAdd(L.t,traitRate(L.t)*(inClub?1:.6)));
+  // playing in your new main position teaches you too
+  if(posFam(m.pos)<20&&m.form&&m.form.length){ m.posF[m.pos]=Math.min(20,posFam(m.pos)+.12); }
+  posAsk(); }
+// the manager asks you to learn a new position
+function posAsk(){ const m=S.me; if(!m||m.club==null||m.loan||m.injury||m.ptrain||S.week<4||S.week>WEEKS-3||(m.posAskCd||0)>absWk()||m.youth&&m.age<16) return; if(Math.random()>.08) return; const c=myClubObj(); const lv=clubLevel(c); const o=ovr();
+  const myAhead=squadAt(m.club).filter(p=>p.o>o).length; const slots=SEL_SLOTS[m.pos]||1; const cands=[];
+  POSITIONS.filter(p=>p!=='GK'&&p!==m.pos&&posFam(p)<15&&posSim(m.pos,p)>=.3).forEach(p=>{ const grp=SEL_GROUP[p]||[p]; const there=c.squad.map(P).filter(x=>x&&grp.includes(x.p)).sort((a,b)=>b.o-a.o); const sl=SEL_SLOTS[p]||1; const eff=ovrAt(p)-2; const ahead=there.filter(x=>x.o>eff).length; const short=there.filter(x=>x.o>=lv-2).length<sl;
+    const why=short&&eff>=lv-6?'short':myAhead>=slots+1&&ahead<sl&&eff>=o-3?'chance':ovrAt(p)>=o+2?'suits':null; if(why) cands.push({p,why,s:(why==='short'?3:why==='chance'?2:1)+posSim(m.pos,p)}); });
+  if(!cands.length) return; const best=cands.sort((a,b)=>b.s-a.s)[0]; m.posAskCd=absWk()+ri(10,16); sceneQueue('posreq',{p:best.p,why:best.why}); }
+SCENES.posreq=d=>{ const m=S.me; const mg=mgrName(); const p=d.p; const fam=famLbl(posFam(p))[1].toLowerCase(); const wk=posWeeksTo(p,15);
+  const reason=d.why==='short'?pick([`We're short at ${p}. I need bodies there and I think you can do it.`,`Injuries and form have left us thin at ${p}. You've got the tools for it.`]):d.why==='chance'?pick([`Honestly? You're not getting in ahead of the lads at ${m.pos} right now. At ${p}, I think you'd play.`,`I want you on the pitch. ${p} could be your way into the team.`]):pick([`I've watched you in training. Your attributes suit ${p} better than you think.`,`The way you play, I can see you at ${p}. It could open up your game.`]);
+  return {title:`${mg} wants you to try ${p}`,label:'Manager · position change',who:mg,intro:pick([`${mg} calls you into his office after training.`,`The manager pulls you aside on the training pitch.`]),start:'a',nodes:{
+   a:{say:`${reason} You're ${fam} there now. With the work, the coaches reckon about ${wk} weeks to get comfortable.`,opts:[
+    {t:`I'm in. Let's do it`,fx:()=>{ m.ptrain={pos:p,mgr:1,since:absWk()}; m.rel.manager=clamp(m.rel.manager+4,0,100); return {narr:pick([`"Good lad." Position work starts tomorrow. Add position work to your weekly plan to speed it up.`,`He shakes your hand. "That's the attitude I want." The coaches will start working with you at ${p}.`]),fx:[['Manager',4]]}; }},
+    {t:`I'd rather stay at ${m.pos}`,fx:()=>{ const d2=d.why==='chance'?-4:-2; m.rel.manager=clamp(m.rel.manager+d2,0,100); return {narr:d.why==='chance'?`"Your call. But the team picks itself at ${m.pos} right now." He doesn't look pleased.`:`"Fair enough. I just think it would help you." He moves on.`,fx:[['Manager',d2]]}; }},
+    {t:'Can I think about it?',fx:()=>{ m.posAskCd=absWk()+ri(3,5); return {narr:`"Don't take too long." He'll ask again in a few weeks.`,fx:[]}; }}]}}}; };
+// ---------- hooks ----------
+{ const _pw48=planWeek; planWeek=function(){ const r=_pw48.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me&&S.me.first&&S._tw48!==absWk()){ S._tw48=absWk(); trainWeek47(); } }catch(e){ console.warn('train48',e); } return r; }; }
+Object.assign(PERSONAL,{position:{name:'Position work',pos:1,e:6},role:{name:'Role work',role:1,e:6}});
+{ const _ps48=personalSession; personalSession=function(i,light){ const m=S.me; const k=m&&m.pers?m.pers[i]:null; if(m) traitInit(); const r=_ps48.apply(this,arguments); try{ const T=PERSONAL[k]; if(!T) return r; const mult=light?.6:1;
+    if(T.pos&&m.ptrain) posGain(.2*mult); if(T.role) roleGain(.6*mult);
+    if(T.trait&&m.tlearn&&m.tlearn.length){ const L=m.tlearn[0]; traitAdd(L.t,traitSess(L.t)*mult); if(m.tlearn[1]&&Math.random()<.5) traitAdd(m.tlearn[1].t,traitSess(m.tlearn[1].t)*.5*mult); } }catch(e){ console.warn('ps48',e); } return r; }; }
+{ const _ss48=selScore; selScore=function(){ let s=_ss48.apply(this,arguments); try{ s-=famPen(posFam(S.me.pos)); s+=roleSelBonus(); }catch(e){} return s; }; }
+{ const _mc48=momentChance; momentChance=function(o){ const r=_mc48.apply(this,arguments); if(r==null) return r; try{ const m=S.me; let d=-famPen(posFam(m.pos))*.011; const k=myRole(); if(k&&MROLES[k].a.includes(o[1])){ const u=(m.roleU&&m.roleU[k])||roleUInit(k); d+=clamp((u-50)/1200,-.03,.04); } if(o[4]&&m.traits.includes(o[4])) d+=.03; return clamp(r+d,.04,.88); }catch(e){} return r; }; }
+// Relentless keeps going
+{ const _fm48=finishMyMatch; finishMyMatch=function(){ const r=_fm48.apply(this,arguments); try{ const m=S.me; if(m&&S.mode!=='mgr'&&m.traits&&m.traits.includes('Relentless')&&S.lastMatch&&S.lastMatch.played) m.energy=clamp(m.energy+4,0,100); }catch(e){} return r; }; }
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
@@ -8911,6 +9477,158 @@ function legacyCard(){ const m=S.me; const ids=Object.keys(m.bond||{}).map(Numbe
     return `<div class="pz-row">${crest(c)}<div class="pz-rt"><b>${esc(c.name)}</b><span>${esc(t.n)} · ${b.apps} games, ${b.g} goals${how?` · ${how}`:''}</span></div><span class="pill ${k}">${w}</span></div>`; }).join('');
   if(!curHTML&&!past) return ''; return W('Your legacy',`<div class="stack">${curHTML}${past?`<div class="lbl">Former clubs</div><div class="pz-list">${past}</div>`:''}</div>`); }
 { const k=SECTIONS.find(x=>x[0]==='career')[2].indexOf('Personality'); const _pv46=VIEWS['career:'+k]; VIEWS['career:'+k]=()=>{ const h=_pv46(); try{ const lc=legacyCard(); if(!lc) return h; const i=h.indexOf('<section class="w ps"><div class="wb"><span class="ps-k">Personality'); return i>=0?h.slice(0,i)+lc+h.slice(i):h.replace(/<\/div>$/,lc+'</div>'); }catch(e){ console.warn('lg',e); return h; } }; }
+
+// ---------- v47 UI: club profile with history, managers and legends; manager moves in the news hub ----------
+function seasonLbl(y){ return `${y}/${String(y+1).slice(-2)}`; }
+function ciHonours(c){ const out={}; const add=(name,code,n,last,yrs)=>{ const o=out[name]=out[name]||{name,code,n:0,last:0,years:[]}; o.n+=n; o.last=Math.max(o.last,last||0); if(yrs) o.years.push(...yrs); };
+  const C=COUNTRIES[c.country]||{}; const top=LEAGUES.find(l=>l.c===c.country&&l.tier===1);
+  const nm={L:top?top.name:'League',C:C.cup||'Cup',LC:C.cup2||'League Cup',UCL:'Champions League',UEL:'Europa League',UECL:'Conference League',CWC:"Cup Winners' Cup",FC:'Inter-Cities Fairs Cup'};
+  (CLUB_HON[c.name]||'').split(',').filter(Boolean).forEach(x=>{ const m=x.match(/^([A-Z]+)(\d+)\/(\d+)$/); if(m) add(nm[m[1]]||m[1],m[1],+m[2],+m[3],null); });
+  (S.archive||[]).forEach(A=>{ const y=A.year+1; for(const lid in A.leagues) if(A.leagues[lid].champion===c.id){ const L=LMETA(lid); if(L) add(L.name,L.tier===1?'L':'L'+L.tier,1,y,[y]); }
+    for(const k in A.cups) if(A.cups[k].winner===c.id) add(A.cups[k].name,k==='EFL'?'LC':'C',1,y,[y]);
+    for(const k in A.euro) if(A.euro[k].winner===c.id) add(EURO_NAME[k]||A.euro[k].name,k,1,y,[y]); });
+  const ord={L:0,C:1,LC:2,UCL:3,UEL:4,UECL:5,CWC:6,FC:7}; return Object.values(out).sort((a,b)=>(ord[a.code]??8)-(ord[b.code]??8)||b.n-a.n); }
+function ciSeasons(c){ return (S.archive||[]).map(A=>{ for(const lid in A.leagues){ const rows=A.leagues[lid].rows; const i=rows.findIndex(r=>r[0]===c.id); if(i>=0) return {y:A.year,lid,pos:i+1,N:rows.length,pts:rows[i][7],champ:i===0}; } return null; }).filter(Boolean).reverse(); }
+function mgHowTxt(h){ if(h.t==null) return 'Current'; if(h.interim||h.how==='interim') return 'Interim'; if(h.how==='poached'&&h.to!=null&&club(h.to)) return `Left for ${club(h.to).name}`; if(h.how==='national') return h.nt?`Took the ${h.nt} job`:'National team job'; return MG_HOW[h.how]||'Left'; }
+function ciMgrRows(c){ mgEnsure(); const first=(c.mh||[])[0]; const real=mgRealHist(c.name); const rows=[]; const RH={s:'Sacked',l:'Left',r:'Retired',n:'National team job',p:'Left for another club',m:'Mutual consent'};
+  real.forEach(h=>{ if(first&&h.n===first.n&&(h.t==null||h.f>=first.f)) return; if(first&&h.f>first.f) return; rows.push({n:h.n,f:h.f,t:h.t||(first?first.f:''),how:RH[h.how]||'Left',won:h.won,sack:h.how==='s'}); });
+  (c.mh||[]).forEach((h,i)=>{ let won=(h.won||[]).map(w=>`${w[0]} ${w[1]}`).join(', '); if(i===0){ const r=real.find(x=>x.n===h.n&&x.t==null); if(r&&r.won) won=r.won+(won?', '+won:''); } rows.push({n:h.n,f:h.f,t:h.t,how:mgHowTxt(h),won,sack:h.how==='sacked',cur:h.t==null,interim:h.interim}); });
+  return rows.reverse(); }
+function ciLegends(c){ const L=(CLUB_LEG[c.name]||'').split(';').filter(Boolean).map(x=>{ const [n,t]=x.split('|'); return {n,icon:/i/.test(t),mgr:/m/.test(t)}; });
+  const out={icons:L.filter(x=>x.icon),legends:L.filter(x=>!x.icon),fav:[]}; const seen=new Set(L.map(x=>x.n)); const fav=(n,why,me)=>{ if(!n||seen.has(n)) return; seen.add(n); out.fav.push({n,why,me}); };
+  try{ if(S.me&&S.mode!=='mgr'&&S.me.bond&&S.me.bond[c.id]){ const t=legacyTier(c.id); const nm=`${S.me.first} ${S.me.last}`; if(t.k==='icon'){ out.icons.unshift({n:nm,me:1}); seen.add(nm); } else if(t.k==='legend'){ out.legends.unshift({n:nm,me:1}); seen.add(nm); } else if(['cult','servant','fav'].includes(t.k)) fav(nm,t.n,1); } }catch(e){}
+  (c.mh||[]).forEach(h=>{ const w=(h.won||[]).length; if(w>=4&&!seen.has(h.n)){ out.legends.push({n:h.n,mgr:1,why:`${w} trophies as manager`}); seen.add(h.n); } else if(w>=1&&h.how!=='sacked') fav(h.n,`${h.t==null?'Manager':'Former manager'} · won ${[...new Set(h.won.map(x=>x[0]))].join(', ')}`); });
+  mgRealHist(c.name).forEach(h=>{ if(['l','r','n','p'].includes(h.how)&&mgWonCount(h.won)>=3) fav(h.n,`Former manager · ${h.won}`); });
+  if(c.mgr){ const e=mgOf(c); if(e&&mgHereWins(c,e)>=2) fav(c.mgr,`Manager · ${mgHereWins(c,e)} trophies here`); }
+  const sq=(c.squad||[]).map(id=>P(id)).filter(Boolean); const cap=c.cap!=null?P(c.cap):null; if(cap) fav(cap.n,'Club captain'); const star=sq.filter(p=>p!==cap).sort((a,b)=>b.o-a.o)[0]; if(star&&star.o>=clubLevel(c)+3) fav(star.n,'Star player');
+  const vet=sq.filter(p=>p.real&&p.a>=30&&p!==cap&&p!==star).sort((a,b)=>b.o-a.o)[0]; if(vet) fav(vet.n,'Senior pro');
+  return out; }
+function ciPosLine(c,L){ const lid=c.league; if(!L) return ''; const row=tbl(lid)[c.id]; const pos=leaguePos(c.id);
+  if(row&&row[0]>0) return `<div><span>Position</span><b>${ordinal(pos)} <small>${row[6]} pts from ${row[0]}</small></b></div>`;
+  let last=''; const LT=S.lastTables||{}; for(const l in LT){ const i=LT[l].indexOf(c.id); if(i>=0){ last=`${ordinal(i+1)} in ${LMETA(l)?LMETA(l).name:l}`; break; } }
+  return `<div><span>${last?'Last season':'Position'}</span><b>${last||'Season not started'}</b></div>`; }
+function ciMyPos(cid){ const m=S.me; const sq=squadAt(cid); const o=ovr(); const slots=(typeof SEL_SLOTS!=='undefined'&&SEL_SLOTS[m.pos])||1; const ahead=sq.filter(p=>p.o>o).length; const lv=clubLevel(club(cid));
+  if(o<lv-10) return 'Well short of their level for now'; if(o<lv-6&&ahead>=slots) return `${ahead} ahead of you. You'd be a back-up`;
+  return ahead===0?'You\'d be first choice':ahead<slots?'You\'d be a starter':ahead<slots+2?`Rotation: ${ahead} ahead of you`:`${ahead} ahead of you. Big competition`; }
+function ciMgrCard(c,T){ const e=mgOf(c); const age=mgAge(e); const sec=e&&!e.user?mgSecLabel(e.pr||0):null; const won=e?mgHereWins(c,e):0; const h=(c.mh||[]).find(x=>x.t==null);
+  const bb=e?(e.feud>=35?['Strained','r']:(e.bb||70)>=78?['Fully backed','g']:(e.bb||70)>=62?['Backed','']:['Some doubts','y']):null; const prev=e?[...mgRealSpells(e.n).filter(x=>x.club!==c.name&&x.t).map(x=>x.club),...e.hist.filter(x=>x.t!=null&&x.c!==c.id).map(x=>club(x.c)?club(x.c).name:'').filter(Boolean)]:[];
+  const prevU=[...new Set(prev)].slice(-4);
+  return `<div class="ci-mgr"><div class="ci-mgr-top"><b>${esc(c.mgr||'Vacant')}</b>${e?`<span>${flagOf(e.nat)} ${age?age+' · ':''}${esc(mgStarsTxt(e))}</span>`:''}</div>
+    <div class="lines">${e?`<div><span>Reputation</span><b>${hStars(clamp((e.rep-35)/12,.5,5))}</b></div>`:''}<div><span>In charge since</span><b>${h?h.f:'–'}${h&&h.interim?' <small>interim</small>':''}</b></div>${sec?`<div><span>Job security</span><b><span class="pill ${sec[1]}">${sec[0]}</span></b></div>`:''}${bb?`<div><span>Board</span><b><span class="pill ${bb[1]}">${bb[0]}</span></b></div>`:''}<div><span>Trophies here</span><b>${won||'None yet'}</b></div><div><span>Style</span><b>${esc(T.style)} <small>${esc(T.form)}</small></b></div><div><span>Personality</span><b>${esc(T.mgrType)}</b></div>${prevU.length?`<div><span>Previous clubs</span><b>${prevU.map(esc).join(', ')}</b></div>`:''}</div>
+    <div class="ci-bars">${ciBar('Trust in young players',T.trust,['Very low','Low','Average','High','Very high'])}</div><p class="note" style="margin:0">${esc(T.mgrDesc)}</p></div>`; }
+function openClubInfo(cid){ const c=club(cid); if(!c) return; CI.cid=cid; const T=clubTraits(c); const me=S.me&&S.mode!=='mgr'?S.me:null; const L=c.league&&S.leagues&&S.leagues[c.league]?LMETA(c.league):null; const lv=clubLevel(c);
+  try{ mgEnsure(); }catch(e){}
+  const tabs=[['over','Overview'],['hist','History'],['mgr','Managers'],['leg','Legends'],['squad','Squad'],['fans','Fans & ground']]; if(!tabs.some(t=>t[0]===CI.tab)) CI.tab=CI.tab==='fac'?'fans':'over';
+  let body='';
+  if(CI.tab==='over'){ const plan=me&&me.age<=21?planFor(cid):null; const pp=me?ppotFor(cid):null; const wk=wageFor(cid,lv,'First team'); const hon=ciHonours(c); const lt=hon.find(h=>h.code==='L'); const e=mgOf(c); const sec=e&&!e.user?mgSecLabel(e.pr||0):null;
+    const myP=me?ciMyPos(cid):''; const young=me&&me.age<16&&plan==='fl'&&/first choice|starter/.test(myP);
+    body=`<div class="lines"><div><span>League</span><b>${L?esc(L.name):'Europe'}</b></div>${ciPosLine(c,L)}<div><span>Manager</span><b>${esc(c.mgr||'–')}${sec?` <span class="pill ${sec[1]}">${sec[0]}</span>`:''}</b></div>${hon.length?`<div><span>Honours</span><b>${lt?`${lt.n} league title${lt.n>1?'s':''}`:`${hon.reduce((s,h)=>s+h.n,0)} major trophies`} <small>last ${Math.max(...hon.map(h=>h.last))}</small></b></div>`:''}<div><span>Stadium</span><b>${esc(c.stadium||'Home ground')} <small>${T.cap.toLocaleString('en-IE')}</small></b></div><div><span>Typical first-team wage</span><b>${money(wk)}/wk <small>${money(perMonth(wk))}/month</small></b></div><div><span>Spends on</span><b>${T.payPolicy==='potential'?'Young talent and potential':T.payPolicy==='balanced'?'A mix of youth and experience':'Proven players'}</b></div></div>
+      ${me?`<div class="lbl">How they see you</div><div class="lines">${me.age<=21?`<div><span>Their scouts rate your potential</span><b>${hStars(paStars(pp))}</b></div>`:''}${plan?`<div><span>Likely plan for you</span><b>${esc(DPLAN[plan].n)}</b></div>`:''}<div><span>Your position</span><b>${myP}</b></div></div>${young?`<p class="note" style="margin:0">You'd be their best option, but at ${me.age} they'd manage your minutes carefully.</p>`:''}`:''}`; }
+  else if(CI.tab==='hist'){ const hon=ciHonours(c); const ss=ciSeasons(c);
+    body=`<div class="lbl">Honours</div>${hon.length?`<div class="ci-hons">${hon.map(h=>`<div class="ci-hon"><b>${h.n}</b><div><span>${esc(h.name)}</span><small>${h.years.length?`Won in this save: ${h.years.map(seasonLbl0).join(', ')}`:`Last won ${h.last}`}${h.years.length&&h.n>h.years.length?` · ${h.n-h.years.length} before`:''}</small></div></div>`).join('')}</div>`:'<p class="empty">No major honours yet. Win something and it goes here.</p>'}
+      <div class="lbl">Season by season</div>${ss.length?`<div class="ci-seas">${ss.slice(0,12).map(s=>`<div><span>${seasonLbl(s.y)}</span><span>${esc(LMETA(s.lid)?LMETA(s.lid).name:s.lid)}</span><b class="${s.champ?'c-hi':''}">${ordinal(s.pos)}${s.champ?' 🏆':''}</b></div>`).join('')}</div>`:'<p class="empty">The first season of your save is still being played.</p>'}
+      <p class="note" style="margin:0">Honours before ${seasonLbl(S.archive&&S.archive[0]?S.archive[0].year:S.year)} are based on real history and some may be out of date.</p>`; }
+  else if(CI.tab==='mgr'){ const rows=ciMgrRows(c).filter(r=>!r.cur); body=`${ciMgrCard(c,T)}<div class="lbl">Previous managers</div>${rows.length?`<div class="ci-mgs">${rows.slice(0,14).map(r=>`<div class="ci-mg"><div><b>${esc(r.n)}</b><span>${r.f}${r.t&&r.t!==r.f?'–'+r.t:''}${r.won?` · ${esc(r.won)}`:''}</span></div><span class="pill ${r.sack?'r':r.interim?'':'b'}">${esc(r.how)}</span></div>`).join('')}</div>`:'<p class="empty">No record of earlier managers.</p>'}`; }
+  else if(CI.tab==='leg'){ const g=ciLegends(c); const row=(x,pl,cls)=>`<div class="ci-mg"><div><b>${esc(x.n)}${x.me?' <small>(you)</small>':''}</b>${x.why||x.mgr?`<span>${esc(x.why||'Manager')}</span>`:''}</div><span class="pill ${cls}">${pl}</span></div>`;
+    body=`${g.icons.length?`<div class="lbl">Icons</div><div class="ci-mgs">${g.icons.map(x=>row(x,'Icon','y')).join('')}</div>`:''}${g.legends.length?`<div class="lbl">Legends</div><div class="ci-mgs">${g.legends.map(x=>row(x,'Legend','b')).join('')}</div>`:''}
+      <div class="lbl">Favoured personnel</div>${g.fav.length?`<div class="ci-mgs">${g.fav.map(x=>row(x,'Favoured','g')).join('')}</div>`:'<p class="empty">Nobody stands out yet.</p>'}${!g.icons.length&&!g.legends.length?'<p class="note" style="margin:0">No famous names on record. Stay long enough and win things, and it could be you.</p>':''}`; }
+  else if(CI.tab==='fans'){ const feisty=['Quiet','Polite','Lively','Loud and demanding','Ferocious'][T.passion-1];
+    body=`<div class="ci-bars">${ciBar('Passion',T.passion,['Quiet','Polite','Lively','Loud','Ferocious'])}${ciBar('Patience with young players',T.youthPat,['None','Little','Some','Plenty','Endless'])}</div><p style="margin:0">${feisty}. ${T.passion>=4?pick(['They live and die with every result.','The noise on a big night is something else.','They let you know when it isn\'t good enough.']):T.passion<=2?'A supportive crowd that rarely turns on its own players.':'They back the team, but they expect effort.'} ${T.youthPat>=4?'They love seeing their own young players come through and give them time.':T.youthPat<=2?'They want results now. Young players get little time to settle.':'They\'ll give a young player a chance if he shows fight.'}</p><div class="lines"><div><span>Average crowd</span><b>about ${(Math.round(T.cap*clamp(.55+T.passion*.08,.5,.97)/100)*100).toLocaleString('en-IE')}</b></div><div><span>Stadium</span><b>${esc(c.stadium||'Home ground')} <small>${T.cap.toLocaleString('en-IE')}</small></b></div></div>
+      <div class="lbl">Facilities</div><div class="ci-bars">${ciBar('Training facilities',T.train)}${ciBar('Youth facilities',T.youthFac)}${ciBar('Academy reputation',T.academy)}${ciBar('Scouting network',T.scout)}</div><p class="note" style="margin:0">${T.academy>=4?'A famous academy. Players who come through here are taken seriously everywhere.':T.youthFac>=4?'Excellent youth set-up even if the academy\'s name isn\'t famous yet.':T.youthFac<=2?'Basic youth set-up. Development depends on you.':'A solid place to develop.'} ${T.scout>=4?'Their scouts see everything, so their view of your potential is usually right.':T.scout<=2?'Their scouting is patchy, so their view of you can be way off.':''}</p>`; }
+  else { const sq=(c.squad||[]).map(id=>P(id)).filter(Boolean).sort((a,b)=>b.o-a.o); const mine=me?squadAt(cid):[]; const row=p=>`<div class="pz-row"><div class="ci-pos">${esc(p.p)}</div><div class="pz-rt"><b>${esc(p.n)}</b><span>${p.a!=null?`Age ${p.a}`:''}${p.id===c.cap?' · Captain':''}</span></div><span class="pill">${p.o}</span></div>`;
+    const kids=sq.filter(p=>p.a<=21).sort((a,b)=>(b.pt||b.o)-(a.pt||a.o)).slice(0,4);
+    body=`${me&&mine.length?`<div class="lbl">In your position</div><div class="pz-list">${mine.slice(0,5).map(row).join('')}</div>`:''}<div class="lbl">Best players</div><div class="pz-list">${sq.slice(0,8).map(row).join('')}</div>${kids.length?`<div class="lbl">Young players</div><div class="pz-list">${kids.map(row).join('')}</div>`:''}`; }
+  const sh=$('#sheet'); modal(`<button class="sx" data-act="ciClose" aria-label="Close">✕</button><div class="ci"><div class="ci-head">${crest(c,true).replace(/ data-ci="\d+"/,'')}<div><b>${esc(c.name)}</b><span>${L?esc(L.name)+' · ':''}level ${lv}</span><span class="ci-st">${hStars(staturePts(c))} <i>stature</i></span></div></div>
+    <div class="ci-tabs">${tabs.map(([k,l])=>`<button class="chip" aria-pressed="${CI.tab===k}" data-act="ciTab" data-arg="${k}">${l}</button>`).join('')}</div>${body}</div>`); if(sh) sh.scrollTop=0; }
+function seasonLbl0(y){ return String(y); }
+
+// ---------- news hub: the managerial merry-go-round ----------
+function mgMoveTxt(x){ const f=x.from!=null&&club(x.from)?club(x.from).name:null, t=x.to!=null&&club(x.to)?club(x.to).name:null;
+  if(x.how==='hired') return [`${x.n} appointed by ${t}`,f?`Arrived from ${f}`:'Appointed','b'];
+  if(x.how==='sacked') return [`${x.n} sacked by ${f}`,'Sacked','r']; if(x.how==='poached') return [`${x.n} leaves ${f}`,t?`Joined ${t}`:'Left','y'];
+  if(x.how==='national') return [`${x.n} takes the ${x.nt||'national'} job`,f?`Left ${f}`:'National team','g'];
+  return [`${x.n} leaves ${f||'his club'}`,MG_HOW[x.how]||'Left','']; }
+function mgMovesView(){ const G=mgEnsure(); if(!G) return '<p class="empty">Nothing yet.</p>'; const mine=myClubObj(); const vis=x=>{ const a=x.from!=null?club(x.from):null, b=x.to!=null?club(x.to):null; return (a&&mgVisible(a))||(b&&mgVisible(b))||x.nt; };
+  const mv=G.moves.filter(x=>x.how!=='poached'&&vis(x)).slice(0,30);
+  const hot=[]; for(const lid in S.leagues){ S.leagues[lid].clubs.forEach(id=>{ const c=club(id); const e=mgOf(c); if(e&&!e.user&&(e.pr||0)>=38&&mgVisible(c)) hot.push({c,e}); }); } hot.sort((a,b)=>b.e.pr-a.e.pr);
+  const free=Object.values(G.db).filter(e=>e.club==null&&!e.ret&&!e.nt&&!e.interim&&!e.user).sort((a,b)=>b.rep-a.rep).slice(0,8);
+  const row=(a,b,pl,cls,cid)=>`<div class="nwrow">${cid!=null?`<span class="nwc">${tcrest(cid)}</span>`:`<span class="nwc nwi"><i class="world"></i></span>`}<div><b>${esc(a)}</b><span class="note"><span class="pill ${cls}">${esc(pl)}</span> ${esc(b)}</span></div></div>`;
+  return W('Hot seats',hot.length?`<div class="nwlist">${hot.slice(0,8).map(({c,e})=>{ const s=mgSecLabel(e.pr); return row(`${e.n}, ${c.name}`,`${ordinal(leaguePos(c.id)||0)} in ${LMETA(c.league).name}${e.feud>=35?' · rift with the board':''}`,s[0],s[1],c.id); }).join('')}</div>`:'<p class="empty">Nobody\'s job is in danger right now.</p>')
+   +W('Manager moves',mv.length?`<div class="nwlist">${mv.map(x=>{ const [t,b,cls]=mgMoveTxt(x); return row(t,`${b} · ${x.y}`,x.how==='hired'?'Hired':x.how==='sacked'?'Sacked':x.how==='national'?'National team':'Left',cls,x.to!=null?x.to:x.from); }).join('')}</div>`:'<p class="empty">No changes yet this season.</p>')
+   +W('Out of work',free.length?`<div class="nwlist">${free.map(e=>{ const last=mgPrevTxt(e); const wk=Math.max(0,absWk()-(e.out||absWk())); return row(e.n,`${last?'Last job: '+last+' · ':''}out of work ${wk<4?'for a few days':wk<WEEKS?'for '+Math.max(1,Math.round(wk/4.3))+' months':'for over a year'}`,mgStarsTxt(e),'',null); }).join('')}</div>`:'<p class="empty">Everyone\'s in work.</p>'); }
+{ const _wv47=VIEWS['world:0']; VIEWS['world:0']=()=>{ if(WNT!=='mgrs'){ const h=_wv47(); return h.replace(/(<div class="seg nwtabs">[\s\S]*?)(<\/div>)/,`$1<button class="chip" aria-pressed="false" data-act="wnt" data-arg="mgrs">Managers</button>$2`); }
+  WNT='breaking'; let h=''; try{ h=_wv47(); }finally{ WNT='mgrs'; } const seg=(h.match(/<div class="seg nwtabs">[\s\S]*?<\/div>/)||[''])[0].replace(/aria-pressed="true"/g,'aria-pressed="false"').replace(/<\/div>$/,'<button class="chip" aria-pressed="true" data-act="wnt" data-arg="mgrs">Managers</button></div>');
+  return `<div class="dash c1">${seg}${mgMovesView()}</div>`; }; }
+
+// ---------- v47 UI: training — traits you can actually learn, new positions, FM roles ----------
+(()=>{ const s=SECTIONS.find(x=>x[0]==='training'); if(s&&!s[2].includes('Positions & roles')) s[2].push('Positions & roles'); })();
+const TR_POSK=()=>'training:'+SECTIONS.find(x=>x[0]==='training')[2].indexOf('Positions & roles');
+const PP_XY={GK:[50,91],CB:[50,76],LB:[15,70],RB:[85,70],CDM:[50,61],CM:[50,48],CAM:[50,35],LW:[15,27],RW:[85,27],ST:[50,13]};
+function ppCls(f){ return f>=18?'nat':f>=15?'acc':f>=12?'com':f>=9?'unc':'awk'; }
+function wkTxt(w){ return w<=1?'about a week':w<=6?`about ${w} weeks`:w<=40?`about ${Math.round(w/4.3)} month${Math.round(w/4.3)>1?'s':''}`:'a season or more'; }
+VIEWS[TR_POSK()]=()=>{ const m=S.me; posInit(); const T=m.ptrain; const f=p=>posFam(p); const gk=m.pos==='GK';
+  const pitch=`<div class="pp-side"><div class="pp-pitch" role="img" aria-label="Your positions"><i class="pp-half"></i><i class="pp-box b"></i><i class="pp-box t"></i>${POSITIONS.filter(p=>gk?p==='GK':p!=='GK').map(p=>{ const [x,y]=PP_XY[p]; const fv=f(p); return `<button class="pp-dot ${ppCls(fv)}${p===m.pos?' main':''}${T&&T.pos===p?' tr':''}" style="left:${x}%;top:${y}%" data-act="posPick" data-arg="${p}" aria-label="${p} ${famLbl(fv)[1]}">${p}</button>`; }).join('')}</div>
+    <div class="pp-key">${[['nat','Natural'],['acc','Accomplished'],['com','Competent'],['unc','Unconvincing'],['awk','Awkward']].map(([k,l])=>`<span><i class="pp-k ${k}"></i>${l}</span>`).join('')}</div></div>`;
+  const cur=T&&T.pos?(()=>{ const fv=f(T.pos); const w=posWeeksTo(T.pos,15), w2=posWeeksTo(T.pos,18); return `<div class="pp-cur"><div class="row sb"><div><b>Learning ${esc(POS_NAME[T.pos])}</b><span class="note" style="display:block">${famLbl(fv)[1]} now${fv<15?` · accomplished in ${wkTxt(w)}`:fv<18?` · natural in ${wkTxt(w2)}`:''}${T.mgr?' · the manager asked for this':''}</span></div><span class="pill ${famLbl(fv)[2]}">${fv.toFixed(1)}/20</span></div><div class="bar"><i style="width:${fv/20*100}%"></i></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap">${fv>=15&&T.pos!==m.pos?`<button class="btn" data-act="posSwitch" data-arg="${T.pos}">Make ${T.pos} my main position</button>`:''}<button class="btn sec" data-act="posStop">Stop</button></div></div>`; })():`<p class="note" style="margin:0">Tap a position on the pitch to start learning it. Positions close to yours (a striker moving out wide, say) come much quicker than ones that ask a completely different job.</p>`;
+  const list=POSITIONS.filter(p=>gk?p==='GK':p!=='GK').map(p=>{ const fv=f(p); const L=famLbl(fv); const oa=ovrAt(p); const w=fv<15?posWeeksTo(p,15):0;
+    return `<div class="pp-row${p===m.pos?' main':''}"><div><b>${p} <small>${esc(POS_NAME[p])}</small></b><span>${L[1]}${p===m.pos?' · main position':fv<15?` · ${wkTxt(w)} to accomplished`:''}</span></div><span class="pill">${oa} OVR</span>${p===m.pos?'<span class="pill g">Main</span>':T&&T.pos===p?'<span class="pill b">Learning</span>':fv>=15?`<button class="btn sec" data-act="posSwitch" data-arg="${p}">Switch</button>`:`<button class="btn sec" data-act="posTrain" data-arg="${p}">Learn</button>`}</div>`; }).join('');
+  const rk=myRole(); const want=mgrWantsRole(); const roles=rolesFor(m.pos).map(k=>{ const u=(m.roleU&&m.roleU[k]!=null)?m.roleU[k]:roleUInit(k); const L=roleULbl(u);
+    return `<div class="pp-role${k===rk?' on':''}"><div class="row sb"><div><b>${esc(MROLES[k].n)}</b>${k===want?' <span class="pill y">Manager wants this</span>':''}<span class="note" style="display:block">${MROLES[k].a.slice(0,4).map(a=>`${ANAME[a]||a} ${m.attrs[a]!=null?m.attrs[a]:'–'}`).join(' · ')}</span></div>${hStars(roleStars(k))}</div>
+      <div class="pp-ru"><div class="bar"><i style="width:${u}%"></i></div><span class="pill ${L[1]}">${L[0]}</span>${k===rk?'<span class="pill b">Your role</span>':`<button class="btn sec" data-act="rolePick" data-arg="${k}">Play this role</button>`}</div></div>`; }).join('');
+  const ex=m.plan&&m.plan.extra; const exBtn=(k,l)=>ex===k?`<span class="pill g">${l} in your plan</span>`:`<button class="btn sec" data-act="planExtra" data-arg="${k}">Use ${l.toLowerCase()} as my extra session</button>`;
+  return `<div class="stack">${W(`Positions · main: ${m.pos}`,`<div class="pp-wrap">${pitch}<div class="stack" style="gap:10px">${cur}${exBtn('position','Position work')}</div></div>`)}
+    ${W('Every position',`<div class="pp-list">${list}</div><p class="note" style="margin:0">Playing out of your natural position costs you a little on the pitch until you're accomplished there. Your rating shown is what you'd be at each position.</p>`)}
+    ${roles?W(`Roles for a ${POS_NAME[m.pos].toLowerCase()}`,`<div class="pp-roles">${roles}</div><div class="row" style="gap:6px;flex-wrap:wrap">${exBtn('role','Role work')}</div><p class="note" style="margin:0">Stars show how well your attributes suit a role. Understanding grows every week you play it and train it, and the role's key attributes get extra work.${want?` Playing the role the manager wants helps you get picked.`:''}</p>`):''}</div>`; };
+// ---------- PlayStyles ----------
+VIEWS['training:2']=()=>{ const m=S.me; traitInit(); const groups={}; TRAITS.forEach(t=>(groups[t[1]]=groups[t[1]]||[]).push(t)); const now=absWk();
+  const slots=[0,1].map(i=>{ const L=m.tlearn[i]; if(!L) return `<div class="tl-slot empty"><b>Free slot</b><span>Pick a PlayStyle below to start learning it.</span></div>`; const fit=traitFitLbl(traitFit(L.t));
+    return `<div class="tl-slot"><div class="row sb"><b>${esc(L.t)}</b><span class="pill ${fit[1]}">${fit[0]}</span></div><div class="bar"><i style="width:${Math.min(100,L.p)}%"></i></div><span>${Math.round(L.p)}% · ${wkTxt(traitWeeks(L.t))} left · ${Math.round(traitChance(L.t)*100)}% chance it sticks</span><button class="btn sec" data-act="traitStop" data-arg="${esc(L.t)}">Stop</button></div>`; }).join('');
+  const mate=m.learn&&m.learn.t?`<p class="note" style="margin:0">You're also picking up <b>${esc(m.learn.t)}</b> from ${esc((P(m.learn.pid)||{}).n||'a teammate')} (${Math.round(m.learn.prog)}%).</p>`:'';
+  const ex=m.plan&&m.plan.extra==='trait'?`<span class="pill g">Trait drill in your plan · ${m.plan.count||0} a week</span>`:`<button class="btn sec" data-act="planExtra" data-arg="trait">Use trait drill as my extra session</button>`;
+  return `<div class="stack">${W(`Learning now · ${m.tlearn.length}/2`,`<div class="tl-slots">${slots}</div><div class="row" style="gap:6px;flex-wrap:wrap">${ex}</div>${mate}<p class="note" style="margin:0">Learning happens in training every week. Trait drill extras speed it up. The closer your attributes are to what a PlayStyle needs, the quicker it comes. It can fail, but you keep some of the work and can try again.</p>`)}
+    ${Object.entries(groups).map(([g,list])=>W(g,`<div class="tl-list">${list.map(t=>{ const has=m.traits.includes(t[0]); const L=m.tlearn.find(x=>x.t===t[0]); const cd=(m.tcool[t[0]]||0)>now?m.tcool[t[0]]-now:0; const fv=traitFit(t[0]); const fit=traitFitLbl(fv);
+      const req=Object.entries(t[2]).map(([k,v])=>`<span class="${m.attrs[k]>=v?'c-hi':'c-lo'}">${ANAME[k]} ${m.attrs[k]}/${v}</span>`).join(' · ');
+      const act=has?'<span class="pill g">Unlocked</span>':L?'<span class="pill b">Learning</span>':cd?`<span class="pill">Retry in ${cd}w</span>`:m.tlearn.length>=2?`<span class="pill">${wkTxt(traitWeeks(t[0]))}</span>`:`<button class="btn sec" data-act="traitLearn" data-arg="${esc(t[0])}">Learn</button>`;
+      return `<div class="tl-row"><div><b>${esc(t[0])}</b>${has?'':` <span class="pill ${fit[1]}">${fit[0]}</span>`}<span class="note" style="display:block;margin-top:2px">${req}${has||L||cd?'':` · ${wkTxt(traitWeeks(t[0]))}`}</span>${!has&&(m.traitProg[t[0]]||0)>0&&!L?`<span class="note" style="display:block">${Math.round(m.traitProg[t[0]])}% carried over from last time</span>`:''}</div>${act}</div>`; }).join('')}</div>`)).join('')}</div>`; };
+// the weekly plan's old single "PlayStyle to develop" box points here now
+{ const _tp47=VIEWS['training:0']; VIEWS['training:0']=()=>{ const h=_tp47(); try{ const m=S.me; traitInit(); const L=m.tlearn; const pos=m.ptrain&&m.ptrain.pos?m.ptrain.pos:null;
+    const box=`<div class="fld"><label>Learning</label><button class="btn sec" data-act="go" data-arg="training:2" style="text-align:left">${L.length?L.map(x=>`${esc(x.t)} ${Math.round(x.p)}%`).join(' · '):'No PlayStyles yet · pick up to two'}${pos?` · ${pos} ${posFam(pos).toFixed(0)}/20`:''}</button></div>`;
+    return h.replace(/<div class="fld"><label for="trt">PlayStyle to develop<\/label><select id="trt"[\s\S]*?<\/select><\/div>/,box); }catch(e){ return h; } }; }
+Object.assign(ACT,{
+  posPick:p=>{ const m=S.me; if(p===m.pos){ toast(`${p} is your main position`); return; } if(posFam(p)>=15) ACT.posSwitch(p); else ACT.posTrain(p); },
+  posTrain:p=>{ const m=S.me; if(m.ptrain&&m.ptrain.pos===p) return; m.ptrain={pos:p,mgr:m.ptrain&&m.ptrain.mgr&&m.ptrain.pos===p?1:0,since:absWk()}; saveSoon(); render(); toast(`Learning ${p}. ${wkTxt(posWeeksTo(p,15))} to accomplished.`); },
+  posStop:()=>{ const m=S.me; if(m.ptrain&&m.ptrain.mgr) m.rel.manager=clamp(m.rel.manager-2,0,100); m.ptrain=null; saveSoon(); render(); },
+  posSwitch:p=>{ const r=posSwitch(p); if(!r.ok&&r.txt) toast(r.txt); saveSoon(); render(); },
+  rolePick:k=>{ const m=S.me; m.prole=k; roleUInit(k); saveSoon(); render(); toast(`You'll play as ${/^[AEIOU]/.test(MROLES[k].n)?'an':'a'} ${MROLES[k].n}`); },
+  traitLearn:t=>{ const r=traitStart(t); if(!r.ok) toast(r.txt); else toast(`Learning ${t}. ${wkTxt(traitWeeks(t))}.`); saveSoon(); render(); },
+  traitStop:t=>{ traitStop(t); saveSoon(); render(); },
+  planExtra:k=>{ const m=S.me; m.plan=m.plan||defaultPlan(); m.plan.extra=k; if(!(+m.plan.count)) m.plan.count=2; m.plan.preset='custom'; applyWeekPlan(); saveSoon(); render(); toast(`${PERSONAL[k].name} is now your extra session, ${m.plan.count} a week.`); } });
+// ---------- squad hub: senior team and youth team ----------
+let SQV='senior';
+function youthSquadFor(cid){ const c=club(cid); if(!c) return null;
+  if(S.youth&&S.youth.cid===cid) return {label:S.youth.label+'s',coach:S.youth.coach,name:S.youth.name,list:S.youth.squad.map(p=>({n:p.n,p:p.p,a:p.a,o:p.o,pt:p.pt||p.o+4+h45(p.n)%12})),live:1};
+  S.ysq=S.ysq||{}; let Y=S.ysq[cid]; const T=clubTraits(c); const lv=clubLevel(c); const nat=()=>c.country&&NATMIX[c.country]?natFor(c.country):'ENG';
+  const mk=(p,a)=>{ const o=Math.round(clamp(lv-24+T.academy*2+rnd(-4,5)+(a-16)*2,30,78)); return {n:nameFor(nat()),p,a,o,pt:Math.round(clamp(o+rnd(6,18)+T.academy*1.5,o,92))}; };
+  const POSS=['GK','GK','CB','CB','CB','LB','RB','CDM','CM','CM','CM','CAM','LW','RW','ST','ST','CB','LW'];
+  if(!Y){ Y=S.ysq[cid]={s:S.season,coach:nameFor(nat()),list:POSS.map(p=>mk(p,ri(16,19)))}; }
+  else if(Y.s!==S.season){ const d=S.season-Y.s; Y.s=S.season; Y.list=Y.list.map(p=>({...p,a:p.a+d,o:Math.min(p.pt,p.o+ri(1,4)*d)})).filter(p=>p.a<=19); const have=Y.list.map(p=>p.p); const need=POSS.slice(); have.forEach(p=>{ const i=need.indexOf(p); if(i>=0) need.splice(i,1); }); need.forEach(p=>Y.list.push(mk(p,16))); }
+  const keep=Object.keys(S.ysq).map(Number).filter(k=>k!==cid).slice(-2); Object.keys(S.ysq).map(Number).forEach(k=>{ if(k!==cid&&!keep.includes(k)) delete S.ysq[k]; });
+  return {label:c.country==='ENG'?'U18s':'U19s',coach:Y.coach,name:'',list:Y.list}; }
+function youthView(){ const c=myClubObj(); if(!c) return W('Youth team','<p class="empty">You don\'t have a club right now.</p>'); const Y=youthSquadFor(c.id); const m=S.me; const T=clubTraits(c);
+  const PG={GK:'Goalkeepers',CB:'Defenders',LB:'Defenders',RB:'Defenders',CDM:'Midfielders',CM:'Midfielders',CAM:'Midfielders',LW:'Attackers',RW:'Attackers',ST:'Attackers'};
+  const meIn=!!Y.live; const list=Y.list.slice(); if(meIn) list.push({n:`${m.first} ${m.last}`,p:m.pos,a:m.age,o:ovr(),pt:ppot(),me:1});
+  const best=Y.list.slice().sort((a,b)=>b.pt-a.pt).slice(0,3);
+  const lv=clubLevel(c); const yst=pt=>clamp((pt-lv+12)/6,.5,5); const row=p=>`<div class="sqr${p.me?' me':''}"><span class="sqp">${p.p}</span><div class="sqn"><b>${esc(p.n)}</b><span>${p.a} yrs · potential ${hStars(yst(p.pt))}</span></div><span class="sqo">${p.o}</span></div>`;
+  let pos=''; if(Y.live&&S.youth.table){ try{ const t=S.youth.table; const ids=Object.keys(t).map(Number).sort((x,y)=>t[y][6]-t[x][6]||(t[y][4]-t[y][5])-(t[x][4]-t[x][5])); const i=ids.indexOf(c.id); if(i>=0&&t[c.id][0]>0) pos=`${ordinal(i+1)} in the ${esc(S.youth.name)} · ${t[c.id][6]} pts`; }catch(e){} }
+  const groups=['Goalkeepers','Defenders','Midfielders','Attackers'].map(g=>{ const ps=list.filter(p=>PG[p.p]===g).sort((a,b)=>b.o-a.o); return ps.length?`<div class="lbl">${g} · ${ps.length}</div><div class="sqlist">${ps.map(row).join('')}</div>`:''; }).join('');
+  return W(`${esc(c.name)} ${Y.label}`,`<div class="lines"><div><span>Coach</span><b>${esc(Y.coach)}</b></div><div><span>Academy</span><b>${['Basic','Modest','Good','Very good','World class'][T.academy-1]}</b></div>${pos?`<div><span>Youth league</span><b>${pos}</b></div>`:''}${meIn?'<div><span>You</span><b>In this squad</b></div>':''}</div>`)
+   +W('Best prospects',`<div class="sqlist">${best.map(row).join('')}</div><p class="note">Potential stars are relative to the first team: three stars means a likely first-team player here. The best usually get a first-team chance by 18 or 19.</p>`)
+   +W(`${Y.label} squad`,`<div class="stack">${groups}</div>`); }
+{ const _sqh=VIEWS['squad:0']; VIEWS['squad:0']=()=>{ const c=myClubObj(); if(!c) return _sqh(); const seg=`<div class="seg ih-tabs sqv">${[['senior','Senior team'],['youth','Youth team']].map(([k,l])=>`<button class="chip" aria-pressed="${SQV===k}" data-act="sqv" data-arg="${k}">${l}</button>`).join('')}</div>`;
+  if(SQV==='youth') return `<div class="dash c1">${seg}${youthView()}</div>`; const h=_sqh(); return h.replace(/^<div class="dash([^"]*)">/,(x)=>x+seg); }; }
+VIEWS['squad:2']=()=>`<div class="dash c1">${youthView()}</div>`;
+ACT.sqv=k=>{ SQV=k; render(); };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
