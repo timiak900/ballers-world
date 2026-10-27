@@ -1162,6 +1162,16 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .ys-club b{display:block;font-size:16px}
 .ys-club span{display:block;font-size:12.5px;color:var(--mute)}
 .ys-see span{display:block;font-size:12px;color:var(--mute);margin-top:4px}
+
+.lg-cur{display:flex;flex-direction:column;gap:10px}
+.lg-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.lg-stats>div{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.lg-stats b{display:block;font-family:var(--cond);font-size:22px;line-height:1.1}
+.lg-stats span{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+.lg-voices{display:flex;flex-direction:column;gap:8px}
+.lg-v{padding:9px 12px;border-radius:10px;background:var(--panel-2);border-left:3px solid var(--accent)}
+.lg-v span{display:block;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.lg-v p{margin:2px 0 0;font-size:14px;line-height:1.4}
 </style>
 
 <div class="app" id="app" hidden>
@@ -6082,6 +6092,63 @@ function interestList(){ const m=S.me; const out=new Map(); const add=(cid,st,ra
   (m.offers||[]).forEach(o=>{ if(o.type!=='renew') add(o.club,'Offer on the table',5); });
   return [...out.values()].sort((a,b)=>b.rank-a.rank||club(b.cid).rep-club(a.cid).rep); }
 
+// ===================== v46: club legacy. What you mean to each club and its fans =====================
+function bondOf(cid,make){ const m=S.me; if(cid==null) return null; m.bond=m.bond||{}; if(!m.bond[cid]&&make){ m.bond[cid]={apps:0,g:0,a:0,big:0,seas:[],acad:m.age<=16?1:0,cap:0,love:null,left:null}; } return m.bond[cid]||null; }
+function bondTrophies(cid){ return (S.me.trophies||[]).filter(t=>t.club===cid&&!/^Promotion/.test(t.name||'')).length; }
+function legacyPts(cid){ const b=bondOf(cid); if(!b) return 0; return b.apps+b.g*1.5+b.a*.8+bondTrophies(cid)*30+b.seas.length*10+b.acad*25+b.cap*15+b.big*8; }
+function bondLove(cid){ const m=S.me, b=bondOf(cid); if(!b) return 50; return cid===m.club&&!m.loan?m.rel.fans:(b.love!=null?b.love:50); }
+function legacyTier(cid){ const b=bondOf(cid); if(!b) return {k:'new',n:'New face'}; const L=legacyPts(cid), love=bondLove(cid);
+  if(b.left&&b.left.how==='forced'&&love<30) return {k:'traitor',n:'Persona non grata',d:'The fans haven\'t forgiven how you left.'};
+  if(L>=600&&love>=60) return {k:'icon',n:'Club icon',d:'One of the greatest players in the club\'s history.'};
+  if(L>=380&&love>=55) return {k:'legend',n:'Club legend',d:'Your name gets sung long after you\'ve gone.'};
+  if((L>=220||b.big>=3)&&love>=62) return {k:'cult',n:'Cult hero',d:'The fans adore you, whatever the stats say.'};
+  if(b.seas.length>=5&&L>=200) return {k:'servant',n:'Club servant',d:'Years of loyal service. Respected by everyone.'};
+  if(love>=75&&L>=70) return {k:'fav',n:'Fan favourite',d:'The fans have taken to you.'};
+  if(L<60) return {k:'new',n:'New face',d:'Still making your name here.'};
+  return {k:'est',n:'Established',d:'Part of the furniture, without being a hero yet.'}; }
+const TIER_CUSHION={fav:.3,cult:.45,servant:.4,legend:.6,icon:.75};
+function clubRegard(cid){ const m=S.me, c=club(cid); if(!c) return 50; const L=legacyPts(cid); const cur=cid===m.club&&!m.loan; return clamp(Math.round((cur?(m.rel.manager-50)*.5:0)+50+(cur?(ovr()-clubLevel(c))*2:0)+Math.min(35,L/14)-(m.age>=32&&cur?(m.age-31)*4:0)-(bondOf(cid)&&bondOf(cid).left&&bondOf(cid).left.how==='forced'?40:0)),0,100); }
+// every club game builds it; the fans' love protects you on bad days
+{ const _fm46=finishMyMatch; finishMyMatch=function(){ const c=S.mctx, m=S.me; const f0=m?m.rel.fans:0, mo0=m?m.morale:0; const r=_fm46.apply(this,arguments); try{ const L=S.lastMatch; if(!L||!c||c.youth||c.intl||!L.played||m.club==null||m.loan) return r; const cid=m.club; const b=bondOf(cid,true);
+    b.apps++; b.g+=L.g||0; b.a+=L.a||0; if(!b.seas.includes(S.season)) b.seas.push(S.season); if(m.captain==='C'&&!b.capS) { b.capS=S.season; b.cap++; } else if(m.captain==='C'&&b.capS!==S.season){ b.capS=S.season; b.cap++; }
+    const tags=(c.mday&&c.mday.tags)||[]; if((L.g||0)>0&&(tags.includes('final')||tags.includes('derby')||(c.mday&&c.mday.lvl>=3))) b.big++;
+    const t=legacyTier(cid); const k=TIER_CUSHION[t.k]||0; if(k&&m.rel.fans<f0) m.rel.fans=clamp(m.rel.fans+(f0-m.rel.fans)*k,0,100); if(k>=.6&&m.morale<mo0) m.morale=clamp(m.morale+(mo0-m.morale)*.4,0,100); b.love=m.rel.fans; }catch(e){ console.warn('bond46',e); } return r; }; }
+{ const _jc46=joinClub; joinClub=function(cid){ const r=_jc46.apply(this,arguments); try{ const b=bondOf(cid,true); if(b.left){ b.back=S.season; } }catch(e){} return r; }; }
+// time catches up: some fans start saying it, others never will
+function legacyWeek(){ const m=S.me; if(!m||m.club==null||m.loan) return; const cid=m.club; const b=bondOf(cid,true); if(b.acad==null) b.acad=0; b.love=m.rel.fans; const t=legacyTier(cid);
+  if(['legend','icon'].includes(t.k)&&!m.transferReq&&!m.strike&&m.rel.fans<35) m.rel.fans=35;
+  if(m.age>=31&&b.seas.length>=3&&formAvg(6)<6.6&&(m.oldCd||0)<absWk()&&Math.random()<.18){ m.oldCd=absWk()+10; const leg=['legend','icon','cult'].includes(t.k);
+    m.rel.fans=clamp(m.rel.fans-(leg?.5:2),0,100);
+    news('you',pick(leg?['Fans split over their hero','"Not him. Never him."','Time to move on? Not for everyone']:['Time to move on?','Some fans want fresh legs','The doubts grow']),leg?pick([`${outlet()}: a few fans say the legs have gone. The rest won't hear a word of it.`,`A fan forum poll asks if it's time for ${m.last} to go. The loudest answer: "Wash your mouth out."`,`${outlet()}: younger fans want change. The old guard want ${m.last} to finish his career here.`]):pick([`${outlet()}: some fans think it's time ${m.club!=null?myClubObj().name:'the club'} moved on from ${m.last}.`,`"Thanks for everything, but it's time." The fans' podcast didn't hold back.`,`Phone-ins are asking whether ${m.last} still has it.`])); } }
+{ const _pw46=planWeek; planWeek=function(){ const r=_pw46.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me) legacyWeek(); }catch(e){} return r; }; }
+// forcing a move: the fans remember
+{ const _rt46=requestTransfer; requestTransfer=function(on){ const m=S.me; const cid=m&&m.club; const t=cid!=null?legacyTier(cid):null; const r=_rt46.apply(this,arguments); try{ if(on&&cid!=null){ const L=legacyPts(cid); const hit=6+Math.min(14,L/40); m.rel.fans=clamp(m.rel.fans-hit,0,100); const b=bondOf(cid,true); b.forced=(b.forced||0)+1;
+    news('bad',t&&['legend','icon','cult'].includes(t.k)?pick(['A hero wants out','"After everything?"','Fans in shock']):pick(['Fans turn on you','Not happy','The fans react']),t&&['legend','icon','cult'].includes(t.k)?pick([`${outlet()}: the reaction online is raw. Some fans are taking your name off their shirts.`,`${outlet()}: plenty of fans feel betrayed. A few still say they'd never boo you.`]):pick([`${outlet()}: the fans aren't impressed. "Nobody is bigger than the club."`,`Your transfer request goes down badly in the stands.`])); } }catch(e){} return r; }; }
+{ const _tc46=treqChoice; treqChoice=function(k){ const m=S.me; const r=_tc46.apply(this,arguments); try{ if(k==='strike'&&m.club!=null){ m.rel.fans=clamp(m.rel.fans-12,0,100); const b=bondOf(m.club,true); b.forced=(b.forced||0)+2; news('bad','Banners in the stands',pick([`A banner at the next home game: "You're not bigger than this club."`,`${outlet()}: fans chant against you at the next game. Refusing to train has crossed a line.`])); } }catch(e){} return r; }; }
+// leaving: how you go matters
+function legacyLeave(cid,how){ const m=S.me; const b=bondOf(cid,true); const c=club(cid); if(!b||!c) return; const love0=b.love!=null?b.love:m.rel.fans; const t=legacyTier(cid);
+  b.love=how==='forced'?Math.min(love0*.35,22):how==='sold'?clamp(love0*.88+(['legend','icon','cult'].includes(t.k)?5:0),0,100):how==='expired'?love0*.85:love0*.75; b.left={how,s:S.season,tier:t.n};
+  const big=['legend','icon','cult','servant'].includes(t.k);
+  if(how==='forced') news('bad',pick([`${c.name} fans won't forget this`,'A bitter exit']),pick([`${outlet()}: ${b.apps} games for the club, and this is how it ends. Expect a hostile reception if you ever go back.`,`The ${c.name} fans feel let down. Forcing your way out has cost you a lot of goodwill.`]));
+  else if(big) news('good',pick([`Thank you, ${m.last}`,`An emotional farewell`,`${c.name} say goodbye to a ${t.n.toLowerCase()}`]),pick([`${b.apps} games, ${b.g} goals${bondTrophies(cid)?`, ${bondTrophies(cid)} trophies`:''}. ${c.name} fans line up to say thank you.`,`The club post a tribute video. It goes everywhere. ${b.apps} appearances and a lot of memories.`]));
+}
+{ const _sc46=signContract; signContract=function(){ const m=S.me, N=S.nego; const old=m&&m.club, ctx=N&&N.ctx, fee=N&&N.offer?N.offer.fee||0:0; const forced=!!(m&&(m.transferReq||m.strike||(m.push&&m.listed))); const r=_sc46.apply(this,arguments); try{ if(S.mode!=='mgr'&&old!=null&&ctx!=='renew'&&ctx!=='loan'&&m.club!==old) legacyLeave(old,forced?'forced':fee>0?'sold':'free'); if(ctx==='renew'&&m.club!=null){ const b=bondOf(m.club,true); m.rel.fans=clamp(m.rel.fans+2,0,100); } }catch(e){ console.warn('leave46',e); } return r; }; }
+{ const _se46=seasonEnd; seasonEnd=function(){ const m=S.me; const old=m&&m.club; const r=_se46.apply(this,arguments); try{ if(S.mode!=='mgr'&&old!=null&&m.club==null) legacyLeave(old,'expired'); }catch(e){} return r; }; }
+// going back
+{ const _mm46=myMatch; myMatch=function(fx){ const r=_mm46.apply(this,arguments); try{ const c=S.mctx, m=S.me; if(!c||c.youth||c.intl||c.oppCid==null) return r; const b=bondOf(c.oppCid); if(!b||!b.left||c.retDone) return r; c.retDone=1; const opp=club(c.oppCid); const love=bondLove(c.oppCid); const t=b.left.tier||'';
+    if(love>=70){ m.morale=clamp(m.morale+3,0,100); c.ratingNoise=(c.ratingNoise||0)+.1; news('good',pick([`Welcome home, ${m.last}`,'A standing ovation']),pick([`The ${opp.name} fans stand and applaud when your name is read out. ${t?`Once a ${t.toLowerCase()}, always one.`:''}`,`Your old fans give you a warm welcome back. Even their manager comes over to shake your hand.`]),true); }
+    else if(love<=28){ m.morale=clamp(m.morale-3,0,100); c.tt=(c.tt||0)-.5; news('bad',pick(['A hostile return','Boos ring out','No welcome back']),pick([`Every touch you take is booed by the ${opp.name} fans.`,`A banner in the home end: "Never forget." Your old fans haven't.`,`${opp.name} fans whistle every time you get near the ball.`]),true); }
+    else news('you','Back at your old club',pick([`Polite applause from the ${opp.name} fans. A few boos too.`,`Mixed reception from your old fans.`]),true); }catch(e){} return r; }; }
+// the end: legends get sent off properly
+{ const _dr46=doRetire; doRetire=function(){ const m=S.me; let best=null; try{ Object.keys(m.bond||{}).forEach(k=>{ const t=legacyTier(+k); if(['icon','legend'].includes(t.k)&&(!best||legacyPts(+k)>legacyPts(best))) best=+k; }); }catch(e){} const r=_dr46.apply(this,arguments); try{ if(best!=null){ const c=club(best), t=legacyTier(best); news('good',`${c.name} honour a ${t.n.toLowerCase()}`,t.k==='icon'?pick([`${c.name} announce a testimonial match. It sells out in an hour.`,`${c.name} name a stand after you. ${bondOf(best).apps} games, never forgotten.`]):pick([`${c.name} invite you back for a lap of honour on the final day.`,`Your name goes up in the ${c.name} hall of fame.`])); } }catch(e){} return r; }; }
+// what the fans are saying this week (stable for the week, so it doesn't flicker)
+function fanVoices(cid){ const m=S.me; const rr=r45(h45(cid+'|'+absWk()+'|'+saveSeed())); const pk=a=>a[Math.floor(rr()*a.length)]; const t=legacyTier(cid); const love=bondLove(cid); const old=m.age>=31, poor=formAvg(6)<6.6, good=formAvg(6)>=7.2; const cur=cid===m.club;
+  const out=[]; if(t.k==='traitor'){ out.push(['Most fans',pk(['Don\'t even say his name in here.','Took the money and ran. We won\'t forget.','Boo him every time he touches it.'])]); out.push(['A few',pk(['He gave us some great days, to be fair.','Football is a business. I don\'t blame him.'])]); return out; }
+  if(love>=55) out.push(['Loyal fans',['legend','icon','cult'].includes(t.k)?pk(['Best player this club has ever had. Don\'t @ me.','Even on his bad days he\'s better than anything we could buy.','He could play in goal and I\'d still pick him.','Statue. Outside the ground. Now.','Anyone criticising him has never seen him play.']):pk(['Love him. Give him time.','Proper player. He cares.','One of our own now.','Best thing about this team.'])]);
+  out.push(['Realists',old&&poor?pk(['Great servant, but the legs are going.','Use him from the bench now. Sad but true.','Respect him, but we need to plan for the future.']):good?pk(['In great form. Fair play.','Hard to argue with that run.']):pk(['Solid. Does his job.','Needs to add more goals.','Decent, not world class.','Fine, but we need more from him in big games.'])]);
+  if(love<50||(old&&poor)||(cur&&m.transferReq)) out.push(['Critics',cur&&m.transferReq?pk(['Wants out? Door\'s that way.','Nobody is bigger than the club.']):old&&poor?pk(['Time to move on. Thanks for the memories.','Can\'t live on reputation forever.','He\'s finished. Sell while we still can.']):pk(['Overrated. Always has been.','Disappears when it matters.','Why does he always start?'])]);
+  return out; }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -8830,6 +8897,20 @@ ACT.planTalk=()=>{ const r=planTalk(); if(r.ok) showPending(); else toast(r.txt)
 { const _oo45=ofOutlook; ofOutlook=function(o,c){ const t=_oo45.apply(this,arguments); try{ const m=S.me; if(m.age<=21){ const pp=ppotFor(c.id); const pl=planFor(c.id); return `${t} Their scouts rate your potential ${paStars(pp)} stars.${pl?` Likely plan: ${DPLAN[pl].n.toLowerCase()}.`:''}`; } }catch(e){} return t; }; }
 // the unveiling happens straight after you sign
 { const _sg45=ACT.sign; ACT.sign=function(){ const r=_sg45.apply(this,arguments); try{ if(!S.pending&&S.queue&&S.queue.length){ const i=S.queue.findIndex(q=>q&&q.kind==='scene'&&q.sid==='unveil'); if(i>=0){ S.pending=S.queue.splice(i,1)[0]; showPending(); } } }catch(e){} return r; }; }
+
+// ---------- v46 UI: your legacy at every club ----------
+function loveWord(v){ return v>=80?['g','Adored']:v>=62?['g','Loved']:v>=45?['b','Respected']:v>=30?['y','Mixed']:['r','Hostile']; }
+function legacyCard(){ const m=S.me; const ids=Object.keys(m.bond||{}).map(Number).filter(id=>club(id)); const cur=m.club!=null&&!m.loan?m.club:null; if(cur!=null) bondOf(cur,true);
+  const curHTML=cur!=null?(()=>{ const c=club(cur), b=bondOf(cur), t=legacyTier(cur), love=bondLove(cur), reg=clubRegard(cur); const vo=fanVoices(cur);
+    return `<div class="lg-cur"><div class="ys-club">${crest(c)}<div><b>${esc(c.name)}</b><span>${b.seas.length} season${b.seas.length===1?'':'s'}${b.acad?' · academy graduate':''}</span></div></div>
+      <b class="ps-lab">${esc(t.n)}</b><p style="margin:0">${esc(t.d||'')}</p>
+      <div class="ci-bars">${ciBar('Fans\' love',clamp(Math.ceil(love/20),1,5),['Hostile','Mixed','Respected','Loved','Adored'])}${ciBar('How the club values you',clamp(Math.ceil(reg/20),1,5),['Expendable','Squad option','Valued','Important','Untouchable'])}</div>
+      <div class="lg-stats"><div><b>${b.apps}</b><span>Games</span></div><div><b>${b.g}</b><span>Goals</span></div><div><b>${b.a}</b><span>Assists</span></div><div><b>${bondTrophies(cur)}</b><span>Trophies</span></div></div>
+      <div class="lbl">What the fans are saying</div><div class="lg-voices">${vo.map(([who,q])=>`<div class="lg-v"><span>${esc(who)}</span><p>"${esc(q)}"</p></div>`).join('')}</div></div>`; })():'';
+  const past=ids.filter(id=>id!==cur&&bondOf(id).apps>0).sort((a,b)=>legacyPts(b)-legacyPts(a)).map(id=>{ const c=club(id), b=bondOf(id), love=bondLove(id); const [k,w]=loveWord(love); const t=legacyTier(id); const how=b.left?{forced:'forced your way out',sold:'sold',free:'left on a free',expired:'contract ran out'}[b.left.how]||'left':'';
+    return `<div class="pz-row">${crest(c)}<div class="pz-rt"><b>${esc(c.name)}</b><span>${esc(t.n)} · ${b.apps} games, ${b.g} goals${how?` · ${how}`:''}</span></div><span class="pill ${k}">${w}</span></div>`; }).join('');
+  if(!curHTML&&!past) return ''; return W('Your legacy',`<div class="stack">${curHTML}${past?`<div class="lbl">Former clubs</div><div class="pz-list">${past}</div>`:''}</div>`); }
+{ const k=SECTIONS.find(x=>x[0]==='career')[2].indexOf('Personality'); const _pv46=VIEWS['career:'+k]; VIEWS['career:'+k]=()=>{ const h=_pv46(); try{ const lc=legacyCard(); if(!lc) return h; const i=h.indexOf('<section class="w ps"><div class="wb"><span class="ps-k">Personality'); return i>=0?h.slice(0,i)+lc+h.slice(i):h.replace(/<\/div>$/,lc+'</div>'); }catch(e){ console.warn('lg',e); return h; } }; }
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
