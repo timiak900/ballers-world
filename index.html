@@ -1136,6 +1136,27 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .ps-bar{height:8px;border-radius:999px;background:var(--panel-3);overflow:hidden}
 .ps-bar i{display:block;height:100%;border-radius:999px}
 .ps-ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+
+/* v45 club profiles, plans, scouting */
+.hst{position:relative;display:inline-block;font-size:15px;letter-spacing:1px;line-height:1;white-space:nowrap}
+.hst .hb{color:var(--panel-3)}
+.hst .hf{position:absolute;left:0;top:0;overflow:hidden;color:var(--gold,#e3b324)}
+[data-ci]{cursor:pointer}
+.ci{display:flex;flex-direction:column;gap:12px}
+.ci-head{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding-right:40px}
+.ci-head b{display:block;font-size:20px;line-height:1.15}
+.ci-head span{display:block;font-size:12.5px;color:var(--mute)}
+.ci-head .ci-st{margin-top:3px;display:flex;align-items:center;gap:6px}
+.ci-head .ci-st i{font-style:normal;font-size:11.5px}
+.ci-bars{display:flex;flex-direction:column;gap:8px}
+.ci-bar{display:grid;grid-template-columns:minmax(120px,42%) 1fr 78px;gap:10px;align-items:center;font-size:13px}
+.ci-bar b{text-align:right;font-size:12px}
+.ci-pos{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--panel-3)}
+.dp-n{font-size:17px}
+.dp-path{display:flex;flex-wrap:wrap;gap:5px}
+.dp-st{font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--mute)}
+.dp-st.ok{color:var(--pos,#2fbf71);border-color:color-mix(in srgb,var(--pos,#2fbf71) 45%,transparent)}
+.dp-st.cur{color:#fff;background:var(--accent);border-color:var(--accent)}
 </style>
 
 <div class="app" id="app" hidden>
@@ -5894,6 +5915,143 @@ function keepHimCheck(){ const m=S.me; if(!m||m.club==null||m.loan||m.age>21||m.
   news('good',`${cur.name} want to tie you down`,`With ${big.map(c=>c.name).slice(0,2).join(' and ')} sniffing around, ${cur.name} have offered you a new long-term deal worth ${money(w)} a week. Details in Transfers.`); }
 { const _fd44c=finishDay; finishDay=function(){ const r=_fd44c.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me&&S.day===0) keepHimCheck(); }catch(e){} return r; }; }
 
+// ===================== v45: clubs that think. Scouting, expectations, development plans, calls, unveilings =====================
+function h45(s){ let h=2166136261; s=String(s); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function r45(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function saveSeed(){ if(!S.cseed) S.cseed=Math.floor(Math.random()*1e9); return S.cseed; }
+
+// ---------- every club has its own character (different in every save) ----------
+const ACADEMY_NAMES=/Ajax|Barcelona|Benfica|Sporting CP|FC Porto|Southampton|Manchester United|Chelsea|Real Madrid|Bayern|Borussia Dortmund|Olympique Lyonnais|Rennes|PSV|Feyenoord|AZ|Athletic Club|Real Sociedad|Celtic|Arsenal|Manchester City|Villarreal|Atalanta|Shamrock Rovers|St Patrick|Valencia|Sporting/;
+const FIERCE_FANS=/Millwall|Leeds|Napoli|Marseille|Borussia Dortmund|Celtic|Rangers|Galatasaray|Fenerbah|Feyenoord|Union Berlin|Sevilla|Athletic Club|Lazio|Roma|Bohemian|Shelbourne|Derry|Sheffield|Newcastle|Sunderland|Cardiff|Legia|Benfica/;
+const MGR_TYPES=[['Father figure','Protective of young players and patient when they struggle.'],['Demanding','Expects standards every single day. Praise is rare.'],['Tactician','Obsessed with detail. Learn the system and you play.'],['Motivator','Gets players running through walls for him.'],['Pragmatist','Plays whoever wins him games. Reputation means nothing.'],['Developer','Loves giving young players a chance and building them up.']];
+function clubTraits(c){ if(!c) return null; const r=r45(h45(c.name+'|'+saveSeed())); const rep=c.rep||50; const ac=ACADEMY_NAMES.test(c.name); const ff=FIERCE_FANS.test(c.name);
+  const lvl5=x=>clamp(Math.round(x),1,5);
+  const train=lvl5(1+(rep-40)/12+r()*1.2-.4), youthFac=lvl5(1+(rep-42)/13+(ac?1.2:0)+r()*1.2-.5), academy=lvl5(1+(rep-45)/14+(ac?1.6:0)+r()*1.4-.6), scout=lvl5(1+(rep-40)/12+r()*1.4-.5);
+  const passion=lvl5(2+(rep-50)/20+(ff?1.6:0)+r()*1.6-.5), youthPat=lvl5(3+(ac?1:0)-(ff?.6:0)+r()*2-1-(rep>=85?.6:0));
+  const mt=MGR_TYPES[Math.floor(r()*MGR_TYPES.length)]; const trust=lvl5(2.6+(mt[0]==='Developer'?1.4:mt[0]==='Father figure'?.8:mt[0]==='Pragmatist'?-.8:0)+(ac?.6:0)+r()*1.4-.7-(rep>=88?.5:0));
+  const pol=r()+(ac?.25:0)+(rep>=85?.2:0)-(rep<65?.25:0); const payPolicy=pol>.75?'potential':pol>.35?'balanced':'proven';
+  let style='Balanced'; try{ if(typeof aiStyle==='function'&&typeof hashStr==='function') style=aiStyle(c.id); }catch(e){} let form='4-3-3'; try{ if(typeof TACTIC_PRESETS!=='undefined'&&TACTIC_PRESETS[style]) form=TACTIC_PRESETS[style].f; }catch(e){}
+  const cap=clamp(Math.round(Math.pow(Math.max(0,rep-35),2)*25/1000)*1000,1500,90000);
+  return {train,youthFac,academy,scout,passion,youthPat,mgrType:mt[0],mgrDesc:mt[1],trust,payPolicy,style,form,cap}; }
+
+// ---------- scouting: every club forms its own view of your potential ----------
+function exposure(){ const m=S.me; const apps=(m.results||[]).filter(r=>r.mins).length; const yc=Object.values((m.intl&&m.intl.youth)||{}).reduce((s,v)=>s+v,0)+((m.intl&&m.intl.caps)||0); const tg=(m.tourHist||[]).reduce((s,h)=>s+(h.games||[]).length,0);
+  return clamp(apps/90+yc/25+tg/12,.08,.9); }
+function scoutBias(){ const m=S.me; if(m.scoutBias==null) m.scoutBias=Math.round((rnd(-1,1)+rnd(-1,1)+rnd(-1,1))*2.2*10)/10; return m.scoutBias; }
+function formAvg(n){ const f=(S.me.form||[]).slice(-(n||8)); return f.length?avg(f):6.7; }
+function ppot(){ const m=S.me; const ex=exposure(); return clamp(m.pot+scoutBias()*(1-ex)+(m.rep-50)/25+(formAvg(8)-6.8)*1.5,35,99); }
+function ppotFor(cid){ const m=S.me, c=club(cid); if(!c) return ppot(); const T=clubTraits(c); const ex=exposure(); const own=(r45(h45(cid+'|'+saveSeed()+'|'+m.first+m.last))()-.5)*10;
+  return clamp(ppot()+own*(1-ex)*(1.45-T.scout*.2),35,99); }
+function paStars(v){ return v>=94?5:v>=90?4.5:v>=86?4:v>=82?3.5:v>=78?3:v>=74?2.5:v>=70?2:v>=66?1.5:v>=60?1:.5; }
+function scoutEff(cid){ const m=S.me, o=ovr(); if(m.age>21) return o; const pp=cid!=null?ppotFor(cid):ppot(); const k=m.age<=17?.35:m.age<=19?.3:.2; return o+Math.max(0,pp-o)*k; }
+function playerType(){ const m=S.me; const c=m.club!=null?club(m.club):null; const lv=c?clubLevel(c):60; const pp=ppot(); const mv=(m.moves||[]).filter(x=>x.to===m.club).pop(); const fee=mv&&mv.fee||0;
+  if(c&&fee>=Math.max(8e6,budgetFor(c)*.25)&&S.season-(m.joined||S.season)<=1) return {k:'bigmoney',n:'Big-money signing',fee};
+  if(m.age<=19||(m.age<=21&&ovr()<lv-3)) return pp>=86?{k:'youngster',n:'Wonderkid'}:pp>=78?{k:'youngster',n:'Hot prospect'}:{k:'youngster',n:'Young player'};
+  if(m.age>=24&&(ovr()>=lv||((m.intl&&m.intl.caps)||0)>=10||(m.trophies||[]).length>=3)) return {k:'proven',n:'Proven performer'};
+  return {k:'normal',n:ovr()>=lv?'First-team regular':'Squad player'}; }
+function expectedRating(t){ return t.k==='youngster'?6.3:t.k==='proven'?6.95:t.k==='bigmoney'?7+Math.min(.35,(t.fee||0)/1e8):6.7; }
+
+// ---------- wages: how THIS club sees you, your form and the reports, and whether they pay for potential at all ----------
+wonderPremium=function(cid){ const m=S.me; if(!m||m.age>21) return 1; const c=club(cid); if(!c) return 1; const T=clubTraits(c); const lv=clubLevel(c);
+  const pp=ppotFor(cid); let talent=clamp((pp-79)/10,0,1.2); if(ovr()<lv-12) talent*=clamp(1-(lv-12-ovr())/10,.25,1);
+  const hype=clamp((m.rep-45)/45,0,.9)+clamp((m.wrep||0)/120,0,.5); const perf=clamp((formAvg(8)-6.8)*.45,-.3,.35);
+  const wealth=c.rep>=82?1:c.rep>=74?.65:c.rep>=65?.35:.12; const youthK=m.age<=18?1:m.age===19?.85:m.age===20?.7:.55; const pol=T.payPolicy==='potential'?1:T.payPolicy==='balanced'?.55:.2;
+  const rivals=new Set((m.offers||[]).filter(o=>o.club!==cid&&o.type!=='renew').map(o=>o.club).concat((m.approaches||[]).filter(a=>a.stage!=='dead'&&a.club!==cid).map(a=>a.club))); const comp=Math.min(.4,[...rivals].filter(id=>{ const x=club(id); return x&&x.rep>=c.rep-5; }).length*.13);
+  const p=1+Math.max(0,talent*.85+hype*.45+perf)*wealth*youthK*pol+comp*wealth*.8; return Math.round(clamp(p,1,2.6)*100)/100; };
+// scouts look at potential: offers, agent pitches and youth interest all use it
+{ const _yo45=youthOffers; youthOffers=function(){ const m=S.me; const p0=m.pot; try{ m.pot=Math.round(ppot()); return _yo45.apply(this,arguments); } finally{ m.pot=p0; } }; }
+pitchEff=function(){ return scoutEff(null); };
+{ const _pc45=pitchChance; pitchChance=function(c){ const x=_pc45.apply(this,arguments); try{ const m=S.me; if(m.age<=21&&c){ const d=ppotFor(c.id)-ppot(); return clamp(x*(1+d*.04),.01,.8); } }catch(e){} return x; }; }
+
+// ---------- expectations: a kid gets patience, a big-money signing gets none ----------
+{ const _fm45=finishMyMatch; finishMyMatch=function(){ const c=S.mctx; const r=_fm45.apply(this,arguments); try{ const m=S.me, L=S.lastMatch; if(!L||!L.played||L.youth||L.intl||!c||c.youth) return r; const t=playerType(); const exp=expectedRating(t); const d=L.rating-exp;
+    const kM=t.k==='youngster'?(d<0?.45:1.3):t.k==='bigmoney'?(d<0?1.6:.7):t.k==='proven'?(d<0?1.2:.8):1; const T=clubTraits(myClubObj())||{passion:3,youthPat:3};
+    const kF=t.k==='youngster'?(d<0?(.3+(5-T.youthPat)*.12):1.2):kM*(.8+T.passion*.08);
+    m.rel.manager=clamp(m.rel.manager+clamp(d*.9*kM,-2.5,2.5),0,100); m.rel.fans=clamp(m.rel.fans+clamp(d*kF,-3,3),0,100); if(t.k==='youngster'&&d<0) m.morale=clamp(m.morale+Math.min(2,-d*1.2),0,100);
+    m.expRun=d<-.4?(m.expRun<0?m.expRun-1:-1):d>.5?(m.expRun>0?m.expRun+1:1):0; const cd=(m.expCd||0)>absWk();
+    if(!cd&&t.k==='bigmoney'&&m.expRun<=-3){ m.expCd=absWk()+6; news('bad',pick([`${money(t.fee)} flop?`,`Is ${m.last} worth the money?`,`Pressure grows on ${m.last}`]),pick([`${outlet()}: three poor games in a row. At that price, fans expected far more.`,`The ${myClubObj().name} fans are starting to grumble. A ${money(t.fee)} fee brings that kind of scrutiny.`,`Pundits are asking questions. ${m.last} cost ${money(t.fee)} and hasn't looked like it.`])); }
+    else if(!cd&&t.k==='youngster'&&m.expRun>=3){ m.expCd=absWk()+8; news('good',pick([`The kid is special`,`${m.first} ${m.last}: the name everyone is talking about`,`${m.age} and running games`]),pick([`${outlet()}: three outstanding displays in a row from a player still learning the game.`,`The ${myClubObj().name} fans have a new favourite. Not bad for a ${m.age}-year-old.`,`Coaches at the club are trying to keep a lid on the hype. It isn't working.`])); }
+    else if(!cd&&t.k==='bigmoney'&&m.expRun>=3){ m.expCd=absWk()+8; news('good',pick([`Worth every penny`,`${m.last} silences the doubters`]),`${outlet()}: the fee doesn't look so big now.`); } }catch(e){ console.warn('exp45',e); } return r; }; }
+
+// ---------- development plans for young players ----------
+const DPLAN={yy:{n:'Train and play with the youth team',d:'Youth training and youth matches while you develop.',ft:0},fy:{n:'Train with the first team, play for the youth',d:'Senior training every week, youth matches at the weekend.',ft:1},fl:{n:'First team: limited minutes',d:'In the senior squad. Bench, cup games and the odd start.',ft:1},fr:{n:'First team: regular minutes',d:'Part of the senior team with regular starts.',ft:1},loan:{n:'Loan out for games',d:'The club want you playing regular senior football elsewhere.',ft:0}};
+const DORDER=['yy','fy','fl','fr'];
+function planFor(cid){ const m=S.me; if(m.age>21) return null; const c=club(cid); if(!c) return null; const T=clubTraits(c); const lv=clubLevel(c); const o=ovr(); const g=(o-lv)+Math.max(0,ppotFor(cid)-o)*.15+(T.trust-3)*1.2;
+  if(m.age<17) return g>=-1&&o>=lv-8?'fl':g>=-8?'fy':'yy'; if(g>=-3&&o>=lv-7) return 'fr'; if(g>=-7) return 'fl'; if(g>=-10) return m.age>=18?'loan':'fy'; return m.age>=18?'loan':'yy'; }
+function planSet(k,why,quiet){ const m=S.me; const old=m.dplan&&m.dplan.k; m.dplan={k,s:S.season,w:absWk(),why:why||'club',rev:absWk()+10}; if(k==='loan'&&!m.loan) m.loanReq=true; if(quiet||old===k) return;
+  const mg=mgrName(); const P=DPLAN[k]; news(old&&DORDER.indexOf(k)>DORDER.indexOf(old)?'good':'you',`Your development plan: ${P.n.toLowerCase()}`,`${mg}: "${pick(k==='fr'?['You\'re ready. I want you in the team.','You\'ve earned this. Now keep it.']:k==='fl'?['You\'re with us now. Minutes will come, so be ready when they do.','Train with us, learn, and take your chances.']:k==='fy'?['Train with the first team, keep playing for the youth. We\'ll see how you adapt.','You\'ll be around the senior lads every day. Soak it up.']:k==='loan'?['You need games. Real ones. We\'ll find you the right loan.','A season of senior football will do more for you than sitting on our bench.']:['Keep developing with the youth. Your time will come.','Get your games in with the youth team. We\'re watching.'])}"`); }
+function planCheck(){ const m=S.me; if(!m||m.club==null||m.loan) { if(m&&m.age>21) m.dplan=null; return; } if(m.age>21){ m.dplan=null; return; } const want=planFor(m.club); if(!want) return;
+  if(!m.dplan||m.dplan.s!==S.season&&m.dplan.why!=='promise') planSet(want,'club'); }
+{ const _jc45=joinClub; joinClub=function(cid){ const r=_jc45.apply(this,arguments); try{ const m=S.me; if(m&&m.age<=21){ const pr=m.nextPlan&&m.nextPlan.club===cid?m.nextPlan.k:null; m.nextPlan=null; planSet(pr||planFor(cid),pr?'promise':'club',true); } }catch(e){} return r; }; }
+{ const _ss45=startSeason; startSeason=function(){ const r=_ss45.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me&&S.me.dplan) { S.me.dplan.why='club'; planCheck(); } }catch(e){} return r; }; }
+{ const _pw45=planWeek; planWeek=function(){ const r=_pw45.apply(this,arguments); try{ const m=S.me; if(S.mode!=='mgr'&&m&&m.dplan&&!m.loan&&m.club!=null){ if(DPLAN[m.dplan.k]&&DPLAN[m.dplan.k].ft) m.ftTrain=Math.max(m.ftTrain||0,2); if(m.age>21) m.dplan=null; } else if(S.mode!=='mgr'&&m&&m.club!=null&&!m.loan&&m.age<=21&&!m.dplan) planCheck(); }catch(e){} return r; }; }
+{ const _sel45=selection; selection=function(fx){ const s=_sel45.apply(this,arguments); try{ const m=S.me, D=m.dplan; if(!D||m.loan||!fx||fx.comp==='Y'||s.status==='injured'||s.rest||s.callUp||(m.frozen&&m.frozen.until>=absWk())) return s; const lv=clubLevel(myClubObj());
+    if((D.k==='yy'||D.k==='fy')&&S.youth&&m.breakthrough!==S.season&&['start','bench','unused','reserves','out'].includes(s.status)&&Math.random()<(D.k==='yy'?.9:.7)) return {status:'youth'};
+    if(D.k==='fl'){ if(s.status==='start'&&Math.random()<(fx.comp==='L'?.45:.2)) return {status:'bench',on:ri(58,80)}; if(['out','reserves','unused'].includes(s.status)&&Math.random()<.4) return {status:'bench',on:ri(62,82)}; }
+    if(D.k==='fr'&&ovr()>=lv-10){ if(s.status==='bench'&&Math.random()<.5) return {status:'start'}; if(['out','reserves','unused'].includes(s.status)&&Math.random()<.55) return Math.random()<.5?{status:'start'}:{status:'bench',on:ri(55,75)}; } }catch(e){} return s; }; }
+// talking about your plan
+SCENES.dplan=d=>{ const m=S.me, c=myClubObj(), mg=mgrName(); const D=m.dplan||{k:planFor(m.club)}; const P=DPLAN[D.k]; const want=planFor(m.club); const g=scoutEff(m.club)-clubLevel(c); const T=clubTraits(c); const fm=formAvg(6);
+  const up=()=>{ const i=DORDER.indexOf(D.k); return i>=0&&i<3?DORDER[i+1]:null; };
+  return {title:'Your development plan',label:`${mg} · ${c.name}`,who:mg,intro:pick([`${mg} waves you into his office.`,`You catch ${mg} after training.`,`${mg} has ten minutes before a meeting.`]),start:'a',nodes:{
+   a:{say:`Right now the plan is clear: ${P.n.toLowerCase()}. ${pick(['What\'s on your mind?','Talk to me.','Go on.'])}`,opts:[
+    ...(up()?[{t:'I want more first-team football.',fx:()=>{ const nx=up(); const score=g+(m.rel.manager-55)/8+(fm-6.8)*3+(T.trust-3)*1.2+(m.psy?(m.psy.pro-12)*.15:0)-(DORDER.indexOf(nx)-DORDER.indexOf(want))*2;
+       if(score>=-3){ planSet(nx,'promise',true); return {say:pick([`Fair enough. You've earned it. ${DPLAN[nx].n} from now on.`,`I like the hunger. Okay. ${DPLAN[nx].n}. Don't make me regret it.`]),fx:[['Plan',DPLAN[nx].n]].concat(evApply({manager:1}))}; }
+       return {say:pick(['Not yet. Your time will come, but not by shouting for it.','I hear you. Show me in training first. We\'ll talk again in a few weeks.']),fx:evApply({manager:-1,morale:-1})}; }}]:[]),
+    ...(D.k!=='loan'&&m.age>=18?[{t:'Would a loan help me more?',fx:()=>{ const ok=g<=-4||D.k==='yy'||D.k==='fy'; if(ok){ planSet('loan','promise',true); return {say:'Honestly? Yes. I\'ll tell the club to find you the right place to play.',fx:[['Plan','Loan out']]}; } return {say:'No. I want you here. You\'re part of what we\'re doing.',fx:evApply({manager:1})}; }}]:[]),
+    {t:'What do I need to work on?',fx:()=>{ const ks=Object.keys(OVRW[posKey(m.pos)]).sort((a,b)=>m.attrs[a]-m.attrs[b]).slice(0,2); return {say:`${ANAME[ks[0]]} and ${ANAME[ks[1]].toLowerCase()}. Fix those and the rest follows.`,fx:evApply({train:ks})}; }},
+    {t:'I\'m happy with the plan.',fx:()=>({say:pick(['Good. Keep your head down and keep working.','That\'s the attitude.']),fx:evApply({manager:1})})}]}}}; };
+function planTalk(){ const m=S.me; if(!m.dplan) return {ok:false,txt:'You don\'t have a development plan right now.'}; if((m.planCd||0)>absWk()) return {ok:false,txt:'You only spoke to him about it recently. Give it a few weeks.'}; m.planCd=absWk()+4; S.pending=sceneMake('dplan',{}); return {ok:true}; }
+
+// ---------- when a club wants you, the manager rings (or your parents get the call) ----------
+const POS_ROLE={ST:['the main striker, pinning their centre-backs and finishing moves','the focal point. Everything we create ends with you'],LW:['the left-sided forward who attacks the box','a wide forward who cuts inside and shoots'],RW:['the right-sided forward who attacks the box','a winger who gets at full-backs one v one'],CAM:['the number ten, finding pockets between the lines','the creator. You get the ball in the last third'],CM:['a box-to-box eight who arrives in the box','the midfielder who links everything together'],CDM:['the six who screens the back four','the anchor. You win it back and keep it simple'],CB:['a centre-back who can play out from the back','a defender who dominates his box'],LB:['an attacking full-back who overlaps','a full-back who defends first and joins attacks'],RB:['an attacking full-back who overlaps','a full-back who defends first and joins attacks'],GK:['a keeper who starts our attacks','a keeper who commands his box']};
+function squadAt(cid){ const m=S.me, c=club(cid); const grp=(typeof SEL_GROUP!=='undefined'&&SEL_GROUP[m.pos])||[m.pos]; return (c.squad||[]).map(id=>P(id)).filter(p=>p&&grp.includes(p.p)).sort((a,b)=>b.o-a.o); }
+SCENES.mgrcall=d=>{ const m=S.me, c=club(d.cid); if(!c) return null; const mg=c.mgr||'Their manager'; const T=clubTraits(c); const plan=d.plan||planFor(c.id); const rivals=squadAt(c.id); const better=rivals.filter(p=>p.o>=ovr()).length; d.asked=d.asked||[];
+  const role=pick(POS_ROLE[m.pos]||['an important player']); const o=(m.offers||[]).find(x=>x.id===d.oid);
+  const greet={'Father figure':`${m.first}, it's ${mg}. I've watched a lot of your games. I'd love to look after your next few years.`,'Demanding':`${m.first}. ${mg} here. I'll be straight with you: I want players who work. My scouts say you do.`,'Tactician':`${m.first}, ${mg}. I've studied your clips. I know exactly how you'd fit what we do.`,'Motivator':`${m.first}! ${mg} here. I want you to feel how much we want you.`,'Pragmatist':`${m.first}, it's ${mg}. Short call. You'd improve my team. That's why I'm ringing.`,'Developer':`${m.first}, ${mg}. I've a habit of giving young players a real chance. You could be next.`}[T.mgrType]||`${m.first}, it's ${mg}.`;
+  const opts=()=>[{k:'fit',t:'Where would I fit in?',fx:()=>{ d.asked.push('fit'); return {say:`We play ${T.style.toLowerCase().replace(/ \d.*$/,'')}, usually ${T.form}. I see you as ${role}. ${better===0?'Right now nobody in my squad does that better.':better<=2?`You'd be competing with ${rivals.slice(0,better).map(p=>p.n.split(' ').slice(-1)[0]).join(' and ')}. That's healthy.`:'There\'s competition, I won\'t lie. You\'d have to earn it.'}`,go:'a'}; }},
+    {k:'plan',t:'What\'s the plan for me?',fx:()=>{ d.asked.push('plan'); return {say:`${DPLAN[plan].n}. ${plan==='fr'?'You\'d play. Simple.':plan==='fl'?'You\'d be with us every day and get chances.':plan==='fy'?'Train with the first team, play your games with the youth. When you\'re ready, you\'ll know.':plan==='loan'?'Honestly, a loan first. Then you come back ready.':'Develop with the youth team first. Our academy is one of the best for that.'}`,go:'a'}; }},
+    {k:'mins',t:'I want guaranteed minutes.',fx:()=>{ d.asked.push('mins'); const ok=['fr','fl'].includes(plan)||(plan==='fy'&&m.age<18); if(ok){ m.nextPlan={club:c.id,k:plan==='fy'?'fy':plan==='fl'?'fl':'fr'}; if(o) o.promise=m.nextPlan.k; return {say:plan==='fr'?'You have my word. You\'ll play.':'Minutes, yes. Every week? Earn that part.',fx:[['Promise','Minutes']],go:'a'}; } return {say:pick(['I won\'t promise what I can\'t give. You\'d earn your place like everyone else.','Nobody gets guarantees here. That\'s why we win.']),fx:evApply({morale:-1}),go:'a'}; }},
+    {k:'yes',t:'Sounds like the right move for me.',fx:()=>{ if(o) o.warm=1; return {say:pick(['That\'s what I wanted to hear. Let\'s get it done.','Brilliant. I\'ll tell the board to push on.']),fx:[['Talks','Warmer']]}; }},
+    {k:'think',t:'I need to think about it.',fx:()=>({say:pick(['Of course. Big decision. My number\'s there.','Take your time, but not too long.']),fx:[]})}].filter(x=>!d.asked.includes(x.k));
+  return {title:`${c.name} on the phone`,label:`${mg} · ${T.mgrType}`,who:mg,intro:pick([`Your phone rings. Unknown number. It's ${mg}, the ${c.name} manager.`,`${mg} has asked your agent for a few minutes on the phone.`,`A call comes through from ${c.name}. The manager himself.`]),start:'a',nodes:{a:{say:()=>d.asked.length?pick(['Anything else?','What else do you want to know?','Go on.']):greet,opts:opts}}}; };
+SCENES.parents=d=>{ const m=S.me, c=club(d.cid); if(!c) return null; const T=clubTraits(c); const abroad=m.club!=null&&c.country!==club(m.club).country; const o=(m.offers||[]).find(x=>x.id===d.oid); const ad=nameFor(c.country||'ENG');
+  const fac=n=>['basic','modest','decent','very good','world class'][n-1];
+  return {title:`${c.name} call your parents`,label:`Academy director · ${c.name}`,who:ad,intro:pick([`${ad}, the ${c.name} academy director, has been on the phone to your mum and dad.`,`Your dad hands you the phone at dinner. It's ${c.name}.`,`A letter and then a phone call: ${c.name} want to meet the family.`]),start:'a',nodes:{
+   a:{say:`We'd love to fly you all over${abroad?'':' for the day'} to see the place. Meet the coaches, see where you'd live and train. No pressure.`,opts:[
+     {t:'Fly over and visit',fx:()=>{ if(o) o.warm=1; const fam=abroad&&m.age<17&&Math.random()<.45; const facTxt=T.train===T.youthFac?pick([`Everything is ${fac(T.train)}: the training pitches, the gym, the academy building.`,`The whole place is ${fac(T.train)}, from the first-team pitches to the academy.`]):pick([`The first-team training ground is ${fac(T.train)} and the academy facilities are ${fac(T.youthFac)}.`,`You see ${fac(T.train)} first-team facilities and a ${fac(T.youthFac)} academy set-up.`]); return {narr:`You fly over with your parents. ${facTxt} You watch the under-18s train and meet ${c.mgr}${T.trust>=4?', who knows your name and your stats':''}. ${fam?'On the flight home your mum goes quiet. Moving away this young worries her.':pick(['Your dad can\'t stop talking about it on the way home.','Your mum loved the place. So did you.','Everyone is buzzing on the flight home.'])}`,fx:fam?evApply({morale:-1}):evApply({morale:2})}; }},
+     {t:'A video call with the coaches is enough',fx:()=>({narr:`An hour on a video call. The coaches walk you through ${T.academy>=4?'one of the best academies around':'their academy'} and how they'd develop you.`,fx:[]})},
+     {t:'Thanks, but it\'s not for us',fx:()=>{ if(o) m.offers=m.offers.filter(x=>x!==o); return {narr:`Your parents thank them politely. ${c.name} wish you well.`,fx:[]}; }}]}}}; };
+function callCheck(){ const m=S.me; if(!m||(m.callCd||0)>evDayAbs()) return; m.seenOffers=m.seenOffers||[]; const fresh=(m.offers||[]).filter(o=>!m.seenOffers.includes(o.id)&&o.type!=='renew'&&o.type!=='loan'); fresh.forEach(o=>m.seenOffers.push(o.id)); if(m.seenOffers.length>60) m.seenOffers=m.seenOffers.slice(-60);
+  const o=fresh.find(x=>!x.blocked&&x.club!==m.club); if(!o||S.pending&&S.pending.kind==='scene') return; const c=club(o.club); const cur=m.club!=null?club(m.club):null; const big=!cur||c.rep>=cur.rep;
+  if(m.age<18&&(o.type==='youth'||o.type==='pre'||o.type==='family')){ if(Math.random()<.65){ m.callCd=evDayAbs()+5; sceneQueue('parents',{cid:o.club,oid:o.id}); } return; }
+  if(Math.random()<(big?.6:.3)+(m.age<=21&&ppotFor(o.club)>=84?.15:0)){ m.callCd=evDayAbs()+5; sceneQueue('mgrcall',{cid:o.club,oid:o.id,plan:planFor(o.club)}); } }
+{ const _fd45=finishDay; finishDay=function(){ const r=_fd45.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me){ callCheck(); } }catch(e){ console.warn('call45',e); } return r; }; }
+// a warm call helps the talks; a promise carries over into your plan
+{ const _on45=openNego; openNego=function(ctx,cid,offer){ const N=_on45.apply(this,arguments); try{ if(N&&offer&&offer.warm&&!N.warmed){ N.warmed=1; N.ft.max=roundWage(N.ft.max*1.05); N.patience=(N.patience||3)+1; } if(N&&offer&&offer.promise&&N.start&&!N.promised){ N.promised=1; const st={fr:'Regular Starter',fl:'Squad Player',fy:'Breakthrough Prospect'}[offer.promise]; if(st&&(fmsOf(st)||{r:0}).r>(fmsOf(N.view)||{r:0}).r){ N.view=st; N.start.status=st; } } }catch(e){} return N; }; }
+
+// ---------- signing day: the unveiling ----------
+SCENES.unveil=d=>{ const m=S.me, c=club(d.cid); if(!c) return null; const T=clubTraits(c); const fee=d.fee||0; const size=fee>=30e6||(c.rep>=86&&m.rep>=60)?3:fee>=5e6||c.rep>=78?2:fee>0||c.rep>=65?1:0; const mg=c.mgr; const crowd=size===3?Math.round(T.cap*rnd(.35,.7)/1000)*1000:0;
+  const nums=[7,9,10,11,14,17,19,20,21,22,23,27,29,33,77].filter(()=>Math.random()<.65).slice(0,5);
+  const intro=size===3?`${crowd.toLocaleString('en-IE')} fans are in the stadium for your unveiling. Flares, scarves, your name on the big screen. ${mg} is next to you.`:size===2?`The media room is packed. Cameras everywhere. You hold up the scarf next to ${mg}.`:size===1?`A small press conference and a photo with the scarf next to ${mg}.`:`A quick interview for the club channel and a photo in the kit.`;
+  const qs=[{q:`Why ${c.name}?`,a:[['"The project, the manager, the fans. It just felt right."',{fans:2,manager:1}],[`"This is a club where I can win things."`,{fans:1,media:1}],[`"I want to be the best. This is the place to do it."`,{fans:1,media:2,amb:1}]]},
+    ...(fee>=3e6?[{q:`${money(fee)} is a lot of money. Does the fee weigh on you?`,a:[['"No. Price tags don\'t play football."',{media:2,pre:1}],['"It\'s a responsibility. I\'ll work to earn it."',{fans:2,manager:1}],['"Ask me at the end of the season."',{media:1}]]}]:[{q:`What do you want to achieve here?`,a:[['"Learn every day and get into the team."',{manager:2}],['"Win trophies. Simple."',{fans:2,amb:1}],['"Make the fans proud."',{fans:2}]]}]),
+    {q:`A message for the ${c.name} fans?`,a:[[`"I'll give everything for this shirt."`,{fans:2}],['"I can\'t wait to play in front of you."',{fans:2}],[`"Come and watch. I'm going to enjoy myself."`,{fans:1,media:1}]]}];
+  d.qi=d.qi||0;
+  const node=i=>({say:i<qs.length?qs[i].q:`Last one: which number?`,opts:i<qs.length?qs[i].a.map(([t,fx])=>({t,fx:()=>{ d.qi=i+1; const ef=evApply(Object.fromEntries(Object.entries(fx).filter(([k])=>['fans','media','manager','morale'].includes(k)))); if(fx.amb&&typeof persAdj==='function') persAdj('amb',.3); if(fx.pre&&typeof persAdj==='function') persAdj('pre',.3); return {fx:ef,go:'q'+(i+1)}; }})):nums.map(n=>({t:`Number ${n}`,fx:()=>{ m.shirtNo=n; return {narr:pick([`You pull on the number ${n}. ${size>=2?'The noise is unreal.':'It fits.'}`,`Number ${n} it is. The shirts are on sale within the hour.`,`The ${n} shirt goes up on the big screen. This is real.`]),fx:[['Shirt',`#${n}`]]}; }}))});
+  const nodes={}; for(let i=0;i<=qs.length;i++) nodes['q'+i]=node(i);
+  return {title:size===3?'Your unveiling':'Signing day',label:`${c.name} · ${size===3?'stadium presentation':size===2?'press conference':'club media'}`,who:'Press',intro,start:'q0',nodes}; };
+{ const _sc45=signContract; signContract=function(){ const N=S.nego; const ctx=N&&N.ctx, cid=N&&N.cid, fee=N&&N.offer?N.offer.fee||0:0, typ=N&&N.offer&&N.offer.type; const r=_sc45.apply(this,arguments); try{ const m=S.me; if(S.mode==='mgr'||!m||ctx==='renew'||ctx==='loan'||m.club!==cid) return r;
+    if(typ!=='youth'&&typ!=='family') sceneQueue('unveil',{cid,fee});
+    const c=club(cid); const big=c.rep>=78||fee>=10e6||(m.age<=19&&ppot()>=85&&m.rep>=40); if(big&&!m.sponsorOffer) sponsorMove(c,fee);
+    S.queue=(S.queue||[]).filter(q=>!(q&&q.kind==='scene'&&(q.sid==='mgrcall'||q.sid==='parents')));
+    if(fee>=10e6) news('you',pick(['The weight of the fee','All eyes on the new signing',`${m.last}: the price tag arrives too`]),pick([`${c.name} fans are excited. Expectations will follow.`,`A big fee and a big stage. ${c.name} believe they've signed a star.`,`${outlet()}: "${m.last} has the talent. Now he has the price tag too."`])); }catch(e){ console.warn('sign45',e); } return r; }; }
+// sponsors come for big moves and big prospects
+function sponsorMove(c,fee){ const m=S.me; const brands=m.age<18?['Puma','adidas','Nike','New Balance','Mizuno']:['Puma','adidas','Nike','New Balance','Under Armour','Mizuno']; const brand=pick(brands);
+  const wk=roundWage(Math.min(60000,200+Math.pow(Math.max(0,m.rep),2)*1.6*(c.rep>=85?1.6:c.rep>=75?1.2:.8)+(fee/1e6)*120)); const tier='move'+S.season+'-'+c.id;
+  if((m.sponsors||[]).some(s=>s.tier===tier)) return; m.sponsorOffer={tier,brand,weekly:wk,young:m.age<18};
+  news('good',`${brand} come calling`,`${m.age<18?'With your parents\' approval, ':''}${brand} want you in their boots after your move to ${c.name}. ${money(wk)} a week. Accept it in Finances.`); }
+{ const _fd45b=finishDay; finishDay=function(){ const r=_fd45b.apply(this,arguments); try{ const m=S.me; if(S.mode!=='mgr'&&m&&m.age<=19&&!m.sponsorOffer&&!m.ysp45&&ppot()>=85&&m.rep>=38&&exposure()>=.2){ m.ysp45=1; const c=myClubObj(); if(c) sponsorMove(c,0); } }catch(e){} return r; }; }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -8588,6 +8746,55 @@ VIEWS['career:'+(SECTIONS.find(x=>x[0]==='career')[2].indexOf('Personality'))]=(
   const log=(m.psyLog||[]).map(x=>`<div class="ih-li"><span>${esc(x.when)}</span><b>${esc((PERS_K.find(p=>p[0]===x.k)||['',''])[1])} ${x.up?'▲':'▼'}</b><i>${esc(x.why)}</i></div>`).join('');
   return `<div class="dash c1"><section class="w ps"><div class="wb"><span class="ps-k">Personality</span><b class="ps-lab">${esc(lab)}</b><p style="margin:0">${esc(desc)}</p><div class="ps-rows">${rows}</div><p class="note" style="margin:0">It changes with how you behave: training, press conferences, how you react on the touchline, the moves you push for.</p></div></section>
     ${W('On the pitch',`<ul class="ps-ul">${(fx.length?fx:['Nothing extreme either way. A steady head.']).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`)}${W('How clubs see you',`<ul class="ps-ul">${cl.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`)}${log?W('What changed it',`<div class="ih-list">${log}</div>`):''}</div>`; };
+
+// ---------- v45 UI: club profiles, development plans, how clubs see you ----------
+function hStars(v){ return `<span class="hst" aria-label="${v} out of 5"><span class="hb">★★★★★</span><span class="hf" style="width:${clamp(v,0,5)/5*100}%">★★★★★</span></span>`; }
+function lvlWord(n){ return ['Basic','Modest','Good','Very good','World class'][clamp(n,1,5)-1]; }
+function staturePts(c){ return clamp((c.rep-40)/11,.5,5); }
+// every badge can be tapped for the club's profile
+{ const _cr45=crest; crest=function(c,lg){ const h=_cr45.apply(this,arguments); try{ if(c&&c.id!=null&&S&&S.clubs&&S.clubs[c.id]===c) return h.replace(/^<div class="crest/,`<div data-ci="${c.id}" role="button" aria-label="${esc(c.name)} club profile" class="crest`); }catch(e){} return h; }; }
+document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('[data-ci]'); if(!el) return; if(el.closest('.m2top,.matchview,.mgrid,.scoreline,.sb3,#celebrate,.nav')) return; e.stopPropagation(); e.preventDefault(); CI.tab='over'; openClubInfo(+el.dataset.ci); },true);
+const CI={tab:'over',cid:null};
+function openClubInfo(cid){ const c=club(cid); if(!c) return; CI.cid=cid; const T=clubTraits(c); const me=S.me&&S.mode!=='mgr'?S.me:null; const L=c.league&&S.leagues&&S.leagues[c.league]?LMETA(c.league):null;
+  const pos=L?leaguePos(cid):null; const row=L?tbl(c.league)[cid]:null; const lv=clubLevel(c);
+  const tabs=[['over','Overview'],['fans','Fans'],['fac','Facilities'],['mgr','Manager'],['squad','Squad']];
+  let body='';
+  if(CI.tab==='over'){ const plan=me&&me.age<=21?planFor(cid):null; const pp=me?ppotFor(cid):null; const wk=wageFor(cid,lv,'First team');
+    body=`<div class="lines"><div><span>League</span><b>${L?esc(L.name):'Europe'}</b></div>${pos?`<div><span>Position</span><b>${ordinal(pos)} · ${row?row[6]:0} pts from ${row?row[0]:0}</b></div>`:''}<div><span>Stadium</span><b>${esc(c.stadium||'Home ground')} <small>${T.cap.toLocaleString('en-IE')}</small></b></div><div><span>Typical first-team wage</span><b>${money(wk)}/wk <small>${money(perMonth(wk))}/month</small></b></div><div><span>Spends on</span><b>${T.payPolicy==='potential'?'Young talent and potential':T.payPolicy==='balanced'?'A mix of youth and experience':'Proven players'}</b></div></div>
+      ${me?`<div class="lbl">How they see you</div><div class="lines">${me.age<=21?`<div><span>Their scouts rate your potential</span><b>${hStars(paStars(pp))}</b></div>`:''}${plan?`<div><span>Likely plan for you</span><b>${esc(DPLAN[plan].n)}</b></div>`:''}<div><span>Your position</span><b>${(()=>{ const sq=squadAt(cid); const b=sq.filter(p=>p.o>=ovr()).length; return b===0?'You\'d be first choice':b<=2?`${b} ahead of you`:`${b} ahead of you. Big competition`; })()}</b></div></div>`:''}`; }
+  else if(CI.tab==='fans'){ const feisty=['Quiet','Polite','Lively','Loud and demanding','Ferocious'][T.passion-1]; body=`<div class="ci-bars">${ciBar('Passion',T.passion,['Quiet','Polite','Lively','Loud','Ferocious'])}${ciBar('Patience with young players',T.youthPat,['None','Little','Some','Plenty','Endless'])}</div><p style="margin:0">${feisty}. ${T.passion>=4?pick(['They live and die with every result.','The noise on a big night is something else.','They let you know when it isn\'t good enough.']):T.passion<=2?'A supportive crowd that rarely turns on its own players.':'They back the team, but they expect effort.'} ${T.youthPat>=4?'They love seeing their own young players come through and give them time.':T.youthPat<=2?'They want results now. Young players get little time to settle.':'They\'ll give a young player a chance if he shows fight.'}</p><div class="lines"><div><span>Average crowd</span><b>about ${(Math.round(T.cap*clamp(.55+T.passion*.08,.5,.97)/100)*100).toLocaleString('en-IE')}</b></div></div>`; }
+  else if(CI.tab==='fac'){ body=`<div class="ci-bars">${ciBar('Training facilities',T.train)}${ciBar('Youth facilities',T.youthFac)}${ciBar('Academy reputation',T.academy)}${ciBar('Scouting network',T.scout)}</div><p class="note" style="margin:0">${T.academy>=4?'A famous academy. Players who come through here are taken seriously everywhere.':T.youthFac>=4?'Excellent youth set-up even if the academy\'s name isn\'t famous yet.':T.youthFac<=2?'Basic youth set-up. Development depends on you.':'A solid place to develop.'} ${T.scout>=4?'Their scouts see everything, so their view of your potential is usually right.':T.scout<=2?'Their scouting is patchy, so their view of you can be way off.':''}</p>`; }
+  else if(CI.tab==='mgr'){ body=`<div class="lines"><div><span>Manager</span><b>${esc(c.mgr||'Unknown')}</b></div><div><span>Personality</span><b>${esc(T.mgrType)}</b></div><div><span>Style</span><b>${esc(T.style)}</b></div><div><span>Formation</span><b>${esc(T.form)}</b></div></div><div class="ci-bars">${ciBar('Trust in young players',T.trust,['Very low','Low','Average','High','Very high'])}</div><p style="margin:0">${esc(T.mgrDesc)}</p>`; }
+  else { const sq=(c.squad||[]).map(id=>P(id)).filter(Boolean).sort((a,b)=>b.o-a.o); const mine=me?squadAt(cid):[]; const row=p=>`<div class="pz-row"><div class="ci-pos">${esc(p.p)}</div><div class="pz-rt"><b>${esc(p.n)}</b><span>${p.a!=null?`Age ${p.a}`:''}</span></div><span class="pill">${p.o}</span></div>`;
+    body=`${me&&mine.length?`<div class="lbl">In your position</div><div class="pz-list">${mine.slice(0,5).map(row).join('')}</div>`:''}<div class="lbl">Best players</div><div class="pz-list">${sq.slice(0,6).map(row).join('')}</div>`; }
+  const sh=$('#sheet'); modal(`<button class="sx" data-act="ciClose" aria-label="Close">✕</button><div class="ci"><div class="ci-head">${crest(c,true).replace(/ data-ci="\d+"/,'')}<div><b>${esc(c.name)}</b><span>${L?esc(L.name)+' · ':''}level ${lv}</span><span class="ci-st">${hStars(staturePts(c))} <i>stature</i></span></div></div>
+    <div class="seg ih-tabs">${tabs.map(([k,l])=>`<button class="chip" aria-pressed="${CI.tab===k}" data-act="ciTab" data-arg="${k}">${l}</button>`).join('')}</div>${body}</div>`); if(sh) sh.scrollTop=0; }
+function ciBar(l,n,words){ return `<div class="ci-bar"><span>${l}</span><div class="ps-bar"><i style="width:${n/5*100}%;background:${n>=4?'var(--pos,#2fbf71)':n>=3?'var(--accent)':n>=2?'#e3b324':'var(--neg,#e5484d)'}"></i></div><b>${(words||['Basic','Modest','Good','Very good','World class'])[clamp(n,1,5)-1]}</b></div>`; }
+ACT.ciTab=k=>{ CI.tab=k; openClubInfo(CI.cid); };
+ACT.ciClose=()=>{ closeModal(); };
+
+// ---------- development plan card on the Contract page ----------
+function planCard(){ const m=S.me; if(!m||m.age>21||m.club==null||m.loan) return ''; if(!m.dplan) try{ planCheck(); }catch(e){} const D=m.dplan; if(!D) return ''; const P=DPLAN[D.k]; const i=DORDER.indexOf(D.k);
+  const st=Object.entries(m.ss||{}); const ft=st.filter(([k])=>!k.startsWith('U:')&&!k.startsWith('I:')).reduce((s,[,v])=>s+(v.apps||0),0), yt=st.filter(([k])=>k.startsWith('U:')).reduce((s,[,v])=>s+(v.apps||0),0);
+  const steps=DORDER.map((k,j)=>`<span class="dp-st${j<i?' ok':j===i?' cur':''}">${['Youth','First-team training','Limited minutes','Regular minutes'][j]}</span>`).join('');
+  return W('Your development plan',`<div class="stack"><b class="dp-n">${esc(P.n)}</b><p class="note" style="margin:0">${esc(P.d)}${D.why==='promise'?' Agreed with the manager.':''}</p>${D.k!=='loan'?`<div class="dp-path">${steps}</div>`:''}<div class="kv"><span>First-team games this season</span><b>${ft}</b><span>Youth games this season</span><b>${yt}</b><span>Training</span><b>${P.ft?'With the first team':'With the youth team'}</b></div><button class="btn sec" data-act="planTalk">Talk to the manager about it</button></div>`); }
+ACT.planTalk=()=>{ const r=planTalk(); if(r.ok) showPending(); else toast(r.txt); };
+{ const _ct45=VIEWS['contract:0']; VIEWS['contract:0']=()=>{ const h=_ct45(); try{ const pc=planCard(); return pc?h.replace('<div class="dash c2">','<div class="dash c2">'+pc):h; }catch(e){ return h; } }; }
+
+// ---------- how clubs see you, on the Personality page ----------
+{ const k=SECTIONS.find(x=>x[0]==='career')[2].indexOf('Personality'); const _pv45=VIEWS['career:'+k]; VIEWS['career:'+k]=()=>{ const h=_pv45(); try{ const m=S.me; const t=playerType(); const exp=expectedRating(t); const c=myClubObj(); const T=c?clubTraits(c):null; const lv=c?clubLevel(c):60;
+    const ca=clamp((ovr()-50)/9,.5,5); const pa=paStars(ppot()); const ex=exposure();
+    const mgrSee=t.k==='youngster'?(T&&T.trust>=4?'Patient. He wants to build you up.':'He\'ll give you time, but he\'s watching.'):t.k==='bigmoney'?'He needs you to justify the fee. Quickly.':t.k==='proven'?'He expects you to lead and deliver every week.':'He judges you game by game.';
+    const fanSee=t.k==='youngster'?(T&&T.youthPat>=4?'They love a young player and forgive the bad days.':'They want to love you, but they want results too.'):t.k==='bigmoney'?`They know what you cost. Bad games get noticed.`:t.k==='proven'?'They expect the best version of you every time.':'They\'ll back you if you give everything.';
+    const card=`<section class="w ps"><div class="wb"><span class="ps-k">How clubs see you</span><b class="ps-lab">${esc(t.n)}</b><div class="lines"><div><span>Current ability</span><b>${hStars(Math.round(ca*2)/2)}</b></div>${m.age<=23?`<div><span>Potential (scouts' view)</span><b>${hStars(pa)}</b></div>`:''}<div><span>Expected match rating</span><b>${exp.toFixed(1)}+</b></div></div>
+      <p class="note" style="margin:0">${m.age<=21?(ex<.35?'Scouts haven\'t seen much of you yet, so opinions about your potential vary a lot from club to club.':'Scouts have seen plenty of you now. Most clubs rate you about the same.'):'At your age clubs judge what you do now, not what you might become.'}</p>
+      <div class="ih-list"><div class="ih-li"><span>The manager</span><b>${esc(mgrSee)}</b></div><div class="ih-li"><span>The fans</span><b>${esc(fanSee)}</b></div></div></div></section>`;
+    return h.replace('<div class="dash c1">','<div class="dash c1">'+card); }catch(e){ return h; } }; }
+
+// ---------- offer cards mention how the club rates you ----------
+{ const _oo45=ofOutlook; ofOutlook=function(o,c){ const t=_oo45.apply(this,arguments); try{ const m=S.me; if(m.age<=21){ const pp=ppotFor(c.id); const pl=planFor(c.id); return `${t} Their scouts rate your potential ${paStars(pp)} stars.${pl?` Likely plan: ${DPLAN[pl].n.toLowerCase()}.`:''}`; } }catch(e){} return t; }; }
+// the unveiling happens straight after you sign
+{ const _sg45=ACT.sign; ACT.sign=function(){ const r=_sg45.apply(this,arguments); try{ if(!S.pending&&S.queue&&S.queue.length){ const i=S.queue.findIndex(q=>q&&q.kind==='scene'&&q.sid==='unveil'); if(i>=0){ S.pending=S.queue.splice(i,1)[0]; showPending(); } } }catch(e){} return r; }; }
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
