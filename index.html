@@ -1102,6 +1102,40 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .pz-big span{display:block;font-size:12px;color:var(--mute)}
 .pz-big b{font-family:var(--cond);font-size:34px;font-weight:800;line-height:1}
 .pz-quote{margin:0;font-size:14px;line-height:1.45;border-left:3px solid var(--accent);padding:2px 0 2px 10px}
+
+/* v44 contracts in depth + personality */
+.ng-sub{margin:-2px 0 0;text-align:center;font-size:12.5px;color:var(--mute)}
+.ng-bon{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.ng-bon .ng-lab{align-items:center}
+.ng-bon .ng-lab span{font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);font-weight:600}
+.ng-x{margin-left:auto;width:28px;height:28px;border-radius:50%;border:1px solid var(--line-2);background:none;color:var(--mute);font-size:12px}
+.ng-ctl.sm{grid-template-columns:40px 1fr 40px}
+.ng-ctl.sm .ng-pm{height:36px;font-size:20px}
+.ng-ctl.sm .ng-val{font-size:22px}
+.ng-sts{display:flex;flex-direction:column;gap:6px}
+.ng-st{display:flex;flex-direction:column;gap:2px;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel-3);color:var(--text)}
+.ng-st b{font-size:14px}
+.ng-st b em{font-style:normal;font-size:11px;font-weight:600;color:var(--mute);margin-left:6px;padding:1px 6px;border-radius:999px;border:1px solid var(--line-2)}
+.ng-st span{font-size:12px;color:var(--mute)}
+.ng-st.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,var(--panel-2))}
+.lines b small{font-weight:500;color:var(--mute);font-size:11.5px;margin-left:4px}
+.og i.of-m{display:block;font-style:normal;font-size:11px;color:var(--mute)}
+.ct-head{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.ct-head>div{padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.ct-head span{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.ct-head b{font-size:17px;overflow-wrap:anywhere}
+.ct-head b small{font-size:12px;color:var(--mute);font-weight:500}
+.ct-head i{font-style:normal;font-size:12px;color:var(--mute)}
+@media (max-width:520px){ .ct-head{grid-template-columns:1fr} }
+.ps .wb{display:flex;flex-direction:column;gap:10px;padding:16px}
+.ps-k{font-size:11.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.ps-lab{font-family:var(--cond);font-size:30px;font-weight:800;line-height:1.05}
+.ps-rows{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.ps-row{display:grid;grid-template-columns:minmax(110px,40%) 1fr 72px;gap:10px;align-items:center;font-size:13px}
+.ps-row b{text-align:right;font-size:12px}
+.ps-bar{height:8px;border-radius:999px;background:var(--panel-3);overflow:hidden}
+.ps-bar i{display:block;height:100%;border-radius:999px}
+.ps-ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
 </style>
 
 <div class="app" id="app" hidden>
@@ -5712,6 +5746,139 @@ function pitchYes(c){ const m=S.me; const youth=m.age<17&&m.club!=null;
 // League of Ireland clubs sell for League of Ireland money
 { const _mv43=myValue; myValue=function(){ const v=_mv43.apply(this,arguments); try{ const m=S.me; const c=m&&m.club!=null?club(m.club):null; const L=c&&c.league?LMETA(c.league):null; if(L&&L.c==='IRL'){ const k=L.tier===1?.3:.2, cap=L.tier===1?2500000:800000; return Math.round(Math.min(v*k,cap)/1e4)*1e4; } }catch(e){} return v; }; }
 
+// ===================== v44: contracts in depth (FM squad statuses, real release clauses, itemised bonuses) and personality =====================
+// ---------- squad status, Football Manager style ----------
+const FMS=[
+ {k:'Star Player',role:'Star player',r:6,d:'The team is built around you. You play almost every game.'},
+ {k:'Important Player',role:'Key player',r:5,d:'You start most games, and all the big ones.'},
+ {k:'Regular Starter',role:'First team',r:4,d:'You start most league games.'},
+ {k:'Squad Player',role:'Rotation',r:3,d:'You play regularly, rotating with others.'},
+ {k:'Impact Sub',role:'Rotation',r:3,d:'You come off the bench to change games.'},
+ {k:'Fringe Player',role:'Rotation',r:2,d:'Cup games and the odd league start.'},
+ {k:'Hot Prospect for the Future',role:'Prospect',r:2,d:'A young talent with first-team chances when ready.',young:1},
+ {k:'Breakthrough Prospect',role:'Prospect',r:2,d:'Pushing for first-team football this season.',young:1},
+ {k:'Emergency Backup',role:'Prospect',r:1,d:'Only when others are injured or suspended.'},
+ {k:'Youngster',role:'Youth',r:0,d:'Academy and youth football while you develop.',young:1}];
+function fmsOf(k){ return FMS.find(x=>x.k===k)||null; }
+function fmsFor(role,age){ return role==='Star player'?'Star Player':role==='Key player'?'Important Player':role==='First team'?'Regular Starter':role==='Rotation'?'Squad Player':role==='Prospect'?(age<=21?'Hot Prospect for the Future':'Fringe Player'):'Youngster'; }
+function fmsLabel(k){ const c=k||{}; return c.status||fmsFor(c.role,S.me?S.me.age:20); }
+function fmsChoices(age,view){ const vr=(fmsOf(view)||{r:3}).r; return FMS.filter(x=>(age<=21||!x.young)&&!(x.k==='Youngster'&&age>=18)&&x.r<=Math.max(vr+2,1)&&(x.r>=vr-2)).sort((a,b)=>b.r-a.r); }
+
+// ---------- money shown the way you think about it ----------
+function perMonth(w){ return w*52/12; }
+function moneyFull(n){ n=Math.round(n||0); return '€'+n.toLocaleString('en-IE'); }
+
+// ---------- itemised bonuses ----------
+const BON=[
+ {k:'app',n:'Appearance fee',u:'per game',d:w=>w*.08,max:w=>w*.8},
+ {k:'goal',n:'Goal bonus',u:'per goal',d:w=>w*.12,max:w=>w*2},
+ {k:'assist',n:'Assist bonus',u:'per assist',d:w=>w*.06,max:w=>w*1.2},
+ {k:'cs',n:'Clean sheet bonus',u:'per clean sheet',d:w=>0,max:w=>w*.8,def:1},
+ {k:'unused',n:'Unused substitute fee',u:'per game',d:w=>0,max:w=>w*.4},
+ {k:'promo',n:'Promotion bonus',u:'one-off',d:w=>w*4,max:w=>w*30},
+ {k:'title',n:'League title bonus',u:'one-off',d:w=>0,max:w=>w*40},
+ {k:'cup',n:'Domestic cup bonus',u:'one-off',d:w=>0,max:w=>w*20},
+ {k:'euro',n:'European trophy bonus',u:'one-off',d:w=>0,max:w=>w*50},
+ {k:'land',n:'Season goals landmark',u:'one-off',d:w=>0,max:w=>w*30},
+ {k:'rise',n:'Yearly wage rise',u:'% a year',d:w=>0,max:w=>20,pct:1}];
+function bonOf(k){ return BON.find(b=>b.k===k); }
+function bonBase(w){ const o={}; BON.forEach(b=>{ const v=b.d(w); if(v>0) o[b.k]=roundWage(v); }); return o; }
+// what a club expects a bonus package to cost over a season (in weeks of wages)
+function bonEV(b,w){ const m=S.me; const def=['CB','LB','RB','CDM','GK'].includes(m.pos); const gpg=({ST:.45,LW:.3,RW:.3,CAM:.25,CM:.1,CDM:.05,CB:.05,LB:.03,RB:.03,GK:0}[m.pos]||.1)*clamp(1+(ovr()-60)/40,.5,1.6); const apg=({ST:.12,LW:.2,RW:.2,CAM:.22,CM:.12,CDM:.06,CB:.03,LB:.08,RB:.08,GK:0}[m.pos]||.08);
+  const apps=34; let ev=0; ev+=(b.app||0)*apps+(b.goal||0)*apps*gpg+(b.assist||0)*apps*apg+(b.cs||0)*(def?apps*.3:0)+(b.unused||0)*5+(b.promo||0)*.12+(b.title||0)*.15+(b.cup||0)*.12+(b.euro||0)*.04;
+  if(b.land&&b.landN){ const exp=apps*gpg; ev+=b.land*clamp(sig((exp-b.landN)/3),0,1); } if(b.rise) ev+=w*52*(b.rise/100)*.8; return ev; }
+// ---------- release clause ----------
+function relFactor(amt){ if(!amt) return 0; const v=Math.max(50000,myValue()); const r=amt/v; return r>=6?.01:r>=4?.03:r>=3?.05:r>=2?.08:r>=1.5?.12:.17; }
+
+// ---------- the club's sums, now with every term ----------
+function capAt(age,cid){ const c=club(cid); const lv=c?clubLevel(c):60; if(age>=18) return Infinity; if(age<16) return 100; const tab=age<17?[150,400,1000,2000]:[1200,2500,5000,10000]; return lv>=80?tab[3]:lv>=70?tab[2]:lv>=60?tab[1]:tab[0]; }
+youthWageCap=function(age,cid){ return capAt(age,cid!=null?cid:(S.nego?S.nego.cid:(S.me&&S.me.club))); };
+function persTermsMult(){ const p=S.me&&S.me.psy; if(!p) return 0; return (p.pro-12)*.004+(p.tem<8?-(8-p.tem)*.006:0)-(p.con>13?(p.con-13)*.004:0); }
+function negoEval(N,t){ const m=S.me, ag=agentObj(); const view=N.view||fmsFor(N.ft.role,m.age); const gap=(fmsOf(t.status)||{r:3}).r-(fmsOf(view)||{r:3}).r;
+  const base=bonBase(N.ft.wage); const bF=Math.max(0,bonEV(t.b||{},t.wage)-bonEV(base,N.ft.wage))/52/N.ft.wage*.85;
+  const ask=t.wage/N.ft.wage+relFactor(t.relAmt)+bF+Math.max(0,gap)*.18+(t.signOn/(N.ft.wage*6)-1)*.12+(t.years>4?.03:0);
+  const limit=N.ft.max/N.ft.wage+(ag?ag.skill*.05:0)+(N.ctx==='renew'&&m.captain?.06:0)+(ag&&ag.type==='Greedy'?.05:0)+(ag&&ag.type==='Loyal'&&N.ctx==='renew'?.05:0)+persTermsMult();
+  const cap=capAt(m.age,N.cid); return {ask,limit,gap,view,overCap:t.wage>cap,cap}; }
+proposeTerms=function(t){ const N=S.nego, m=S.me, ag=agentObj(); if(!N||N.status!=='open') return N; N.round++; const E=negoEval(N,t); t.role=(fmsOf(t.status)||{}).role||t.role;
+  if(E.gap>=2){ N.status='reject'; N.msg=`${club(N.cid).name} won't promise you ${t.status==='Star Player'?'Star Player status':'that squad status'}. Talks have stalled.`; }
+  else if(E.ask<=E.limit&&!E.overCap){ N.status='accept'; N.terms={...t,b:{...(t.b||{})}}; N.msg=`${club(N.cid).name} accept your terms.`; }
+  else if((N.breaks=(N.breaks||0)+1)>=(N.patience||3)||N.round>=(N.max||3)+1){ N.status='walk'; if(N.offer) news('bad',`${club(N.cid).name} pull their offer`,`Talks broke down ${N.breaks} times. ${club(N.cid).name} have walked away.`); N.msg=`${club(N.cid).name} have walked away from the table.`; if(N.ctx==='renew') m.renewCd=S.season*100+S.week+6; if(N.offer) m.offers=m.offers.filter(o=>o!==N.offer&&o.id!==N.offer.id); }
+  else { const over=E.ask-E.limit; const vr=(fmsOf(E.view)||{r:3}).r; const cw=roundWage(Math.min(t.wage,N.ft.max*(1+(ag?ag.skill*.04:0)),E.cap)); const b={}; Object.entries(t.b||{}).forEach(([k,v])=>{ const base=bonBase(N.ft.wage)[k]||0; b[k]=k==='rise'||k==='landN'?(k==='rise'?Math.min(v,3):v):Math.round(Math.min(v,Math.max(base,v*.6))); });
+    const st=(fmsOf(t.status)||{r:3}).r>vr?E.view:t.status; const rel=t.relAmt&&over>.12?Math.round(Math.max(t.relAmt,myValue()*3)/1e5)*1e5:t.relAmt;
+    N.counter={...t,wage:cw,status:st,role:(fmsOf(st)||{}).role||t.role,relAmt:rel,release:rel?'Clause':'None',signOn:roundWage(Math.min(t.signOn,N.ft.wage*6)),b}; N.status='wait'; N.readyAt=evDayAbs()+ri(2,4);
+    N.msg=E.overCap&&t.wage>E.cap?`${club(N.cid).name} say the rules for a player your age don't allow that wage.`:`${club(N.cid).name} reject your demands. They'll come back with something in a few days.`; N.countered=true; }
+  (N.log=N.log||[]).push(N.msg); return N; };
+// every negotiation starts with a full set of terms
+function negoUpgrade(N){ if(!N||!N.start||N.v44) return N; const m=S.me; N.v44=1; N.view=fmsFor(N.ft.role,m.age); const up=s=>{ if(!s) return; s.status=s.status||fmsFor(s.role||N.ft.role,m.age); if(s.relAmt==null){ s.relAmt=0; s.release='None'; } s.b=s.b||bonBase(s.wage); };
+  up(N.start); up(N.counter); if(N.terms) up(N.terms); if(N.ctx==='renew'&&m.contract){ const k=m.contract; N.start.b={...N.start.b,...(k.bon||{})}; if(k.release) N.start.relAmt=k.release; } N.draft=null; return N; }
+{ const _on44=openNego; openNego=function(ctx,cid,offer){ const N=_on44.apply(this,arguments); try{ negoUpgrade(N); }catch(e){ console.warn('nego44',e); } return N; }; }
+// offers are capped by the rules at the club making them
+youthWageFix=function(all){ const m=S.me; if(!m||m.age>=18) return; (m.offers||[]).forEach(o=>{ const cap=capAt(m.age,o.club); if(o.type!=='pre'&&o.wage>cap) o.wage=roundWage(cap); }); const cap=capAt(m.age,m.club); if(all&&m.contract&&m.contract.wage>cap){ const k=cap/m.contract.wage; m.contract.wage=roundWage(cap); ['appBonus','goalBonus','assistBonus','promoBonus','loyalty','signOn'].forEach(f=>{ if(m.contract[f]) m.contract[f]=roundWage(m.contract[f]*k); }); } };
+// signing writes every term into the contract
+{ const _sc44=signContract; signContract=function(){ const N=S.nego; const t=N&&N.terms; const r=_sc44.apply(this,arguments); try{ const m=S.me, k=m.contract; if(t&&k&&N.ctx!=='loan'){ const b=t.b||{}; k.status=t.status||fmsFor(k.role,m.age); k.release=t.relAmt?t.relAmt:null; k.appBonus=b.app||0; k.goalBonus=b.goal||0; k.assistBonus=b.assist||0; k.promoBonus=b.promo||0; k.bon={...b}; } }catch(e){ console.warn('sign44',e); } return r; }; }
+// bonuses that pay out
+function bonPay(v,why){ if(!v) return; const m=S.me; const f=()=>{ m.bank+=v; }; if(typeof txWith==='function') txWith(why,f); else f(); m.wkBonus=(m.wkBonus||0)+v; }
+{ const _fm44=finishMyMatch; finishMyMatch=function(){ const c=S.mctx; const r=_fm44.apply(this,arguments); try{ const m=S.me, L=S.lastMatch, k=m.contract, b=k&&k.bon; if(!b||!c||c.youth||c.intl||!L) return r;
+    const def=['CB','LB','RB','CDM','GK'].includes(m.pos); if(L.played&&def&&L.them===0&&b.cs) bonPay(b.cs,'Clean sheet bonus');
+    if(!L.played&&c.sel&&c.sel.status==='bench'&&b.unused) bonPay(b.unused,'Unused substitute fee');
+    if(b.land&&b.landN&&k.landPaid!==S.season){ const g=Object.entries(m.ss||{}).filter(([x])=>!x.startsWith('U:')&&!x.startsWith('I:')).reduce((s,[,v])=>s+(v.g||0),0); if(g>=b.landN){ k.landPaid=S.season; bonPay(b.land,'Goals landmark bonus'); news('good','Landmark bonus',`${g} goals this season. Your ${b.landN}-goal bonus of ${money(b.land)} has been paid.`,true); } } }catch(e){} return r; }; }
+function trophyBonuses(){ const m=S.me, k=m&&m.contract, b=k&&k.bon; if(!b) { if(m) m.tPaid=(m.trophies||[]).length; return; } if(m.tPaid==null){ m.tPaid=(m.trophies||[]).length; return; } const cid=myClubId();
+  (m.trophies||[]).slice(m.tPaid).forEach(t=>{ if(t.club!==cid) return; const nm=String(t.name||''); const euro=/Champions League|Europa League|Conference League/.test(nm); const cup=!euro&&/Cup|Pokal|Copa|Coppa|Coupe|Taça|Beker/.test(nm); const title=!euro&&!cup&&!/^Promotion/.test(nm)&&LEAGUES.some(l=>nm.indexOf(l.name)===0);
+    const v=euro?b.euro:cup?b.cup:title?b.title:0; if(v){ bonPay(v,`${euro?'European':cup?'Cup':'Title'} bonus`); news('good','Trophy bonus paid',`${nm}: your ${money(v)} bonus has been paid.`,true); } }); m.tPaid=(m.trophies||[]).length; }
+{ const _fd44=finishDay; finishDay=function(){ const r=_fd44.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me) trophyBonuses(); }catch(e){} return r; }; }
+{ const _se44=seasonEnd; seasonEnd=function(){ const k0=S.me&&S.me.contract; const rise=k0&&k0.bon&&k0.bon.rise; const r=_se44.apply(this,arguments); try{ const k=S.me.contract; if(rise&&k&&k===k0&&k.years>0&&S.me.club!=null){ const w=k.wage; k.wage=roundWage(w*(1+rise/100)); news('good','Yearly wage rise',`Your contract's ${rise}% yearly rise kicks in: ${money(w)} → ${money(k.wage)} a week.`,true); } }catch(e){} return r; }; }
+
+// ---------- personality ----------
+const PERS_K=[['pro','Professionalism'],['det','Determination'],['amb','Ambition'],['pre','Handling pressure'],['tem','Temperament'],['spo','Sportsmanship'],['loy','Loyalty'],['con','Controversy']];
+function persInit(){ const m=S.me; if(!m||m.psy) return; const T=m.traits||[]; const r=(a,b)=>ri(a,b);
+  m.psy={pro:r(9,15),det:r(10,16),amb:r(10,16),pre:r(8,15),tem:r(9,15),spo:r(9,15),loy:r(7,14),con:r(3,9)};
+  const P=m.psy; if(T.includes('Leadership')||T.includes('Leader')) P.det+=2; if(T.includes('Flair')) P.con+=1;
+  (m.press||[]).forEach(x=>{ if(x.tone==='fiery'){ P.tem-=.4; P.con+=.5; } if(x.tone==='humble') P.spo+=.2; });
+  Object.keys(P).forEach(k=>P[k]=clamp(P[k],1,20)); m.psyLog=[]; }
+function persAdj(k,v,why){ const m=S.me; if(!m) return; persInit(); const P=m.psy; const b=P[k]; P[k]=clamp(b+v,1,20); if(Math.floor(b)!==Math.floor(P[k])&&why){ (m.psyLog=m.psyLog||[]).unshift({when:fmtDate(gameDate()),k,up:v>0,why}); if(m.psyLog.length>12) m.psyLog.length=12; } }
+function persLabel(P){ if(!P) return ['Balanced','Nothing stands out either way yet.'];
+  if(P.pro>=18&&P.det>=16&&P.amb>=15) return ['Model Professional','Lives for football. Coaches would build a club around this attitude.'];
+  if(P.tem<=6&&P.con>=13) return ['Volatile','Talented, but you can explode at any moment. Clubs know it.'];
+  if(P.loy<=5&&P.amb>=15) return ['Mercenary','You go where the money and the trophies are. Fans notice.'];
+  if(P.pro>=17) return ['Professional','Takes training, diet and recovery seriously. Managers trust you.'];
+  if(P.det>=17&&P.pre>=15) return ['Resolute','Thrives when the stakes are highest. Never gives up on a game.'];
+  if(P.det>=17) return ['Determined','You keep going when others drop their heads.'];
+  if(P.amb>=17&&P.det>=14) return ['Driven','Hungry for the biggest stage and willing to work for it.'];
+  if(P.amb>=17) return ['Very Ambitious','You want the top, and you want it soon.'];
+  if(P.tem<=7) return ['Temperamental','Quick to boil over, on and off the pitch.'];
+  if(P.loy>=17) return ['Devoted','Loyal to the badge. Clubs and fans love that.'];
+  if(P.spo>=17&&P.tem>=14) return ['Honest','Plays the game the right way. Referees and opponents respect you.'];
+  if(P.pro<=6) return ['Casual','Talent alone carries you, for now.'];
+  if(P.det<=6||P.pre<=5) return ['Low Determination','Heads drop when things go against you.'];
+  if(P.con>=15) return ['Outspoken','Says what you think. Headline writers love you.'];
+  if(P.pro>=14) return ['Fairly Professional','Good habits, with the odd lapse.'];
+  return ['Balanced','Nothing stands out either way yet.']; }
+function persWord(k,v){ return v>=17?'Very high':v>=14?'High':v>=10?'Average':v>=6?'Low':'Very low'; }
+// on the pitch: determination when chasing a game, nerve on the big occasions, professionalism every day
+{ const _mc44=momentChance; momentChance=function(o){ let r=_mc44.apply(this,arguments); if(r==null) return r; try{ const P=S.me.psy; const c=S.mctx; if(!P||!c) return r; let d=(P.pro-12)*.002;
+    const sim=c.sim; if(sim&&S.live){ const [h,a]=liveScore(S.live.t); const us=sim.meSide==='a'?a:h, th=sim.meSide==='a'?h:a; if(us<th) d+=(P.det-12)*.006; }
+    const big=(c.mday&&c.mday.lvl>=2)||c.intl||(c.curMoment&&/[Pp]enalt/.test(c.curMoment.t||'')); if(big) d+=(P.pre-11)*.006;
+    if(o&&o[3]==='f'&&P.tem<8) d-=.02; return clamp(r+d,.03,.85); }catch(e){ return r; } }; }
+// training: professionals get more out of every session
+{ const _tx44=addTXP; addTXP=function(k,v){ const P=S.me&&S.me.psy; if(P&&v>0) v*=1+(P.pro-12)*.02; return _tx44.call(this,k,v); }; }
+// clubs: the biggest clubs check your character before they come in
+function persClubMult(c){ const P=S.me&&S.me.psy; if(!P||!c) return 1; const big=c.rep>=78; let k=1+(P.pro-12)*.02+(P.det-12)*.01; if(P.tem<8) k-=(8-P.tem)*(big?.05:.03); if(P.con>12) k-=(P.con-12)*(big?.03:.015); if(P.amb>=15&&big) k+=.05; return clamp(k,.5,1.3); }
+{ const _pc44=pitchChance; pitchChance=function(c){ const x=_pc44.apply(this,arguments); try{ return clamp(x*persClubMult(c),.01,.8); }catch(e){ return x; } }; }
+function persFilterOffers(before){ const m=S.me; const added=(m.offers||[]).slice(before); added.forEach(o=>{ const c=club(o.club); if(!c||c.rep<78) return; const k=persClubMult(c); if(k<.85&&Math.random()<(.85-k)*2.5){ m.offers=m.offers.filter(x=>x!==o); if(Math.random()<.6) news('bad',`${c.name} cool their interest`,`${outlet()}: ${c.name} were keen, but reports about your ${m.psy.tem<8?'temperament':'attitude'} have put them off.`,true); } }); }
+{ const _go44=genOffers; genOffers=function(){ const n0=(S.me.offers||[]).length; const r=_go44.apply(this,arguments); try{ persInit(); persFilterOffers(n0); }catch(e){} return r; }; }
+{ const _yo44=youthOffers; youthOffers=function(){ const n0=(S.me.offers||[]).length; const r=_yo44.apply(this,arguments); try{ persInit(); persFilterOffers(n0); }catch(e){} return r; }; }
+// what shapes it: how you behave
+{ const _pa44=pressAnswer; pressAnswer=function(tone){ try{ if(tone==='fiery'){ persAdj('tem',-.5,'Lost your cool with the press'); persAdj('con',.7,'Fiery words in a press conference'); } else if(tone==='humble'){ persAdj('spo',.25,'Humble with the press'); persAdj('con',-.15); } else if(tone==='confident'||tone==='arrogant'){ persAdj('amb',.25,'Talked big in the press'); if(tone==='arrogant') persAdj('con',.5,'Arrogant press conference'); } }catch(e){} return _pa44.apply(this,arguments); }; }
+{ const _mz44=mzAnswer; mzAnswer=function(k){ try{ if(k==='bold') persAdj('con',.3,'Bold words in the mixed zone'); if(k==='humble') persAdj('spo',.15); }catch(e){} return _mz44.apply(this,arguments); }; }
+{ const _sr44=subReact; subReact=function(k){ try{ if(k==='words'){ persAdj('tem',-1,'Row with the manager on the touchline'); persAdj('con',1,'Touchline row made the news'); } else if(k==='bottle'){ persAdj('tem',-.7,'Kicked a water bottle when subbed'); } else if(k==='tunnel'){ persAdj('pro',-.4,'Stormed down the tunnel'); } else if(k==='hand'||k==='clap'){ persAdj('pro',.15); persAdj('spo',.15); } }catch(e){} return _sr44.apply(this,arguments); }; }
+{ const _ts44=teamSession; teamSession=function(i){ try{ const a=S.me.att&&S.me.att[i]; if(a==='skip') persAdj('pro',-1,'Skipped training'); else if(a==='late') persAdj('pro',-.4,'Turned up late to training'); else if(a==='early') persAdj('pro',.12,'First in at the training ground'); else persAdj('pro',.03); }catch(e){} return _ts44.apply(this,arguments); }; }
+{ const _rt44=requestTransfer; requestTransfer=function(on){ try{ if(on){ persAdj('loy',-2,'Handed in a transfer request'); persAdj('amb',.8,'Pushed for a move'); } }catch(e){} return _rt44.apply(this,arguments); }; }
+{ const _ps44=pitchSend; pitchSend=function(cid){ const r=_ps44.apply(this,arguments); try{ if(r&&r.ok){ const c=club(cid), mc=myClubObj(); if(mc&&c&&c.rep>mc.rep+5){ persAdj('amb',.4,'Had your agent offer you to bigger clubs'); persAdj('loy',-.4); } } }catch(e){} return r; }; }
+{ const _sc44b=signContract; signContract=function(){ const N=S.nego; const ctx=N&&N.ctx; const r=_sc44b.apply(this,arguments); try{ if(ctx==='renew') persAdj('loy',1,'Signed a new deal at your club'); else if(ctx==='transfer') persAdj('loy',-.5); }catch(e){} return r; }; }
+{ const _fm44b=finishMyMatch; finishMyMatch=function(){ const c=S.mctx; let wasBehind=false; try{ if(c&&c.sim&&c.sim.meSide){ const sim=c.sim; let h=0,a=0; for(const e of sim.events){ if(e.t>sim.T+1) break; if(e.type==='goal'){ if(e.side==='h') h++; else a++; const us=sim.meSide==='a'?a:h, th=sim.meSide==='a'?h:a; if(us<th) wasBehind=true; } } } }catch(e){} const r=_fm44b.apply(this,arguments);
+  try{ persInit(); const L=S.lastMatch; if(L&&L.played&&!L.youth){ const big=(c&&c.mday&&c.mday.lvl>=2)||L.intl; if(big&&L.rating>=7.5) persAdj('pre',.35,'Delivered on a big occasion'); else if(big&&L.rating<=6) persAdj('pre',-.2,'Went missing on a big occasion'); if(wasBehind&&L.res!=='L'&&L.rating>=7) persAdj('det',.3,'Dragged the team back into a game'); if(c&&c.yellow) persAdj('spo',-.25*c.yellow,'Picked up a booking'); } }catch(e){} return r; }; }
+{ const _fd44b=finishDay; finishDay=function(){ const r=_fd44b.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me) persInit(); }catch(e){} return r; }; }
+
 // ===================== MANAGER MODE DATA: formations, positions, roles, instructions, presets =====================
 // Coordinates are in the team's own frame: fx 0 = own goal line, 1 = opponent goal line; fy 0 = left touchline, 1 = right.
 const FORMATIONS={
@@ -6445,7 +6612,7 @@ const SECTIONS=[
  ['home','Home',['Overview','Profile']],['inbox','Inbox',['Messages']],['schedule','Schedule',['This week','Fixtures & results']],
  ['training','Training',['Weekly plan','Progress','Traits']],['dev','Development',['Attributes','Skill stars']],['squad','Squad',['Squad hub','Dressing room','Youth team','Shirt number']],
  ['manager','Manager',['Talk','Promises']],['contract','Contract',['My contract','Agent']],['transfers','Transfers',['Offers','Transfer centre']],
- ['comps','Competitions',['League tables','League stats','Cups & Europe','Youth league']],['career','Career',['Stats','Badges','Trophies & awards','Season review','Timeline']],['intl','International',['Overview','Match history']],
+ ['comps','Competitions',['League tables','League stats','Cups & Europe','Youth league']],['career','Career',['Stats','Badges','Trophies','Review','Timeline']],['intl','International',['Overview','Match history']],
  ['media','Media',['Press conferences','Headlines','Social']],['world','World',['News','Ballon d\'Or']],['fin','Finances',['Overview','Sponsors','Lifestyle']],['saves','Saves',['Save slots','Logo pack','Settings']]];
 let NAVCTX=null; let SEC='home', SUB=0, INBOX_SEL=0, VSEASON=null, VLEAGUE=null, CSEASON='all';
 function stars(n){ return `<span class="stars">${'★'.repeat(n)}<s>${'★'.repeat(5-n)}</s></span>`; }
@@ -6647,7 +6814,7 @@ VIEWS['squad:3']=()=>{ const m=S.me, c=myClubObj(); if(!c) return '<p class="emp
 VIEWS['manager:1']=()=>{ const ps=S.me.promises; return `<div class="dash c1">${W('Promises',ps.length?`<table><thead><tr><th class="l">Promise</th><th>Progress</th><th class="l">Status</th></tr></thead><tbody>${ps.map(p=>`<tr><td class="l">${esc(p.desc)}</td><td>${p.count}/${p.need} · ${Math.max(0,p.due)} left</td><td class="l">${p.done?(p.kept?'<span class="pill g">Kept</span>':'<span class="pill r">Broken</span>'):'<span class="pill b">Active</span>'}</td></tr>`).join('')}</tbody></table>`:'<p class="empty">No promises. Ask the manager for more playing time to get one.</p>')}</div>`; };
 VIEWS['contract:0']=()=>{ const m=S.me, k=m.contract; if(m.club==null) return `<div class="dash c1">${W('Contract','<p class="empty">You are a free agent. Offers are in Transfers.</p>')}</div>`; const ag=agentObj(); const c=club(m.club);
   const cd=(m.renewCd||0)>S.season*100+S.week;
-  return `<div class="dash c2">${W(`Contract · ${esc(c.name)}`,`<div class="kv"><span>Squad status</span><b>${k.role}</b><span>Weekly wage</span><b>${money(k.wage)}</b><span>Tax & social (${typeof taxRateStr==='function'?taxRateStr(k.wage,c.country):'40%'})</span><b class="c-lo">−${money(typeof weeklyTax==='function'?weeklyTax(k.wage,c.country):k.wage*.4)}</b><span>Agent fee</span><b class="c-lo">${ag?'−'+money(k.wage*ag[2]):'None'}</b><span>Take-home per week</span><b class="c-hi">${money(k.wage-(typeof weeklyTax==='function'?weeklyTax(k.wage,c.country):k.wage*.4)-(ag?k.wage*ag[2]:0))}</b><span>Contract length</span><b>${k.years} season${k.years===1?'':'s'} left (to June ${S.year+k.years})</b><span>Signing-on fee</span><b>${money(k.signOn)}</b><span>Appearance bonus</span><b>${money(k.appBonus)}</b><span>Goal bonus</span><b>${money(k.goalBonus)}</b><span>Assist bonus</span><b>${money(k.assistBonus)}</b><span>Promotion bonus</span><b>${money(k.promoBonus)}</b><span>Loyalty bonus</span><b>${k.loyalty?money(k.loyalty):'None'}</b><span>Release clause</span><b>${k.release?money(k.release):'None'}</b><span>Image rights</span><b>${k.image?Math.round(k.image*100)+'%':'None'}</b>${m.loan?`<span>On loan at</span><b>${cname(m.loan.club)}</b>`:''}</div>`)}
+  return `<div class="dash c2">${W(`Pay and tax · ${esc(c.name)}`,`<div class="kv"><span>Squad status</span><b>${esc(typeof fmsLabel==='function'?fmsLabel(k):k.role)}</b><span>Weekly wage</span><b>${money(k.wage)}</b><span>Tax & social (${typeof taxRateStr==='function'?taxRateStr(k.wage,c.country):'40%'})</span><b class="c-lo">−${money(typeof weeklyTax==='function'?weeklyTax(k.wage,c.country):k.wage*.4)}</b><span>Agent fee</span><b class="c-lo">${ag?'−'+money(k.wage*ag[2]):'None'}</b><span>Take-home per week</span><b class="c-hi">${money(k.wage-(typeof weeklyTax==='function'?weeklyTax(k.wage,c.country):k.wage*.4)-(ag?k.wage*ag[2]:0))}</b><span>Contract length</span><b>${k.years} season${k.years===1?'':'s'} left (to June ${S.year+k.years})</b><span>Signing-on fee</span><b>${money(k.signOn)}</b><span>Image rights</span><b>${k.image?Math.round(k.image*100)+'%':'None'}</b>${m.loan?`<span>On loan at</span><b>${cname(m.loan.club)}</b>`:''}</div>`)}
   ${W('Negotiate',`<div class="stack"><p class="note">${k.youth&&m.age<17?'Scholars can\'t sign a professional deal until they turn 17.':`Ask the club for a new deal. ${ag?`${ag[0]} will negotiate for you.`:'You\'ll negotiate yourself. An agent gets better terms.'}`}</p>
    <button class="btn" data-act="renew" ${k.youth&&m.age<17||cd||m.loan?'disabled':''}>${cd?'Club won\'t talk yet':'Ask for a new contract'}</button>
    <button class="btn sec" data-act="treq">${m.transferReq?'Withdraw transfer request':'Hand in transfer request'}</button>
@@ -8274,7 +8441,7 @@ VIEWS['transfers:0']=()=>{ const m=S.me; const w=windowOpen(); const cur=m.club!
   const cards=m.offers.map(o=>{ const c=club(o.club); const lg=c.league&&S.leagues[c.league]?LMETA(c.league).name:''; const lv=clubLevel(c); const step=curL!=null?lv-curL:null; const N=o.nego; const wage=N&&N.status==='accept'&&N.terms?N.terms.wage:o.wage; const dw=curW?Math.round((wage/curW-1)*100):null;
    const btn=o.type==='pre'?`<button class="btn" data-act="preYes" data-arg="${o.id}">Agree to join at 18</button>`:o.blocked?'<span class="pill r">Your club won\'t sell</span>':`<button class="btn" data-act="offer" data-arg="${o.id}">${N&&N.status==='accept'?'Review and sign':N&&N.round?'Continue talks':'Talk terms'}</button>`;
    return `<div class="ocard"><div class="oh">${crest(c,true)}<div><b>${esc(c.name)}</b><span>${esc(lg)} · level ${lv}${step!=null?` <em class="of-step ${step>0?'up':step<0?'dn':''}">${step>0?'▲ +'+step:step<0?'▼ '+step:'same level'}</em>`:''}</span></div>${typ(o)}</div>
-    <div class="og"><div><span>Fee</span><b>${o.fee?money(o.fee):'–'}</b></div><div><span>Wage</span><b>${money(wage)}/wk</b>${dw!=null&&o.type!=='loan'?`<i class="of-d ${dw>0?'up':dw<0?'dn':''}">${dw===0?'Same as now':`${dw>0?'+':''}${dw}% on now`}</i>`:''}</div><div><span>Role</span><b>${esc(o.role)}</b></div><div><span>Expires</span><b>${esc(wkDate(o.expires,6))}</b></div></div>
+    <div class="og"><div><span>Fee</span><b>${o.fee?money(o.fee):'–'}</b></div><div><span>Wage</span><b>${money(wage)}/wk</b><i class="of-m">≈ ${money(perMonth(wage))} a month</i>${dw!=null&&o.type!=='loan'?`<i class="of-d ${dw>0?'up':dw<0?'dn':''}">${dw===0?'Same as now':`${dw>0?'+':''}${dw}% on now`}</i>`:''}</div><div><span>Squad status</span><b>${esc(N&&N.terms&&N.terms.status||fmsFor(o.role,m.age))}</b></div><div><span>Expires</span><b>${esc(wkDate(o.expires,6))}</b></div></div>
     <p class="note" style="margin:0">${ofOutlook(o,c)}</p>${o.why?`<p class="owhy">${esc(o.why)}</p>`:''}${o.type==='pre'?`<p class="note">You'd join in the ${S.year+(o.joinSeason-S.season)} summer. Fee to your club: ${money(o.fee)}.</p>`:''}${ofTalk(o)}
     <div class="oa">${btn}<button class="btn sec" data-act="reject" data-arg="${o.id}">Decline</button></div></div>`; }).join('');
   const aps=(m.approaches||[]).map(a=>{ const c=club(a.club); const st={scout:'<span class="pill">Scouting</span>',bid:'<span class="pill y">Bidding</span>',agreed:'<span class="pill g">Fee agreed</span>',dead:'<span class="pill r">Walked away</span>'}[a.stage];
@@ -8338,6 +8505,74 @@ ACT.pzPick=id=>{ PZ.pick=+id; pzSheet(); };
 ACT.pzBack=()=>{ PZ.pick=null; pzSheet(); };
 ACT.pzClose=()=>{ PZ.pick=null; closeModal(); render(); };
 ACT.pzSend=id=>{ const r=pitchSend(+id); PZ.pick=null; closeModal(); render(); toast(r.txt); };
+
+// ---------- v44 UI: contracts in depth and personality ----------
+// ranges: you can ask for anything. Asking isn't getting.
+ngWageRange=function(N){ const f=N.ft.wage; const st=ngStep(f); const base=[N.start&&N.start.wage,N.counter&&N.counter.wage].filter(x=>x>0); const lo=ngSnap(Math.min(f*.4,...base),st); const hi=ngSnap(Math.max(f*4,...base.map(x=>x*2)),st); return {lo,hi,st}; };
+ngSignRange=function(N){ const f=N.ft.wage; const st=ngStep(f*4); return {lo:0,hi:ngSnap(f*40,st),st}; };
+function ngRelRange(){ const v=Math.max(50000,myValue()); const st=ngStep(v/2); return {lo:ngSnap(v,st),hi:ngSnap(v*10,st),st}; }
+function ngBonRange(b,w){ const hi=b.pct?20:Math.max(50,b.max(w)); const st=b.pct?1:Math.max(10,ngStep(hi/12)); return {lo:0,hi:b.pct?20:ngSnap(hi,st),st}; }
+ngDraft=function(N){ negoUpgrade(N); if(!N.draft||N.draftKey!==ngKey(N)){ const t=N.counter||N.start; N.draft={...t,b:{...(t.b||{})}}; N.draftKey=ngKey(N); } const d=N.draft; d.b=d.b||{}; const R=ngWageRange(N); d.wage=clamp(d.wage,R.lo,R.hi); const SR=ngSignRange(N); d.signOn=clamp(d.signOn||0,0,SR.hi); if(!d.status) d.status=fmsFor(d.role,S.me.age); return d; };
+readNego=function(){ const N=S.nego; const d=ngDraft(N); return {...d,b:{...d.b},role:(fmsOf(d.status)||{}).role||d.role,release:d.relAmt?'Clause':'None'}; };
+ngMeter=function(N,t){ const ag=agentObj(); const E=negoEval(N,{...t,b:t.b||{}}); if(N.fog==null) N.fog=ag?0:Math.round(rnd(-.07,.07)*100)/100; const x=E.ask-E.limit+(ag?0:N.fog);
+  const lvl=E.gap>=2?4:E.overCap?4:x<=-.25?0:x<=0?1:x<=.12?2:3; const pos=[12,35,62,88,96][lvl]; const col=['#2fbf71','#7ccf5c','#e3b324','#e5484d','#e5484d'][lvl];
+  const txt=E.gap>=2?`They won't promise ${t.status} status. Ask for that and talks stall.`:E.overCap?`Over what the rules let a club pay a player your age (${ngEur(E.cap)} a week).`:lvl===0?(t.wage<N.ft.wage*.8?'They\'d bite your hand off. You\'re underselling yourself.':'They\'d sign this today.'):lvl===1?'Within what they can do. They should agree.':lvl===2?'A stretch. Expect them to push back on something.':'Too much for them. Push this and talks could break down.';
+  return `<div class="ng-meter"><div class="row sb"><span>${ag?esc(ag[0])+' reads it':'Your read on it'}</span><b style="color:${col}">${['Easy yes','Likely yes','Push back','Breakdown risk','Not allowed'][lvl]}</b></div><div class="ng-scale"><i style="left:${pos}%;background:${col}"></i></div><p class="note" style="margin:0">${esc(txt)}${ag?'':' Without an agent this is a guess.'}</p></div>`; };
+function ngMoney(w){ return `≈ ${ngEur(perMonth(w))} a month · ${ngEur(w*52)} a year`; }
+function ngBonLines(b,w){ return BON.filter(x=>b&&b[x.k]).map(x=>`<div><span>${esc(x.n)}${x.k==='land'&&b.landN?` (${b.landN} goals)`:''}</span><b>${x.pct?b[x.k]+'%':ngEur(b[x.k])} <small>${esc(x.pct?'a year':x.u)}</small></b></div>`).join(''); }
+ngTermsLines=function(t){ const b=t.b||{}; return `<div class="lines"><div><span>Wage</span><b>${ngEur(t.wage)}/wk <small>${ngEur(perMonth(t.wage))}/month</small></b></div><div><span>Length</span><b>${t.years} season${t.years>1?'s':''} <small>to June ${S.year+t.years}</small></b></div><div><span>Squad status</span><b>${esc(t.status||fmsFor(t.role,S.me.age))}</b></div><div><span>Signing-on fee</span><b>${ngEur(t.signOn)}</b></div><div><span>Release clause</span><b>${t.relAmt?ngEur(t.relAmt):'None'}</b></div>${ngBonLines(b,t.wage)}</div>`; };
+function ngBonRow(N,t,x){ const w=t.wage; const R=ngBonRange(x,w); const v=t.b[x.k]||0; const fmt=x.pct?v+'%':ngEur(v);
+  return `<div class="ng-bon"><div class="ng-lab"><span>${esc(x.n)}</span><i>${esc(x.pct?'a year':x.u)}</i><button class="ng-x" data-act="ngBonDel" data-arg="${x.k}" aria-label="Remove">✕</button></div>${x.k==='land'?`<div class="ng-chips">${[5,10,15,20,25,30].map(n=>`<button class="chip" aria-pressed="${(t.b.landN||10)===n}" data-act="ngLand" data-arg="${n}">${n} goals</button>`).join('')}</div>`:''}
+    <div class="ng-ctl sm"><button class="ng-pm" data-act="ngBon" data-arg="${x.k}|-1" ${v<=R.lo?'disabled':''} aria-label="Less">−</button><b class="ng-val" id="ngb-${x.k}">${fmt}</b><button class="ng-pm" data-act="ngBon" data-arg="${x.k}|1" ${v>=R.hi?'disabled':''} aria-label="More">+</button></div><input class="ng-rng" type="range" min="${R.lo}" max="${R.hi}" step="${R.st}" value="${v}" data-ngb="${x.k}" aria-label="${esc(x.n)}"></div>`; }
+function ngEditor(N,lab){ const m=S.me, ag=agentObj(); const t=ngDraft(N); const WR=ngWageRange(N), SR=ngSignRange(N); const left=Math.max(0,(N.max||3)-N.round); const pat=Math.max(0,(N.patience||3)-(N.breaks||0));
+  const def=['CB','LB','RB','CDM','GK'].includes(m.pos); const view=N.view||fmsFor(N.ft.role,m.age); const sts=fmsChoices(m.age,view); if(!sts.some(x=>x.k===t.status)&&fmsOf(t.status)) sts.push(fmsOf(t.status));
+  const act=BON.filter(x=>t.b[x.k]!=null&&(t.b[x.k]>0||x.k==='land')); const avail=BON.filter(x=>!(t.b[x.k]>0)&&!(x.k==='land'&&t.b.land!=null)&&(!x.def||def));
+  const RR=ngRelRange(); const cap=capAt(m.age,N.cid);
+  return `<div class="ng">${lab}<h2 class="disp">${N.countered?'Their counter-offer':'Your demands'}</h2>
+   <div class="ng-status"><span>Round ${N.round+1} of ${N.max||3}</span><span class="ng-dots" title="Patience">${'<i class="on"></i>'.repeat(pat)}${'<i></i>'.repeat(Math.max(0,(N.patience||3)-pat))}</span><span>Patience</span></div>
+   <p class="note" style="margin:0">${ag?`${esc(ag[0])} reckons a fair wage is around <b>${ngEur(N.ft.wage)}</b> a week.`:`Clubs like this usually pay around <b>${ngEur(N.ft.wage)}</b> a week for your level.`} Push everything as high as you like. Asking isn't getting.${N.msg&&N.countered?' '+esc(N.msg):''}</p>
+   ${cap<Infinity?`<p class="note" style="margin:0">At ${m.age}, the most a club like this can pay you is ${ngEur(cap)} a week.</p>`:''}
+   <div class="ng-row"><div class="ng-lab"><span>Weekly wage</span><i>${Math.round(t.wage/N.ft.wage*100)}% of fair</i></div><div class="ng-ctl"><button class="ng-pm" data-act="ngStep" data-arg="wage|-1" ${t.wage<=WR.lo?'disabled':''} aria-label="Less">−</button><b class="ng-val" id="ngv-wage">${ngEur(t.wage)}<small>/wk</small></b><button class="ng-pm" data-act="ngStep" data-arg="wage|1" ${t.wage>=WR.hi?'disabled':''} aria-label="More">+</button></div><p class="ng-sub" id="ngm-wage">${ngMoney(t.wage)}</p><input class="ng-rng" type="range" min="${WR.lo}" max="${WR.hi}" step="${WR.st}" value="${t.wage}" data-ngr="wage" aria-label="Weekly wage">
+    <div class="ng-chips"><button class="chip" data-act="ngQuick" data-arg="theirs">Their offer</button><button class="chip" data-act="ngQuick" data-arg="1">Fair</button><button class="chip" data-act="ngQuick" data-arg="1.25">+25%</button><button class="chip" data-act="ngQuick" data-arg="1.5">+50%</button><button class="chip" data-act="ngQuick" data-arg="4">Max</button></div></div>
+   <div class="ng-row"><div class="ng-lab"><span>Contract length</span><i>to June ${S.year+t.years}</i></div><div class="ng-chips">${[1,2,3,4,5].map(y=>`<button class="chip" aria-pressed="${t.years===y}" data-act="ngSet" data-arg="years|${y}">${y} yr${y>1?'s':''}</button>`).join('')}</div></div>
+   <div class="ng-row"><div class="ng-lab"><span>Squad status</span><i>They see you as: ${esc(view)}</i></div><div class="ng-sts">${sts.map(x=>`<button class="ng-st${t.status===x.k?' on':''}" data-act="ngSet" data-arg="status|${esc(x.k)}"><b>${esc(x.k)}${x.k===view?' <em>their view</em>':''}</b><span>${esc(x.d)}</span></button>`).join('')}</div></div>
+   <div class="ng-row"><div class="ng-lab"><span>Signing-on fee</span><i>Paid once when you sign</i></div><div class="ng-ctl"><button class="ng-pm" data-act="ngStep" data-arg="signOn|-1" ${t.signOn<=0?'disabled':''} aria-label="Less">−</button><b class="ng-val" id="ngv-signOn">${ngEur(t.signOn)}</b><button class="ng-pm" data-act="ngStep" data-arg="signOn|1" ${t.signOn>=SR.hi?'disabled':''} aria-label="More">+</button></div><input class="ng-rng" type="range" min="0" max="${SR.hi}" step="${SR.st}" value="${t.signOn}" data-ngr="signOn" aria-label="Signing-on fee"></div>
+   <div class="ng-row"><div class="ng-lab"><span>Release clause</span><i>${t.relAmt?`${(t.relAmt/Math.max(50000,myValue())).toFixed(1)}× your value (${money(myValue())})`:'Lower = easier to leave, harder to agree'}</i></div><div class="ng-chips"><button class="chip" aria-pressed="${!t.relAmt}" data-act="ngRel" data-arg="0">No clause</button><button class="chip" aria-pressed="${!!t.relAmt}" data-act="ngRel" data-arg="1">Set a clause</button></div>
+    ${t.relAmt?`<div class="ng-ctl"><button class="ng-pm" data-act="ngRelStep" data-arg="-1" ${t.relAmt<=RR.lo?'disabled':''} aria-label="Less">−</button><b class="ng-val" id="ngv-relAmt">${ngEur(t.relAmt)}</b><button class="ng-pm" data-act="ngRelStep" data-arg="1" ${t.relAmt>=RR.hi?'disabled':''} aria-label="More">+</button></div><input class="ng-rng" type="range" min="${RR.lo}" max="${RR.hi}" step="${RR.st}" value="${t.relAmt}" data-ngr="relAmt" aria-label="Release clause">`:''}</div>
+   <div class="ng-row"><div class="ng-lab"><span>Bonuses and clauses</span><i>${act.length} in the deal</i></div>${act.map(x=>ngBonRow(N,t,x)).join('')}
+    ${avail.length?`<div class="lbl" style="margin-top:4px">Add</div><div class="ng-chips">${avail.map(x=>`<button class="chip" data-act="ngBonAdd" data-arg="${x.k}">+ ${esc(x.n)}</button>`).join('')}</div>`:''}</div>
+   <div id="ngMeter">${ngMeter(N,t)}</div>
+   <p class="note" style="margin:0">${left} proposal${left===1?'':'s'} left before they lose interest.</p>
+   <div class="row ng-btns"><button class="btn" data-act="propose">Send proposal</button><button class="btn sec" data-act="negoPark">Later</button><button class="btn sec" data-act="ngWalk">Walk away</button></div></div>`; }
+{ const _sn44=showNego; showNego=function(){ const N=S.nego; if(!N) return; negoUpgrade(N); if(N.status!=='open'||N.ctx==='loan') return _sn44.apply(this,arguments); const c=club(N.cid); const head=N.ctx==='renew'?'New contract':'Personal terms'; ngSheet(ngEditor(N,`<div class="label">${head} · ${esc(c.name)}</div>`)); }; }
+ACT.ngRel=on=>{ const N=S.nego; const t=ngDraft(N); const RR=ngRelRange(); t.relAmt=+on?ngSnap(Math.max(50000,myValue())*3,RR.st):0; showNego(); };
+ACT.ngRelStep=d=>{ const N=S.nego; const t=ngDraft(N); const RR=ngRelRange(); t.relAmt=clamp(ngSnap((t.relAmt||RR.lo)+(+d)*RR.st,RR.st),RR.lo,RR.hi); showNego(); };
+ACT.ngBon=a=>{ const N=S.nego; const [k,d]=a.split('|'); const t=ngDraft(N); const x=bonOf(k); const R=ngBonRange(x,t.wage); t.b[k]=clamp(Math.round(((t.b[k]||0)+(+d)*R.st)/R.st)*R.st,R.lo,R.hi); showNego(); };
+ACT.ngBonAdd=k=>{ const N=S.nego; const t=ngDraft(N); const x=bonOf(k); const R=ngBonRange(x,t.wage); t.b[k]=x.pct?3:Math.max(R.st,Math.round((x.d(t.wage)||R.hi*.2)/R.st)*R.st); if(k==='land') t.b.landN=t.b.landN||10; showNego(); };
+ACT.ngBonDel=k=>{ const N=S.nego; const t=ngDraft(N); delete t.b[k]; if(k==='land') delete t.b.landN; showNego(); };
+ACT.ngLand=n=>{ const N=S.nego; const t=ngDraft(N); t.b.landN=+n; showNego(); };
+ACT.ngAmend=(()=>{ const _a=ACT.ngAmend; return ()=>{ const N=S.nego; const sent=N&&N.sent; _a(); try{ if(S.nego&&sent){ S.nego.draft={...sent,b:{...(sent.b||{})}}; S.nego.draftKey=ngKey(S.nego); showNego(); } }catch(e){} }; })();
+ACT.ngQuick=(()=>{ const _q=ACT.ngQuick; return k=>{ const N=S.nego; if(k==='theirs'){ const t=ngDraft(N); const b=N.counter||N.start; t.wage=b.wage; t.signOn=b.signOn; t.b={...(b.b||{})}; t.status=b.status||t.status; t.relAmt=b.relAmt||0; showNego(); return; } _q(k); }; })();
+// sliders for bonuses update in place
+document.addEventListener('input',e=>{ const el=e.target; const N=S.nego; if(!el||!el.dataset||!N) return; if(el.dataset.ngb){ const k=el.dataset.ngb; const t=ngDraft(N); const x=bonOf(k); t.b[k]=+el.value; const v=document.getElementById('ngb-'+k); if(v) v.textContent=x&&x.pct?t.b[k]+'%':ngEur(t.b[k]); const mt=document.getElementById('ngMeter'); if(mt) mt.innerHTML=ngMeter(N,t); }
+  else if(el.dataset.ngr==='wage'){ const t=ngDraft(N); const s=document.getElementById('ngm-wage'); if(s) s.textContent=ngMoney(t.wage); } });
+document.addEventListener('change',e=>{ const el=e.target; if(el&&el.dataset&&el.dataset.ngb&&S.nego) showNego(); });
+
+// ---------- the contract page shows every term ----------
+function contractTermsHTML(k){ const m=S.me; const b=k.bon||{app:k.appBonus,goal:k.goalBonus,assist:k.assistBonus,promo:k.promoBonus}; const st=k.status||fmsFor(k.role,m.age); const fm=fmsOf(st);
+  return `<div class="ct-head"><div><span>Squad status</span><b>${esc(st)}</b><i>${esc(fm?fm.d:'')}</i></div><div><span>Wage</span><b>${moneyFull(k.wage)}<small>/wk</small></b><i>${moneyFull(perMonth(k.wage))} a month · ${moneyFull(k.wage*52)} a year</i></div></div>
+   <div class="lines">${BON.filter(x=>b[x.k]).map(x=>`<div><span>${esc(x.n)}${x.k==='land'&&b.landN?` (${b.landN} goals)`:''}</span><b>${x.pct?b[x.k]+'%':moneyFull(b[x.k])} <small>${esc(x.pct?'a year':x.u)}</small></b></div>`).join('')}<div><span>Release clause</span><b>${k.release?moneyFull(k.release):'None'}</b></div>${k.loyalty?`<div><span>Loyalty bonus</span><b>${moneyFull(k.loyalty)}</b></div>`:''}</div>`; }
+{ const _ct44=VIEWS['contract:0']; VIEWS['contract:0']=()=>{ const h=_ct44(); try{ const m=S.me, k=m.contract; if(m.club==null||!k) return h; return h.replace('<div class="dash c2">',`<div class="dash c2">${W('Your deal at a glance',contractTermsHTML(k))}`); }catch(e){ return h; } }; }
+
+// ---------- personality ----------
+(()=>{ const s=SECTIONS.find(x=>x[0]==='career'); if(s&&!s[2].includes('Personality')) s[2].push('Personality'); })();
+VIEWS['career:'+(SECTIONS.find(x=>x[0]==='career')[2].indexOf('Personality'))]=()=>{ const m=S.me; persInit(); const P=m.psy; const [lab,desc]=persLabel(P);
+  const rows=PERS_K.map(([k,n])=>{ const v=P[k]; const x=k==='con'?21-v:v; const col=x>=14?'var(--pos,#2fbf71)':x>=10?'var(--accent)':x>=6?'#e3b324':'var(--neg,#e5484d)'; return `<div class="ps-row"><span>${n}</span><div class="ps-bar"><i style="width:${Math.round(v/20*100)}%;background:${k==='con'?(v>=14?'var(--neg,#e5484d)':v>=10?'#e3b324':'var(--pos,#2fbf71)'):col}"></i></div><b>${persWord(k,v)}</b></div>`; }).join('');
+  const fx=[]; if(P.det>=14) fx.push('Better odds on your chances when your team is behind.'); else if(P.det<=8) fx.push('Heads drop when you fall behind. Your chances suffer.'); if(P.pre>=14) fx.push('You step up in big games and penalties.'); else if(P.pre<=8) fx.push('Big occasions get to you. Your odds dip in finals and penalties.'); if(P.pro>=14) fx.push('You get more out of every training session.'); else if(P.pro<=8) fx.push('You coast in training and develop more slowly.'); if(P.tem<=8) fx.push('Rash challenges and flashpoints are more likely.');
+  const cl=[]; if(P.pro>=15) cl.push('Top clubs love your professionalism.'); if(P.tem<8) cl.push('Some big clubs are wary of your temperament.'); if(P.con>=14) cl.push('Your headlines make some clubs nervous.'); if(P.amb>=15) cl.push('Ambitious. Big clubs see a player who wants to win.'); if(P.loy>=15) cl.push('Your club trusts you. Better terms when you renew.'); if(!cl.length) cl.push('Nothing in your character is putting clubs off.');
+  const log=(m.psyLog||[]).map(x=>`<div class="ih-li"><span>${esc(x.when)}</span><b>${esc((PERS_K.find(p=>p[0]===x.k)||['',''])[1])} ${x.up?'▲':'▼'}</b><i>${esc(x.why)}</i></div>`).join('');
+  return `<div class="dash c1"><section class="w ps"><div class="wb"><span class="ps-k">Personality</span><b class="ps-lab">${esc(lab)}</b><p style="margin:0">${esc(desc)}</p><div class="ps-rows">${rows}</div><p class="note" style="margin:0">It changes with how you behave: training, press conferences, how you react on the touchline, the moves you push for.</p></div></section>
+    ${W('On the pitch',`<ul class="ps-ul">${(fx.length?fx:['Nothing extreme either way. A steady head.']).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`)}${W('How clubs see you',`<ul class="ps-ul">${cl.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`)}${log?W('What changed it',`<div class="ih-list">${log}</div>`):''}</div>`; };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
