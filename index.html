@@ -1218,6 +1218,32 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .tl-row .note{overflow-wrap:anywhere}
 .tl-row .btn{padding:4px 12px;font-size:12px}
 .dash>.seg.sqv{grid-column:1/-1}
+.ndot{position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 2px var(--panel,#111827);pointer-events:none}
+#nav button{position:relative}
+#subs button{position:relative}
+#subs .ndot{top:8px;right:2px}
+.moregrid .mg{position:relative}
+.lg2 .wb{display:flex;flex-direction:column;gap:10px}
+.lg2-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.lg2-h b{display:block;font-size:16px}
+.lg2-h span:not(.pill){display:block;font-size:12px;color:var(--mute)}
+.lg2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:700px){.lg2-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.lg2-grid>div{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.lg2-grid span{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.lg2-grid b{font-size:15px}
+.lg2-grid i{font-style:normal;font-size:11.5px;color:var(--mute)}
+.lg2-grid .ps-bar{display:block;margin-top:4px}
+.pt-list{display:flex;flex-direction:column}
+.pt-row{display:flex;flex-direction:column;gap:6px;padding:9px 0;border-bottom:1px solid var(--line)}
+.pt-row:last-child{border-bottom:0}
+.pt-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.pt-h b{display:block;font-size:13.5px}
+.pt-h span:not(.pill):not(.sqp){display:block;font-size:11.5px;color:var(--mute)}
+.pt-h .btn{padding:4px 10px;font-size:12px}
+.pt-b{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;font-size:11.5px;color:var(--mute)}
+.trs{margin-bottom:10px}
+.pp-role .chip{align-self:flex-start;margin:0}
 .dp-n{font-size:17px}
 .dp-path{display:flex;flex-wrap:wrap;gap:5px}
 .dp-st{font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--mute)}
@@ -2893,7 +2919,7 @@ function momentPick(ix,ev){ if(typeof dressMoment==='function') dressMoment(ev);
   const pushE=(x)=>{ sim.events.push(Object.assign({t,half:hm.half,min:hm.min,fromMoment:true},x)); sim.events.sort((a,b)=>a.t-b.t); };
   const ex=(o[3]==='x'||o[3]==='c')&&typeof momentExtra==='function'?momentExtra(o,ev,res,pushE):null;
   if(ex){ res=ex; }
-  else if(o[3]==='n'){ const taker=sim[side].xi.find(p=>p.slot==='ST'&&!p.me)||sim[side].xi[9]; if(Math.random()<.78){ pushE({type:'goal',side,who:taker.n,ast:null}); res.txt=`You hand the ball to ${taker.n}. He scores.`; } else { pushE({type:'save',side,who:taker.n}); res.txt=`You hand the ball to ${taker.n}. Saved! The fans wanted you to take it.`; } }
+  else if(o[3]==='n'){ const okT=p=>p&&!p.me&&p.n!==meName&&p.slot!=='GK'; const taker=(M.mate&&sim[side].xi.find(p=>okT(p)&&p.n===M.mate))||sim[side].xi.find(p=>okT(p)&&p.slot==='ST')||sim[side].xi.find(p=>okT(p)&&['LW','RW','CAM','AM','LM','RM'].includes(p.slot))||sim[side].xi.find(okT); if(Math.random()<.78){ pushE({type:'goal',side,who:taker.n,ast:null}); res.txt=`You hand the ball to ${taker.n}. He scores.`; } else { pushE({type:'save',side,who:taker.n}); res.txt=`You hand the ball to ${taker.n}. Saved! The fans wanted you to take it.`; } }
   else if(o[3]==='s'){ res.txt=pick(['You play it safe. Nothing lost, nothing gained.','Simple pass, keep the ball. Fine.','You recycle it. The manager claps.','No risks. Back to the centre-backs.']); }
   else if(o[3]==='f'){ res.txt='You take him down. Yellow card, but the danger is gone.'; c.yellow++; c.keyOk++; pushE({type:'card',side,who:meName,me:true}); }
   else { const pch=momentChance(o); const ok=Math.random()<pch; c.lastChoice=o[0]; if(o[3]==='g') c.xg=(c.xg||0)+pch*.8;
@@ -4573,7 +4599,7 @@ injure=function(where){ const m=S.me; if(m.injury) return; let t=pickInj(m.injPr
   if(days>13) (S.queue=S.queue||[]).push({kind:'rehab',days,type:t[0],tier:t[4]}); };
 function rehabPick(k){ const m=S.me, j=m.injury; if(!j) return; const c=myClubObj(); const kx=c?(COST_IDX[c.country]||1):1;
   if(k==='fast'){ j.days=Math.max(2,Math.round(j.days*.65)); m.reinjury=S.week+10; m.rel.manager=clamp(m.rel.manager+2,0,100); news('you','Fast-tracked rehab','You\'re pushing to come back early. The risk of breaking down again is higher for a while.'); }
-  else if(k==='spec'){ const cost=roundWage((j.tier>=3?9000:2500)*kx); m.bank-=cost; j.days=Math.max(2,Math.round(j.days*.85)); news('you','Specialist rehab',`You pay ${money(cost)} for a specialist programme. Quicker, and no extra risk.`); }
+  else if(k==='spec'){ const clubPays=m.club!=null; const cost=clubPays?0:roundWage((j.tier>=3?9000:2500)*kx); m.bank-=cost; j.days=Math.max(2,Math.round(j.days*.85)); news('you','Specialist rehab',clubPays?`The club's medical team bring in a specialist. ${c?c.name:'The club'} cover the cost. Quicker, and no extra risk.`:`You pay ${money(cost)} for a specialist programme. Quicker, and no extra risk.`); }
   else news('you','Full rehab','You\'ll come back when you\'re fully fit.',true); }
 function careerInjChoice(k){ const m=S.me; if(k==='retire'){ m.injury={type:'career-ending knee injury',days:9999,total:9999,tier:4}; S.queue=S.queue||[]; S.queue.unshift({kind:'retireForce',injury:true}); return; }
   m.injury={type:'knee reconstruction',days:ri(300,400),total:350,tier:4,fight:true}; news('you','The fight starts now','Surgery, then months of rehab. Nobody can promise you\'ll play again, but you\'re going to try.'); }
@@ -4655,7 +4681,7 @@ dressMoment=function(e){ if(!e||e.dressed||!S.mctx||!S.mctx.sim) return; try{ co
   else if(!e.chain){ const g=momentGroup(); const all=(MOM2[g]||[]).concat(MOM3[g]||[]).concat((MOMENTS[g]||[]).map(z=>({...z}))); const fresh=all.filter(z=>(!z.w||z.w(x))&&!used.includes(z.t)&&!m.moSeen.includes(z.t)); const pool=fresh.length?fresh:all.filter(z=>(!z.w||z.w(x))&&!used.includes(z.t)); if(pool.length) mo=pick(pool); }
   used.push(mo.t); if(!e.chain&&!e.sit){ m.moSeen.push(mo.t); if(m.moSeen.length>24) m.moSeen.shift(); }
   const mm=(MOM2.MID.includes(mo)||MOM3.MID.includes(mo)||mo===FOLLOW.carry)?'mine':null;
-  const dressed={t:fillT(mo.t,x,mm),o:mo.o.map(o=>{ const z=o.slice(); z[0]=fillT(o[0],x,mm); return z; }),sit:!!e.sit,id:mo.id};
+  const dressed={t:fillT(mo.t,x,mm),o:mo.o.map(o=>{ const z=o.slice(); z[0]=fillT(o[0],x,mm); return z; }),sit:!!e.sit,id:mo.id,mate:x.mate};
   if(!e.sit&&x.min>=82&&Math.abs(x.diff)<=1&&!/^\{?min/.test(mo.t)&&!/\d+'\./.test(dressed.t)) dressed.t=(x.diff<0?'Last chance to rescue this. ':x.diff===0?'Late on, it\'s level. ':'You\'re hanging on. ')+dressed.t;
   e.mo=dressed; e.dressed=true; e.ctx={us:x.us,them:x.them}; }catch(err){ e.dressed=true; } };
 // a bonus chance in some games, so the number of big moments isn't always the same
@@ -5381,11 +5407,11 @@ function celebDo(id,e){ const c=S.mctx, m=S.me; if(!c||!e||e.celeb) return null;
   else if(id==='bench'){ fx.push(...evApply({mates:1})); }
   else if(id==='dedicate'){ fx.push(...evApply({morale:1})); }
   if(!m.celeb) m.celeb='pile';
-  if(id===m.celeb){ m.celebRun=(m.celebRun||0)+1; m.celebFame=m.celebFame||{}; const n=m.celebRun, f=m.celebFame[id]||0; const nm=celebName(id);
+  if(id===m.celeb&&!c.youth&&!(c.intl&&c.ic&&c.ic.level!=='Senior')){ m.celebRun=(m.celebRun||0)+1; m.celebFame=m.celebFame||{}; const n=m.celebRun, f=m.celebFame[id]||0; const nm=celebName(id);
     if(n>=6&&f<1){ m.celebFame[id]=1; news('you',`The ${nm.toLowerCase()} is catching on`,`Fans are starting to copy your celebration in the stands.`,true); }
-    else if(n>=14&&f<2){ m.celebFame[id]=2; m.followers+=ri(2000,9000); news('good','Kids in the park',`${outlet()}: kids all over the country are doing ${m.last}'s ${nm.toLowerCase()} after every goal.`); }
-    else if(n>=24&&f<3){ m.celebFame[id]=3; const thief=S.players.filter(p=>p.o>=80&&p.c!==myClubId()).sort(()=>Math.random()-.5)[0]; if(thief) news('you',`${thief.n} steals your celebration`,`${thief.n} pulls out the ${nm.toLowerCase()} after scoring. Fans online say he copied it from you.`); }
-    else if(n>=35&&f<4){ m.celebFame[id]=4; m.followers+=ri(10000,40000); m.rep=clamp(m.rep+1,0,100); news('good','In the game',`Your ${nm.toLowerCase()} makes it into the new football video game as a signature celebration.`); } }
+    else if(n>=14&&f<2&&(m.rep||0)>=45){ m.celebFame[id]=2; m.followers+=ri(2000,9000); news('good','Kids in the park',`${outlet()}: kids all over the country are doing ${m.last}'s ${nm.toLowerCase()} after every goal.`); }
+    else if(n>=24&&f<3&&(m.rep||0)>=55){ m.celebFame[id]=3; const thief=S.players.filter(p=>p.o>=80&&p.c!==myClubId()).sort(()=>Math.random()-.5)[0]; if(thief) news('you',`${thief.n} steals your celebration`,`${thief.n} pulls out the ${nm.toLowerCase()} after scoring. Fans online say he copied it from you.`); }
+    else if(n>=35&&f<4&&(m.rep||0)>=68){ m.celebFame[id]=4; m.followers+=ri(10000,40000); m.rep=clamp(m.rep+1,0,100); news('good','In the game',`Your ${nm.toLowerCase()} makes it into the new football video game as a signature celebration.`); } }
   c.celebLog=(c.celebLog||[]).concat({min:dispMin(e,c.sim),id}); return {txt,fx}; }
 
 function bondForce(id){ if(S.pending||(S.queue&&S.queue.length)) return false; const e=EVENTS.find(x=>x.id===id); if(!e) return false; let inst=null; try{ inst=e.make(); }catch(_){} if(!inst) return false; S.evCur={id,inst}; S.queue=S.queue||[]; S.queue.push({kind:'event',id,title:inst.title,txt:inst.txt,opts:inst.o.map(o=>o[0])}); return true; }
@@ -7393,6 +7419,168 @@ Object.assign(PERSONAL,{position:{name:'Position work',pos:1,e:6},role:{name:'Ro
 // Relentless keeps going
 { const _fm48=finishMyMatch; finishMyMatch=function(){ const r=_fm48.apply(this,arguments); try{ const m=S.me; if(m&&S.mode!=='mgr'&&m.traits&&m.traits.includes('Relentless')&&S.lastMatch&&S.lastMatch.played) m.energy=clamp(m.energy+4,0,100); }catch(e){} return r; }; }
 
+// ===================== v48 (batch 1): a proper youth career, earned recognition, smaller fixes =====================
+// ---------- where you are: the youth set-up or the first team ----------
+function tierOf(){ const m=S.me; if(!m||S.mode==='mgr'||m.club==null||m.loan) return 'first'; if(m.tier) return m.tier;
+  const D=m.dplan&&m.dplan.k; const firstApps=(()=>{ try{ const b=m.bond&&m.bond[m.club]; return b?b.apps||0:0; }catch(e){ return 0; } })();
+  m.tier=((m.contract&&m.contract.youth)||(m.age<=19&&(D==='yy'||D==='fy')))&&firstApps<10?'youth':'first';
+  if(m.tier==='youth'){ m.partners=[]; if(m.ftOp==null) m.ftOp=Math.round(clamp(40+(m.rel.manager-50)*.4,20,70)); if(!firstApps) m.rel.fans=Math.min(m.rel.fans,38); }
+  return m.tier; }
+function isYouthTier(){ const m=S.me; return !!m&&S.mode!=='mgr'&&!m.loan&&m.club!=null&&!!S.youth&&tierOf()==='youth'; }
+function coachName(){ return S.youth&&S.youth.coach?S.youth.coach:'The youth coach'; }
+function youthTeamName(){ const c=myClubObj(); if(!c||!S.youth) return 'the youth team'; const b=S.youth.label==='U21'&&['ESP','GER','FRA'].includes(c.country); return b?`${c.name} B`:`${c.name} ${S.youth.label}s`; }
+function youthStats(){ const m=S.me; const k=S.youth?'U:'+S.youth.label:null; return k&&m.ss&&m.ss[k]?m.ss[k]:null; }
+function youthForm(){ const st=youthStats(); const r=st&&st.rat?st.rat.slice(-6):[]; return r.length?avg(r):6.7; }
+function youthPos(){ try{ return youthSorted().indexOf(S.youth.cid)+1; }catch(e){ return null; } }
+// fame: how much the wider world knows about you (0 unknown .. 3 star)
+function fameLvl(){ const m=S.me; const b=m.bond&&m.club!=null?m.bond[m.club]:null; const fa=(b&&b.apps)||0; const r=m.rep||0;
+  if(r>=70) return 3; if(r>=55||fa>=40) return 2; if(r>=40||fa>=8||(isYouthTier()&&youthForm()>=7.6&&(youthStats()||{}).apps>=8)) return 1; return 0; }
+{ const _mn49=mgrName; mgrName=function(){ return isYouthTier()?coachName():_mn49.apply(this,arguments); }; }
+
+// ---------- selection: youth players play for the youth team unless the first team calls ----------
+function ftCallChance(fx){ const m=S.me, c=myClubObj(); if(!c||m.age<16) return 0; const lv=clubLevel(c); if(ovr()<lv-12) return 0;
+  const grp=SEL_GROUP[m.pos]||[m.pos], slots=SEL_SLOTS[m.pos]||1; const fit=c.squad.map(P).filter(p=>p&&grp.includes(p.p)&&!pInj(p)&&p.o>=lv-7).length;
+  let ch=0; if(fit<slots+1) ch+=.42; if(fit<slots) ch+=.25; if(fx.comp==='C'&&(fx.round==null||fx.round<2)) ch+=.22; if(fx.comp==='L'&&S.week>WEEKS-2) ch+=.06;
+  if(m.dplan&&m.dplan.k==='fy') ch+=.06; if(youthForm()>=7.3) ch+=.06; return clamp(ch*clamp(((m.ftOp||45)-30)/40,.15,1.35),0,.8); }
+{ const _sel49=selection; selection=function(fx){ if(!fx||fx.comp==='Y'||!isYouthTier()) return _sel49.apply(this,arguments); const m=S.me; if(m.injury) return {status:'injured'}; if(m.callUp) return _sel49.apply(this,arguments);
+    if(Math.random()<ftCallChance(fx)){ const c=myClubObj(); const lv=clubLevel(c); const grp=SEL_GROUP[m.pos]||[m.pos]; const fit=c.squad.map(P).filter(p=>p&&grp.includes(p.p)&&!pInj(p)&&p.o>=lv-7).length;
+      m.ftCalls=(m.ftCalls||0)+1; const s=fit<(SEL_SLOTS[m.pos]||1)&&Math.random()<.4?{status:'start',ftCall:1}:Math.random()<.6?{status:'bench',on:ri(62,85),ftCall:1}:{status:'unused',ftCall:1};
+      news('good',m.ftCalls===1?'Called into the first-team squad':pick(['In the first-team squad again','First-team call','You travel with the first team']),`${c.mgr} names you in the squad${s.status==='start'?' and you start':''}. ${m.ftCalls===1?'Your first taste of senior football.':'Make it count.'}`); return s; }
+    const hasY=(S.days||[]).some(d=>d&&d.type==='match'&&d.fx&&d.fx.comp==='Y'); return {status:hasY?'out':'youth'}; }; }
+// youth matches move to Sunday when the first team play on Saturday
+{ const _yh49=youthPlanHook; youthPlanHook=function(days){ if(!isYouthTier()) return _yh49.apply(this,arguments); if(!S.youth||!S.me||S.me.age>21) return; if(INTL_WEEKS.includes(S.week)&&S.me.intlCall) return; const yf=youthFixture(); if(!yf) return;
+    if(days[5]&&days[5].type==='match'){ if(days[6]&&days[6].type!=='match') days[6]={type:'match',fx:{comp:'Y'}}; return; } days[4]={type:'prep'}; days[5]={type:'match',fx:{comp:'Y'}}; }; }
+// a first-team game you're not involved in is simulated quietly
+{ const _mm49=myMatch; myMatch=function(fx){ const r=_mm49.apply(this,arguments); try{ const c=S.mctx; if(isYouthTier()&&c&&c.fx===fx&&!c.youth&&fx.comp!=='Y'&&['out','reserves','injured'].includes(c.sel.status)&&S.pending&&['teamsheet','prematch'].includes(S.pending.kind)){ S.pending=null; finishMyMatch(); if(S.pending&&S.pending.kind==='result') S.pending=null; if(S.lastMatch) S.lastMatch.quiet=1; } }catch(e){ console.warn('mm49',e); } return r; }; }
+
+// ---------- after every match ----------
+{ const _fm49=finishMyMatch; finishMyMatch=function(){ const m=S.me, c=S.mctx; const f0=m?m.rel.fans:0, fol0=m?m.followers:0; const r=_fm49.apply(this,arguments); try{ if(c) c.fin=1; const L=S.lastMatch; if(!m||!L||!c||S.mode==='mgr') return r;
+    // the youth coach and the first-team manager both notice
+    if(L.youth&&L.played){ m.ftOp=clamp((m.ftOp||45)+(L.rating-6.8)*1.1+(L.g||0)*.5+(L.a||0)*.3,0,100); m.rel.fans=clamp(f0+(m.rel.fans-f0)*.15,0,100); m.followers=fol0+Math.round((m.followers-fol0)*.2); }
+    if(!L.youth&&!L.intl&&L.played&&isYouthTier()) m.ftOp=clamp((m.ftOp||45)+(L.rating-6.6)*2.2+(L.g||0)*1.5,0,100);
+    // academy legacy
+    if(L.youth&&L.played&&m.club!=null&&!m.loan){ const b=bondOf(m.club,true); b.yapps=(b.yapps||0)+1; b.yg=(b.yg||0)+(L.g||0); b.ya=(b.ya||0)+(L.a||0); b.yseas=b.yseas||[]; if(!b.yseas.includes(S.season)) b.yseas.push(S.season); }
+    // games played together (for partnerships)
+    if(!L.youth&&!L.intl&&L.played&&c.sim&&c.sim.meSide){ m.gt=m.gt||{}; (c.sim[c.sim.meSide].xi||[]).forEach(p=>{ if(p&&!p.me&&p.id!=null) m.gt[p.id]=(m.gt[p.id]||0)+1; }); }
+    // tactical familiarity grows on the pitch
+    if(L.played&&!L.intl&&(L.mins||0)>=30) m.rel.tactical=clamp(m.rel.tactical+1.2,0,100);
+    // the role you actually played
+    if(L.played&&!L.intl&&(L.mins||0)>=30&&typeof myRole==='function'){ const k=myRole(); if(k){ const u0=roleUInit(k); m.roleU[k]=Math.min(100,u0+(u0>=75?.9:1.8)*(L.mins/90)); } }
+    if(S.heldBadges&&S.heldBadges.length){ S.queue=S.queue||[]; S.heldBadges.forEach(b=>S.queue.push(b)); S.heldBadges=[]; }
+  }catch(e){ console.warn('fm49',e); } return r; }; }
+// badge pop-ups wait until the final whistle
+{ const _rn49=resolveNext; resolveNext=function(){ try{ const c=S.mctx; if(c&&!c.fin&&c.sim&&S.queue&&S.queue.some(q=>q&&q.kind==='badge')){ S.heldBadges=(S.heldBadges||[]).concat(S.queue.filter(q=>q&&q.kind==='badge')); S.queue=S.queue.filter(q=>!q||q.kind!=='badge'); } }catch(e){} return _rn49.apply(this,arguments); }; }
+{ const _bc49=badgeCheck; badgeCheck=function(){ const m=S.me; const f0=m?m.followers:0; const r=_bc49.apply(this,arguments); try{ if(m&&isYouthTier()) m.followers=f0+Math.round((m.followers-f0)*.1); }catch(e){} return r; }; }
+
+// ---------- reaction: if you weren't involved, it isn't about you ----------
+const TEAM_FAN={W:['Massive three points 💪','Job done. On to the next one','That\'s more like it','Clean sheet, three points, happy days','The lads were brilliant today','Professional. Exactly what we needed'],D:['Should have won that','A point. Fine, not great','Frustrating. We had chances','Not good enough at home','Two points dropped if you ask me'],L:['Embarrassing. Changes needed.','Nowhere near good enough','The manager has questions to answer','Heads gone in the second half','Sort it out. That was awful']};
+{ const _gr49=genReaction; genReaction=function(){ const r=S.lastMatch, c=S.mctx, m=S.me; try{ if(!r||!c||c.youth||c.intl||r.played) return _gr49.apply(this,arguments);
+    const myClub=myClubObj(); if(!myClub) return _gr49.apply(this,arguments); const cc=myClub.country||'ENG'; const opp=c.oppCid!=null?club(c.oppCid):null; const oppName=opp?opp.name:'them'; const tier=myClub.rep>=80?4:myClub.rep>=60?3:myClub.rep>=40?2:1;
+    const res=r.res, score=`${r.us}-${r.them}`, posts=[], arts=[]; const base=[2,6,20,60,200][tier]; const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(n>=1e4?0:1)+'K':String(n);
+    const say=(h,txt,k,ver,kind)=>posts.push({h,txt,l:fmt(Math.max(1,Math.round(base*k*rnd(.5,1.6)))),ver:!!ver,kind:kind||'fan'});
+    const sim=c.sim; const us=sim?sim.meSide||(c.det&&c.det.home?'h':'a'):'h'; const goals=sim?sim.events.filter(e=>e.type==='goal'):[]; const ours=goals.filter(e=>e.side===(c.det&&c.det.home?'h':'a')); const theirs=goals.filter(e=>e.side!==(c.det&&c.det.home?'h':'a'));
+    const top=(L)=>{ const n={}; L.forEach(e=>n[e.who]=(n[e.who]||0)+1); const x=Object.entries(n).sort((a,b)=>b[1]-a[1])[0]; return x?{n:x[0],g:x[1]}:null; }; const hero=top(ours), them=top(theirs);
+    const outs=COUNTRIES[cc].outlets; const vb=res==='W'?'beat':res==='D'?'draw with':'lose to';
+    arts.push({src:pick(outs),h:hero&&hero.g>=2?`${hero.n} at the double as ${myClub.name} ${vb} ${oppName}`:hero&&res==='W'?`${hero.n} the difference as ${myClub.name} ${vb} ${oppName}`:`${myClub.name} ${score} ${oppName}`,b:hero?`${hero.n} ${hero.g>1?'scored twice':'got on the scoresheet'}.${them?` ${them.n} scored for ${oppName}.`:''}`:res==='L'&&them?`${them.n} did the damage for ${oppName}.`:'Reaction and ratings from the game.'});
+    if(tier>=3) arts.push({src:pick(outs.filter(o=>o!==arts[0].src))||outs[0],h:res==='L'?`Questions for ${myClub.mgr} after ${score} defeat`:`What we learned from ${myClub.name} vs ${oppName}`,b:'Analysis and reaction from the stadium.'});
+    const n=[2,3,4,5,6][tier]; const pool=TEAM_FAN[res].slice(); if(hero) pool.push(`${hero.n.split(' ').slice(-1)[0]} ${hero.g>1?'twice! ':''}What a player`,`MOTM ${hero.n.split(' ').slice(-1)[0]}, easy`); if(res==='L'&&them) pool.push(`Nobody could live with ${them.n} today`);
+    for(let i=0;i<n&&pool.length;i++){ const t=pool.splice(Math.floor(Math.random()*pool.length),1)[0]; say(handleFor(myClub),t,1); }
+    const fl=fameLvl(); const inSquad=r.sel==='unused'||r.sel==='bench';
+    if(fl>=1&&inSquad&&Math.random()<(res==='L'?.5:.25)) say(handleFor(myClub),pick([`Why not give ${m.last} a few minutes?`,`${m.last} on the bench all game. Give the kid a go`]),1);
+    else if(fl>=1&&!inSquad&&res==='L'&&Math.random()<(fl>=2?.35:.15)) say(handleFor(myClub),pick([`When are we seeing ${m.last}? Could've made a difference today`,`Bring the young lad ${m.last} in. Can't be worse than that`]),1);
+    if(opp) say(handleFor(opp),res==='W'?pick(['Fair play, better team won','Not our day']):res==='L'?pick(['Get in! Big win','What a result 🔥']):'A point away from home. We\'ll take it',1);
+    return {tier,big:false,posts,arts,trend:false}; }catch(e){ console.warn('gr49',e); } return _gr49.apply(this,arguments); }; }
+
+// ---------- press: earned, not given ----------
+{ const _mp49=maybePress; maybePress=function(kind,fx){ try{ const m=S.me; if(isYouthTier()) return; if(m.age<18&&m.captain!=='C'){ const b=m.bond&&m.bond[m.club]; const fa=b?b.apps||0:0; if(fa<10||formAvg(4)<7.2||Math.random()<.6) return; } }catch(e){} return _mp49.apply(this,arguments); }; }
+
+// ---------- talking to your manager ----------
+{ const _tk49=talk; talk=function(topic){ const m=S.me, c=myClubObj(); if(!c) return _tk49.apply(this,arguments);
+    if(isYouthTier()){ if((m.talkCd[topic]||0)>S.season*100+S.week) return {ok:false,txt:'You raised this recently. Give it a few weeks.'}; const co=coachName(); const yf=youthForm(); const st=youthStats()||{apps:0}; let txt='', d=0;
+      if(topic==='minutes'){ m.talkCd[topic]=S.season*100+S.week+3; if(st.apps>=4&&yf>=6.9){ txt=`${co}: "You're in my team. Keep it up and you'll stay there."`; d=1; } else if(ovr()>=youthLevel(c.id)){ txt=`${co}: "You'll play. Train well this week and you start Saturday."`; d=1; } else { txt=`${co}: "Earn it in training. Nobody here gets picked on reputation."`; d=-2; } }
+      else if(topic==='ftchance'){ m.talkCd[topic]=S.season*100+S.week+5; if(yf>=7.2&&m.rel.manager>=60){ m.ftOp=clamp((m.ftOp||45)+4,0,100); txt=`${co}: "I'll speak to the first-team staff. Keep doing this and they'll come for you."`; d=1; } else if(yf>=6.9){ txt=`${co}: "You're close. A few more games like the last few and I'll push your name."`; } else { txt=`${co}: "First team? Concentrate on being my best player first."`; d=-2; } }
+      else if(topic==='loan'){ m.talkCd[topic]=S.season*100+S.week+6; if(m.age>=18){ m.loanReq=true; txt=`${co}: "Senior football would do you good. I'll pass it on."`; } else { txt=`${co}: "At ${m.age}? Stay, learn, and play for me."`; d=-1; } }
+      else { const keep=c.mgr; c.mgr=co; try{ return _tk49.apply(this,arguments); } finally{ c.mgr=keep; } }
+      m.rel.manager=clamp(m.rel.manager+d,0,100); return {ok:true,txt,d}; }
+    if(topic==='minutes'){ const lv=clubLevel(c), o=ovr(), fm=formAvg(4); const status=['Team leader','Highly influential'].includes(m.status); const b=m.bond&&m.bond[m.club]; const fa=b?b.apps||0:0;
+      if(!status&&((m.age<18&&c.rep>=78&&fa<10)||o<lv-5||(fm<6.9&&o<lv))){ if((m.talkCd.minutes||0)>S.season*100+S.week) return {ok:false,txt:'You raised this recently. Give it a few weeks.'}; m.talkCd.minutes=S.season*100+S.week+4;
+        const harsh=m.age<18&&c.rep>=78; const txt=`${c.mgr}: "${harsh?pick(['You\'re '+m.age+'. Your time will come, but not because you knocked on my door.','Patience. Train like you did this week and we\'ll see.']):o<lv-5?pick(['You\'re not at the level yet. Show me in training.','There are better players ahead of you right now. That\'s football.']):pick(['Your form doesn\'t justify it. Change that and we\'ll talk.','Play better when you get your chance. Then ask me.'])}"`;
+        const d=harsh?0:-1; m.rel.manager=clamp(m.rel.manager+d,0,100); return {ok:true,txt,d}; } }
+    return _tk49.apply(this,arguments); }; }
+Object.assign(TALKS,{ftchance:'Ask about a first-team chance'});
+
+// ---------- promotion: the manager tells you ----------
+{ const _ps49=planSet; planSet=function(k,why,quiet){ const m=S.me; if(m&&m.tier==='youth'&&!m.loan&&(k==='fl'||k==='fr')&&why!=='promo'){ if(!m.promoPend){ m.promoPend={k,s:S.season}; sceneQueue('promote',{k}); } return; } return _ps49.apply(this,arguments); }; }
+function promoNums(){ const m=S.me, c=myClubObj(); if(!c) return []; const N=clubNums(c); const out=[]; const add=n=>{ if(n>=1&&n<=99&&!N[n]&&!out.includes(n)&&!(n===1&&m.pos!=='GK')) out.push(n); };
+  if(m.prefNum) add(m.prefNum); if(m.ynum) add(m.ynum); (NUM_PREF[m.pos]||[]).forEach(add); [27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49].sort(()=>Math.random()-.5).forEach(n=>{ if(out.length<4) add(n); }); return out.slice(0,4); }
+function promoteNow(k,num){ const m=S.me, c=myClubObj(); m.tier='first'; m.promoPend=null; m.promoted={s:S.season,w:S.week,club:c.id}; m.rel.manager=Math.round(clamp(m.ftOp||50,35,80)); m.status='Newcomer';
+  if(num){ m.num=num; m.numClub=c.id; m.numCd=0; } planSet(k||'fl','promo',true); m.ftTrain=Math.max(m.ftTrain||0,2); const b=bondOf(c.id,true); b.promo=S.season;
+  news('good','Promoted to the first team',`${c.mgr} has moved you up to the first-team squad${num?`, wearing number ${num}`:''}. Senior training every day from now on.`); }
+SCENES.promote=d=>{ const m=S.me, c=myClubObj(); if(!c) return null; const mg=c.mgr; const nums=d.nums=d.nums||promoNums(); const yt=youthTeamName();
+  return {title:'The manager wants a word',label:`${c.name} · first team`,who:mg,intro:pick([`You're called up to the first-team building after training. ${mg} is waiting.`,`The youth coach tells you to go and see ${mg}. Now.`]),start:'a',nodes:{
+   a:{say:pick([`I've watched you with ${yt} and in training with us. You're ready. From Monday you're part of my squad.`,`The reports on you are good, and I've seen enough myself. You're coming up to the first team.`]),opts:[
+     {t:'I won\'t let you down',fx:()=>({narr:`"I know. Now the hard part starts." He slides a squad list across the desk.`,go:'n'})},
+     {t:'What do you expect from me?',fx:()=>({narr:`"Train like it's your last day, every day. Minutes come from that, not from me being nice."`,go:'n'})}]},
+   n:{say:`The kit man needs a number for you. ${nums.length?`${nums.join(', ')} are free.`:''}`,opts:nums.map(n=>({t:`Number ${n}${n===m.prefNum?' (your number)':''}`,fx:()=>{ promoteNow(d.k,n); return {narr:pick([`Number ${n}. It's on the dressing-room board by the afternoon.`,`You'll wear ${n}. Your phone doesn't stop buzzing.`]),fx:[['First team','Promoted'],['Shirt',`#${n}`]]}; }})).concat([{t:'Whatever number you give me',fx:()=>{ promoteNow(d.k,null); const n=myNum(); return {narr:`You get number ${n}. Numbers come later. Minutes come first.`,fx:[['First team','Promoted'],['Shirt',`#${n}`]]}; }}])}}}; };
+function promoWeek(){ const m=S.me; if(isYouthTier()) m.rel.fans=Math.min(m.rel.fans,40+fameLvl()*4); if(!isYouthTier()||m.promoPend||m.age<16||S.week<3||S.week>WEEKS-1) return; const c=myClubObj(); const lv=clubLevel(c); const o=ovr(); const yf=youthForm(); const st=youthStats()||{apps:0};
+  // the first-team manager keeps an eye on youth players training with his squad
+  if(m.dplan&&m.dplan.k==='fy') m.ftOp=clamp((m.ftOp||45)+(m.rel.manager-55)/45+(o-(lv-8))*.06,0,100);
+  if(m.ftOp<60) return; let p=0; if(o>=lv-2) p=.2; else if(o>=lv-5&&(yf>=7.1&&st.apps>=5||(m.ftCalls||0)>=3)) p=.1; else if(o>=lv-7&&yf>=7.5&&st.apps>=8) p=.05;
+  if(Math.random()<p){ m.promoPend={k:o>=lv-1?'fr':'fl',s:S.season}; sceneQueue('promote',{k:m.promoPend.k}); } }
+{ const _pw49=planWeek; planWeek=function(){ const r=_pw49.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me&&S.me.first){ tierOf(); promoWeek(); } }catch(e){ console.warn('promo49',e); } return r; }; }
+// joining a club: academy signings start in the youth set-up, and the fans don't know you yet
+{ const _jc49=joinClub; joinClub=function(cid){ const m=S.me; if(m){ m.tier=null; m.promoPend=null; m.ftCalls=0; } const r=_jc49.apply(this,arguments); try{ if(m&&S.mode!=='mgr'){ const t=tierOf(); if(t==='youth'){ m.ftOp=Math.round(clamp(40+(ovr()-clubLevel(club(cid)))*1.5+(ppotFor(cid)-75)*.6,15,65)); m.rel.manager=55; m.rel.fans=Math.min(m.rel.fans,clamp(30+(m.rep||0)*.3,25,45)); } } }catch(e){ console.warn('jc49',e); } return r; }; }
+
+// ---------- end of the season: youth review, awards, ageing out ----------
+{ const _se49=seasonEnd; seasonEnd=function(){ const m=S.me; let yt=null; try{ if(m&&isYouthTier()){ const st=youthStats(); yt={st:st?JSON.parse(JSON.stringify(st)):null,label:S.youth.label,name:S.youth.name,team:youthTeamName(),pos:youthPos(),champ:(()=>{ try{ return youthSorted()[0]; }catch(e){ return null; } })()}; } }catch(e){}
+  const r=_se49.apply(this,arguments);
+  try{ if(yt&&S.pending&&S.pending.kind==='season'){ const s=S.pending.sum; const st=yt.st; s.yt=yt; s.st=st; s.ar=st&&st.rat&&st.rat.length?avg(st.rat):0; s.pos=yt.pos;
+      if(st&&st.apps>=10){ const ar=avg(st.rat); const aw=[]; if(ar>=7.5) aw.push(`${yt.name} Player of the Season`); if(st.g>=(m.pos==='ST'?16:12)) aw.push(`${yt.name} top scorer`); if(yt.champ===m.club) { m.trophies.push({s:S.season-1,y:S.year-1,name:yt.name,club:m.club,youth:1}); aw.push(`${yt.name} champions`); }
+        aw.forEach(a=>{ if(!/champions/.test(a)) m.awards.push({s:S.season-1,y:S.year-1,name:a,youth:1}); }); s.awards=(s.awards||[]).concat(aw); }
+      ageOut(); } }catch(e){ console.warn('se49',e); } return r; }; }
+function ageOut(){ const m=S.me; if(m.tier!=='youth'||m.loan||m.club==null) return; const c=myClubObj(); if(!c) return; const lv=clubLevel(c); const o=ovr();
+  if(m.age===19) news('you','Decision year',`${coachName()}: "This is a big season for you. By the end of it the club will decide: first team, a loan, or moving on."`);
+  if(m.age<20) return;
+  if(o>=lv-7&&(m.ftOp||45)>=52){ m.promoPend={k:'fl',s:S.season}; sceneQueue('promote',{k:'fl'}); return; }
+  if(o>=lv-16){ m.tier='first'; planSet('loan','club'); news('you','Out on loan',`You're too old for the youth set-up now. ${c.name} want you playing senior football on loan this season.`); return; }
+  const old=m.club; m.history.push({from:old,s:S.season}); m.club=null; m.tier=null; m.contract={...m.contract,wage:0,role:'Free agent',years:0,youth:false}; m.youth=false;
+  news('bad',`Released by ${c.name}`,`You've outgrown the youth set-up and the club don't see a first-team future for you. It hurts. Time to find a club that will play you.`); genOffers(3); }
+
+// ---------- shirt numbers: youth numbers, and a number you'd like ----------
+{ const _mnum49=myNum; myNum=function(){ const m=S.me; if(isYouthTier()){ if(!m.ynum||m.ynumClub!==m.club){ const pr=(m.prefNum&&m.prefNum<=40?[m.prefNum]:[]).concat(NUM_PREF[m.pos]||[]).concat([14,16,18,20]); m.ynum=pr[0]; m.ynumClub=m.club; } return m.ynum; }
+    if(m.prefNum&&m.club!=null&&!(m.num&&m.numClub===m.club)){ const c=myClubObj(); const N=clubNums(c); if(!N[m.prefNum]&&!(m.prefNum===1&&m.pos!=='GK')){ m.num=m.prefNum; m.numClub=c.id; return m.prefNum; } } return _mnum49.apply(this,arguments); }; }
+
+// ---------- partnerships need games together and positions that fit ----------
+const PART_FIT={ST:['ST','LW','RW','CAM'],LW:['ST','CAM','LB','CM','RW'],RW:['ST','CAM','RB','CM','LW'],CAM:['ST','LW','RW','CM'],CM:['CM','CDM','CAM','LW','RW'],CDM:['CM','CB','CDM'],CB:['CB','CDM','LB','RB','GK'],LB:['CB','LW','CM'],RB:['CB','RW','CM'],GK:['CB']};
+function partFits(p){ return (PART_FIT[S.me.pos]||[]).includes(p.p); }
+function gamesWith(pid){ return (S.me.gt&&S.me.gt[pid])||0; }
+{ const _cp49=checkPartnership; checkPartnership=function(pid){ const m=S.me, p=P(pid); if(!p||isYouthTier()) return; if(gamesWith(pid)<10||!partFits(p)||(m.mates[pid]||0)<65) return; return _cp49.apply(this,arguments); }; }
+{ const _ma49=mateActions; mateActions=function(pid){ const a=_ma49.apply(this,arguments); try{ const m=S.me, p=P(pid); const inj=pInj(pid), me=!!m.injury; return a.map(x=>{ if(x[0]==='pitch'&&(inj||me)){ const y=x.slice(); y[4]=false; y[5]=me?'You\'re injured.':`${p.n.split(' ')[0]} is injured.`; return y; } return x; }); }catch(e){ return a; } }; }
+function partWork(pid){ const m=S.me, p=P(pid); if(!p) return {ok:false,txt:'Not found.'}; if(m.injury) return {ok:false,txt:'You\'re injured.'}; if(pInj(pid)) return {ok:false,txt:`${p.n.split(' ')[0]} is injured.`};
+  if(!partFits(p)) return {ok:false,txt:'Your positions don\'t link up on the pitch.'}; if(typeof bondLeft==='function'&&bondLeft()<=0) return {ok:false,txt:'You\'ve already made time for three teammates this week.'};
+  m.pcd=m.pcd||{}; if((m.pcd[pid]||0)>absWk()) return {ok:false,txt:'You worked together this week already.'}; m.pcd[pid]=absWk()+1; if(m.bond&&typeof m.bond.n==='number') m.bond.n++;
+  m.pprog=m.pprog||{}; const g=gamesWith(pid); m.pprog[pid]=clamp((m.pprog[pid]||0)+rnd(8,14)*(g>=10?1.3:.7),0,100); m.mates[pid]=clamp((m.mates[pid]==null?45:m.mates[pid])+rnd(2,4),0,100); m.energy=clamp(m.energy-4,0,100);
+  let txt=pick([`Runs, combinations, the timing of the pass. ${p.n.split(' ')[0]} is getting to know your game.`,`An hour after training on patterns. Small details.`,`You work on the one-two around the box until it's automatic.`]);
+  if(m.pprog[pid]>=100&&g>=10&&(m.mates[pid]||0)>=65&&!(m.partners||[]).includes(pid)){ checkPartnership(pid); txt+=` Something clicks: you and ${p.n.split(' ')[0]} have a proper partnership now.`; }
+  else if(m.pprog[pid]>=100&&g<10) txt+=` You need more games together (${g}/10) before it shows on a matchday.`; return {ok:true,txt}; }
+
+// ---------- roles: you choose one to train; matches teach you most ----------
+roleUInit=function(k){ const m=S.me; m.roleU=m.roleU||{}; if(m.roleU[k]!=null) return m.roleU[k]; const rs=rolesFor(m.pos); const best=rs.slice().sort((a,b)=>roleSuit(b)-roleSuit(a))[0]; const gap=roleSuit(k)-ovr();
+  m.roleU[k]=Math.round(k===best?clamp(42+gap,35,55):clamp(10+gap*1.2,4,28)); return m.roleU[k]; };
+roleGain=function(amt){ const m=S.me; const k=m.rtrain&&rolesFor(m.pos).includes(m.rtrain)?m.rtrain:null; if(!k) return; const u0=roleUInit(k); const suit=clamp(1+(roleSuit(k)-ovr())/15,.6,1.25);
+  const u=Math.min(100,u0+amt*1.1*suit*trainAgeF()*trainProF()*(u0>=75?.5:u0>=50?.8:1)*rnd(.8,1.2)); m.roleU[k]=Math.round(u*10)/10; const a=roleULbl(u0)[0], b=roleULbl(u)[0];
+  if(a!==b) news('good',`${MROLES[k].n}: ${b.toLowerCase()}`,`Your understanding of the ${MROLES[k].n.toLowerCase()} role is growing. Playing it in matches helps most.`,true);
+  const ks=MROLES[k].a; if(m.attrs[ks[0]]!=null&&typeof addTXP==='function') addTXP(pick(ks),1.2*amt*(typeof growthMult==='function'?growthMult():1)); };
+// the role you play in matches: the manager's call if he has one, otherwise your preference
+myRole=function(){ const m=S.me; const rs=rolesFor(m.pos); const want=mgrWantsRole(); if(want) return want; if(m.prole&&rs.includes(m.prole)) return m.prole; return rs.slice().sort((a,b)=>roleSuit(b)-roleSuit(a))[0]||null; };
+
+// ---------- save size: keep long careers light ----------
+function trimSave(){ try{ const m=S.me; if(m){ if(m.social&&m.social.length>40) m.social.length=40; if(m.tx&&m.tx.length>300) m.tx=m.tx.slice(-300); if(m.results&&m.results.length>120) m.results=m.results.slice(-120); if(m.evLog&&m.evLog.length>150) m.evLog=m.evLog.slice(-150); }
+  (S.archive||[]).slice(0,-2).forEach(A=>{ for(const l in A.leagues){ const x=A.leagues[l]; if(x.top&&x.top.g&&x.top.g.length>5){ x.top.g=x.top.g.slice(0,5); if(x.top.a) x.top.a=x.top.a.slice(0,5); } } }); }catch(e){} }
+{ const _se49b=seasonEnd; seasonEnd=function(){ const r=_se49b.apply(this,arguments); trimSave(); return r; }; }
+
+{ const _cu49=callUpResult; callUpResult=function(rating,g){ const m=S.me; const yt=isYouthTier(); const r=_cu49.apply(this,arguments); try{ if(yt){ m.ftOp=clamp((m.ftOp||45)+(rating>=7.2||g?9:2),0,100); if((rating>=7.2||g)&&!m.promoPend&&m.age>=16){ m.promoPend={k:'fl',s:S.season}; sceneQueue('promote',{k:'fl'}); } } }catch(e){} return r; }; }
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
@@ -8762,7 +8950,7 @@ VIEWS['schedule:1']=()=>{ const {out,res}=myFixtureList(); if(!out) return '<p c
 ACT.rehab2=k=>{ rehabPick(k); S.pending=null; resolveNext(); closeModal(); render(); };
 ACT.careerInj=k=>{ careerInjChoice(k); S.pending=null; resolveNext(); closeModal(); render(); };
 { const _sp15=showPending; showPending=function(){ const p=S.pending; const c=myClubObj(); const kx=c?(COST_IDX[c.country]||1):1;
-  if(p&&p.kind==='rehab'){ const big=(p.tier||2)>=3; modal(`<div class="label">Medical</div><h2 class="disp">${esc(p.type)}</h2><p style="margin:0;line-height:1.55">The physio says around ${Math.round(p.days/7)} weeks out. How do you want to handle it?</p><div class="answers"><button class="ans" data-act="rehab2" data-arg="full"><em>Full rehab</em><span>Come back when you're fully fit. No extra risk.</span></button><button class="ans" data-act="rehab2" data-arg="fast"><em>Fast-track</em><span>Back about a third sooner. The manager likes it, but you're more likely to break down again.</span></button><button class="ans" data-act="rehab2" data-arg="spec"><em>Pay for a specialist</em><span>${money(roundWage((big?9000:2500)*kx))}. Back a bit sooner, no extra risk.</span></button></div>`); return; }
+  if(p&&p.kind==='rehab'){ const big=(p.tier||2)>=3; modal(`<div class="label">Medical</div><h2 class="disp">${esc(p.type)}</h2><p style="margin:0;line-height:1.55">The physio says around ${Math.round(p.days/7)} weeks out. How do you want to handle it?</p><div class="answers"><button class="ans" data-act="rehab2" data-arg="full"><em>Full rehab</em><span>Come back when you're fully fit. No extra risk.</span></button><button class="ans" data-act="rehab2" data-arg="fast"><em>Fast-track</em><span>Back about a third sooner. The manager likes it, but you're more likely to break down again.</span></button><button class="ans" data-act="rehab2" data-arg="spec"><em>${S.me.club!=null?'Ask for a specialist':'Pay for a specialist'}</em><span>${S.me.club!=null?'The club pays. Back a bit sooner, no extra risk.':money(roundWage((big?9000:2500)*kx))+'. Back a bit sooner, no extra risk.'}</span></button></div>`); return; }
   if(p&&p.kind==='careerInj'){ modal(`<div class="label">Medical</div><h2 class="disp">The specialists' verdict</h2><p style="margin:0;line-height:1.55">Multiple ligaments, cartilage damage. The surgeon is honest with you: there's a real chance you never play at this level again. Even if you make it back, you won't be the same player.</p><div class="answers"><button class="ans" data-act="careerInj" data-arg="fight"><em>Fight to come back</em><span>Surgery and a year of rehab. Maybe a one-in-three chance it works.</span></button><button class="ans" data-act="careerInj" data-arg="retire"><em>Retire</em><span>Walk away now, on your terms.</span></button></div>`); return; }
   return _sp15.apply(this,arguments); }; }
 { const _sr15=sqRow; sqRow=function(p,extra){ const pp=p&&p.id!=null&&!p.me?P(p.id):null; if(pp&&pInj(pp)) extra=(extra?extra+' · ':'')+`<em class="injt">${pp.inj.d>=9999?'Out for good':'Injured · '+injWeeks(pp.inj.d)}</em>`; return _sr15(p,extra); }; }
@@ -9523,7 +9711,7 @@ function openClubInfo(cid){ const c=club(cid); if(!c) return; CI.cid=cid; const 
   if(CI.tab==='over'){ const plan=me&&me.age<=21?planFor(cid):null; const pp=me?ppotFor(cid):null; const wk=wageFor(cid,lv,'First team'); const hon=ciHonours(c); const lt=hon.find(h=>h.code==='L'); const e=mgOf(c); const sec=e&&!e.user?mgSecLabel(e.pr||0):null;
     const myP=me?ciMyPos(cid):''; const young=me&&me.age<16&&plan==='fl'&&/first choice|starter/.test(myP);
     body=`<div class="lines"><div><span>League</span><b>${L?esc(L.name):'Europe'}</b></div>${ciPosLine(c,L)}<div><span>Manager</span><b>${esc(c.mgr||'–')}${sec?` <span class="pill ${sec[1]}">${sec[0]}</span>`:''}</b></div>${hon.length?`<div><span>Honours</span><b>${lt?`${lt.n} league title${lt.n>1?'s':''}`:`${hon.reduce((s,h)=>s+h.n,0)} major trophies`} <small>last ${Math.max(...hon.map(h=>h.last))}</small></b></div>`:''}<div><span>Stadium</span><b>${esc(c.stadium||'Home ground')} <small>${T.cap.toLocaleString('en-IE')}</small></b></div><div><span>Typical first-team wage</span><b>${money(wk)}/wk <small>${money(perMonth(wk))}/month</small></b></div><div><span>Spends on</span><b>${T.payPolicy==='potential'?'Young talent and potential':T.payPolicy==='balanced'?'A mix of youth and experience':'Proven players'}</b></div></div>
-      ${me?`<div class="lbl">How they see you</div><div class="lines">${me.age<=21?`<div><span>Their scouts rate your potential</span><b>${hStars(paStars(pp))}</b></div>`:''}${plan?`<div><span>Likely plan for you</span><b>${esc(DPLAN[plan].n)}</b></div>`:''}<div><span>Your position</span><b>${myP}</b></div></div>${young?`<p class="note" style="margin:0">You'd be their best option, but at ${me.age} they'd manage your minutes carefully.</p>`:''}`:''}`; }
+      ${ciMiniTable(c)}${me?`<div class="lbl">How they see you</div><div class="lines">${me.age<=21?`<div><span>Their scouts rate your potential</span><b>${hStars(paStars(pp))}</b></div>`:''}${plan?`<div><span>Likely plan for you</span><b>${esc(DPLAN[plan].n)}</b></div>`:''}<div><span>Your position</span><b>${myP}</b></div></div>${young?`<p class="note" style="margin:0">You'd be their best option, but at ${me.age} they'd manage your minutes carefully.</p>`:''}`:''}`; }
   else if(CI.tab==='hist'){ const hon=ciHonours(c); const ss=ciSeasons(c);
     body=`<div class="lbl">Honours</div>${hon.length?`<div class="ci-hons">${hon.map(h=>`<div class="ci-hon"><b>${h.n}</b><div><span>${esc(h.name)}</span><small>${h.years.length?`Won in this save: ${h.years.map(seasonLbl0).join(', ')}`:`Last won ${h.last}`}${h.years.length&&h.n>h.years.length?` · ${h.n-h.years.length} before`:''}</small></div></div>`).join('')}</div>`:'<p class="empty">No major honours yet. Win something and it goes here.</p>'}
       <div class="lbl">Season by season</div>${ss.length?`<div class="ci-seas">${ss.slice(0,12).map(s=>`<div><span>${seasonLbl(s.y)}</span><span>${esc(LMETA(s.lid)?LMETA(s.lid).name:s.lid)}</span><b class="${s.champ?'c-hi':''}">${ordinal(s.pos)}${s.champ?' 🏆':''}</b></div>`).join('')}</div>`:'<p class="empty">The first season of your save is still being played.</p>'}
@@ -9560,6 +9748,13 @@ function mgMovesView(){ const G=mgEnsure(); if(!G) return '<p class="empty">Noth
   WNT='breaking'; let h=''; try{ h=_wv47(); }finally{ WNT='mgrs'; } const seg=(h.match(/<div class="seg nwtabs">[\s\S]*?<\/div>/)||[''])[0].replace(/aria-pressed="true"/g,'aria-pressed="false"').replace(/<\/div>$/,'<button class="chip" aria-pressed="true" data-act="wnt" data-arg="mgrs">Managers</button></div>');
   return `<div class="dash c1">${seg}${mgMovesView()}</div>`; }; }
 
+// the league table around the club: this season once it starts, last season before then
+function ciMiniTable(c){ try{ const lid=c.league; let rows=null, title='';
+  if(lid&&S.leagues[lid]){ const T=tbl(lid); const started=Object.values(T).some(r=>r[0]>0); if(started){ rows=sortedTable(lid).map(id=>[id,...T[id]]); title=`${LMETA(lid).name} · this season`; } }
+  if(!rows){ const A=(S.archive||[]).slice(-1)[0]; if(A){ for(const l in A.leagues){ const R=A.leagues[l].rows; if(R.some(r=>r[0]===c.id)){ rows=R; title=`${LMETA(l)?LMETA(l).name:l} · last season`; break; } } } }
+  if(!rows) return ''; const i=Math.max(0,rows.findIndex(r=>r[0]===c.id)); const s=clamp(i-2,0,Math.max(0,rows.length-5));
+  return `<div class="lbl">${esc(title)}</div><table class="mini"><thead><tr><th>#</th><th class="l">Club</th><th>P</th><th>GD</th><th>Pts</th></tr></thead><tbody>${rows.slice(s,s+5).map((r,k)=>{ const [id,p,,,,gf,ga,pts]=r; return `<tr class="${id===c.id?'me':''}"><td>${s+k+1}</td><td class="l t">${esc(club(id).name)}</td><td>${p}</td><td>${gf-ga>0?'+':''}${gf-ga}</td><td><b>${pts}</b></td></tr>`; }).join('')}</tbody></table>`; }catch(e){ return ''; } }
+
 // ---------- v47 UI: training — traits you can actually learn, new positions, FM roles ----------
 (()=>{ const s=SECTIONS.find(x=>x[0]==='training'); if(s&&!s[2].includes('Positions & roles')) s[2].push('Positions & roles'); })();
 const TR_POSK=()=>'training:'+SECTIONS.find(x=>x[0]==='training')[2].indexOf('Positions & roles');
@@ -9573,13 +9768,15 @@ VIEWS[TR_POSK()]=()=>{ const m=S.me; posInit(); const T=m.ptrain; const f=p=>pos
       <div class="row" style="gap:6px;flex-wrap:wrap">${fv>=15&&T.pos!==m.pos?`<button class="btn" data-act="posSwitch" data-arg="${T.pos}">Make ${T.pos} my main position</button>`:''}<button class="btn sec" data-act="posStop">Stop</button></div></div>`; })():`<p class="note" style="margin:0">Tap a position on the pitch to start learning it. Positions close to yours (a striker moving out wide, say) come much quicker than ones that ask a completely different job.</p>`;
   const list=POSITIONS.filter(p=>gk?p==='GK':p!=='GK').map(p=>{ const fv=f(p); const L=famLbl(fv); const oa=ovrAt(p); const w=fv<15?posWeeksTo(p,15):0;
     return `<div class="pp-row${p===m.pos?' main':''}"><div><b>${p} <small>${esc(POS_NAME[p])}</small></b><span>${L[1]}${p===m.pos?' · main position':fv<15?` · ${wkTxt(w)} to accomplished`:''}</span></div><span class="pill">${oa} OVR</span>${p===m.pos?'<span class="pill g">Main</span>':T&&T.pos===p?'<span class="pill b">Learning</span>':fv>=15?`<button class="btn sec" data-act="posSwitch" data-arg="${p}">Switch</button>`:`<button class="btn sec" data-act="posTrain" data-arg="${p}">Learn</button>`}</div>`; }).join('');
-  const rk=myRole(); const want=mgrWantsRole(); const roles=rolesFor(m.pos).map(k=>{ const u=(m.roleU&&m.roleU[k]!=null)?m.roleU[k]:roleUInit(k); const L=roleULbl(u);
-    return `<div class="pp-role${k===rk?' on':''}"><div class="row sb"><div><b>${esc(MROLES[k].n)}</b>${k===want?' <span class="pill y">Manager wants this</span>':''}<span class="note" style="display:block">${MROLES[k].a.slice(0,4).map(a=>`${ANAME[a]||a} ${m.attrs[a]!=null?m.attrs[a]:'–'}`).join(' · ')}</span></div>${hStars(roleStars(k))}</div>
-      <div class="pp-ru"><div class="bar"><i style="width:${u}%"></i></div><span class="pill ${L[1]}">${L[0]}</span>${k===rk?'<span class="pill b">Your role</span>':`<button class="btn sec" data-act="rolePick" data-arg="${k}">Play this role</button>`}</div></div>`; }).join('');
+  const rk=myRole(); const want=mgrWantsRole(); const rt=m.rtrain&&rolesFor(m.pos).includes(m.rtrain)?m.rtrain:null; const roles=rolesFor(m.pos).map(k=>{ const u=roleUInit(k); const L=roleULbl(u);
+    const tags=`${k===want?' <span class="pill y">Manager plays you here</span>':''}${k===rk&&k!==want?' <span class="pill b">You play this</span>':''}${k===rt?' <span class="pill g">Training</span>':''}`;
+    return `<div class="pp-role${k===rt?' on':''}"><div class="row sb"><div><b>${esc(MROLES[k].n)}</b>${tags}<span class="note" style="display:block">${MROLES[k].a.slice(0,4).map(a=>`${ANAME[a]||a} ${m.attrs[a]!=null?m.attrs[a]:'–'}`).join(' · ')}</span></div>${hStars(roleStars(k))}</div>
+      <div class="pp-ru"><div class="bar"><i style="width:${u}%"></i></div><span class="pill ${L[1]}">${L[0]}</span>${k===rt?'<button class="btn sec" data-act="roleTrain" data-arg="">Stop</button>':`<button class="btn sec" data-act="roleTrain" data-arg="${k}">Train</button>`}</div>${!want&&k!==rk?`<button class="chip" data-act="rolePick" data-arg="${k}">Ask to play this role</button>`:''}</div>`; }).join('');
   const ex=m.plan&&m.plan.extra; const exBtn=(k,l)=>ex===k?`<span class="pill g">${l} in your plan</span>`:`<button class="btn sec" data-act="planExtra" data-arg="${k}">Use ${l.toLowerCase()} as my extra session</button>`;
-  return `<div class="stack">${W(`Positions · main: ${m.pos}`,`<div class="pp-wrap">${pitch}<div class="stack" style="gap:10px">${cur}${exBtn('position','Position work')}</div></div>`)}
+  const tf=Math.round(m.rel.tactical||0); const plan=`<div class="lines"><div><span>Position</span><b>${T&&T.pos?`Learning ${T.pos}`:'Not learning a new one'}</b></div><div><span>Role in training</span><b>${rt?esc(MROLES[rt].n):'None picked'}</b></div><div><span>Role in matches</span><b>${rk?esc(MROLES[rk].n):'–'}${want?' <small>manager\'s choice</small>':''}</b></div><div><span>Tactical familiarity</span><b>${tf}% <small>${tf>=75?'knows the system':tf>=50?'getting there':'still learning it'}</small></b></div><div><span>Extra sessions</span><b>${ex&&PERSONAL[ex]&&ex!=='none'?esc(PERSONAL[ex].name)+' ×'+(m.plan.count||0):'None'}</b></div></div><button class="chip" data-act="go" data-arg="training:0">Weekly plan ›</button>`;
+  return `<div class="stack">${W('Your training plan',plan)}${W(`Positions · main: ${m.pos}`,`<div class="pp-wrap">${pitch}<div class="stack" style="gap:10px">${cur}${exBtn('position','Position work')}</div></div>`)}
     ${W('Every position',`<div class="pp-list">${list}</div><p class="note" style="margin:0">Playing out of your natural position costs you a little on the pitch until you're accomplished there. Your rating shown is what you'd be at each position.</p>`)}
-    ${roles?W(`Roles for a ${POS_NAME[m.pos].toLowerCase()}`,`<div class="pp-roles">${roles}</div><div class="row" style="gap:6px;flex-wrap:wrap">${exBtn('role','Role work')}</div><p class="note" style="margin:0">Stars show how well your attributes suit a role. Understanding grows every week you play it and train it, and the role's key attributes get extra work.${want?` Playing the role the manager wants helps you get picked.`:''}</p>`):''}</div>`; };
+    ${roles?W(`Roles for a ${POS_NAME[m.pos].toLowerCase()}`,`<div class="pp-roles">${roles}</div><div class="row" style="gap:6px;flex-wrap:wrap">${exBtn('role','Role work')}</div><p class="note" style="margin:0">Pick one role to train. It takes months, and playing it in matches teaches you far more than drills. In matches you play the role the manager wants${want?'':' (or the one you ask for if he has no preference)'}, and every new manager brings a new system to learn.</p>`):''}</div>`; };
 // ---------- PlayStyles ----------
 VIEWS['training:2']=()=>{ const m=S.me; traitInit(); const groups={}; TRAITS.forEach(t=>(groups[t[1]]=groups[t[1]]||[]).push(t)); const now=absWk();
   const slots=[0,1].map(i=>{ const L=m.tlearn[i]; if(!L) return `<div class="tl-slot empty"><b>Free slot</b><span>Pick a PlayStyle below to start learning it.</span></div>`; const fit=traitFitLbl(traitFit(L.t));
@@ -9600,7 +9797,8 @@ Object.assign(ACT,{
   posTrain:p=>{ const m=S.me; if(m.ptrain&&m.ptrain.pos===p) return; m.ptrain={pos:p,mgr:m.ptrain&&m.ptrain.mgr&&m.ptrain.pos===p?1:0,since:absWk()}; saveSoon(); render(); toast(`Learning ${p}. ${wkTxt(posWeeksTo(p,15))} to accomplished.`); },
   posStop:()=>{ const m=S.me; if(m.ptrain&&m.ptrain.mgr) m.rel.manager=clamp(m.rel.manager-2,0,100); m.ptrain=null; saveSoon(); render(); },
   posSwitch:p=>{ const r=posSwitch(p); if(!r.ok&&r.txt) toast(r.txt); saveSoon(); render(); },
-  rolePick:k=>{ const m=S.me; m.prole=k; roleUInit(k); saveSoon(); render(); toast(`You'll play as ${/^[AEIOU]/.test(MROLES[k].n)?'an':'a'} ${MROLES[k].n}`); },
+  rolePick:k=>{ const m=S.me; m.prole=k; roleUInit(k); saveSoon(); render(); toast(`You'll ask to play as ${/^[AEIOU]/.test(MROLES[k].n)?'an':'a'} ${MROLES[k].n}`); },
+  roleTrain:k=>{ const m=S.me; m.rtrain=k||null; if(k) roleUInit(k); saveSoon(); render(); toast(k?`Training as ${/^[AEIOU]/.test(MROLES[k].n)?'an':'a'} ${MROLES[k].n}`:'Role training stopped'); },
   traitLearn:t=>{ const r=traitStart(t); if(!r.ok) toast(r.txt); else toast(`Learning ${t}. ${wkTxt(traitWeeks(t))}.`); saveSoon(); render(); },
   traitStop:t=>{ traitStop(t); saveSoon(); render(); },
   planExtra:k=>{ const m=S.me; m.plan=m.plan||defaultPlan(); m.plan.extra=k; if(!(+m.plan.count)) m.plan.count=2; m.plan.preset='custom'; applyWeekPlan(); saveSoon(); render(); toast(`${PERSONAL[k].name} is now your extra session, ${m.plan.count} a week.`); } });
@@ -9629,6 +9827,114 @@ function youthView(){ const c=myClubObj(); if(!c) return W('Youth team','<p clas
   if(SQV==='youth') return `<div class="dash c1">${seg}${youthView()}</div>`; const h=_sqh(); return h.replace(/^<div class="dash([^"]*)">/,(x)=>x+seg); }; }
 VIEWS['squad:2']=()=>`<div class="dash c1">${youthView()}</div>`;
 ACT.sqv=k=>{ SQV=k; render(); };
+
+// ---------- v48 UI (batch 1): youth career screens, legacy, partnerships, trophies by season, red dots, accept offers ----------
+// ---- the youth player's week: your matches are youth matches ----
+{ const _nmd=nextMatchDay; nextMatchDay=function(){ if(!isYouthTier()) return _nmd.apply(this,arguments); for(let i=S.day;i<7;i++){ const d=S.days[i]; if(d&&d.type==='match'&&d.fx&&d.fx.comp==='Y') return {i,d}; } return null; }; }
+{ const _es=expectedStatus; expectedStatus=function(d){ try{ if(isYouthTier()&&d&&d.fx&&d.fx.comp!=='Y'&&!S.me.injury) return `First team plays · you're with ${youthTeamName()}`; }catch(e){} return _es.apply(this,arguments); }; }
+{ const _hr=hResults; hResults=function(){ if(!isYouthTier()) return _hr.apply(this,arguments); const res=(S.me.results||[]).filter(x=>x.youth).slice(-4); if(!res.length) return '';
+  return `<section class="w"><div class="wh"><span>${esc(youthTeamName())} results</span><button data-act="go" data-arg="squad:2">Youth team ›</button></div><div class="wb"><div class="rtiles">${res.map(r=>`<div class="rtile"><span class="rw">W${r.w}</span>${r.opp!=null&&club(r.opp)?crest(club(r.opp)):''}<b class="num">${r.us}-${r.them}</b><span class="res ${r.res}">${r.res}</span>${r.mins?rt(r.rating):'<span class="rt n">–</span>'}</div>`).join('')}</div></div></section>`; }; }
+{ const _ht=hTable; hTable=function(){ if(!isYouthTier()) return _ht.apply(this,arguments); try{ const Y=S.youth, T=Y.table; const ids=youthSorted(); const me=Y.cid; const i=Math.max(0,ids.indexOf(me)); const s=clamp(i-2,0,Math.max(0,ids.length-5));
+  return `<section class="w"><div class="wh"><span>${esc(Y.name)}</span><button data-act="go" data-arg="squad:2">Youth team ›</button></div><div class="wb tight"><table class="mini"><thead><tr><th>#</th><th class="l">Club</th><th>P</th><th>GD</th><th>Pts</th></tr></thead><tbody>${ids.slice(s,s+5).map((id,k)=>{ const r=T[id]; return `<tr class="${id===me?'me':''}"><td><span class="tp">${s+k+1}</span></td><td class="l t"><span class="tcl">${crest(club(id))}${esc(club(id).name)} ${Y.label}</span></td><td>${r[0]}</td><td>${r[4]-r[5]>0?'+':''}${r[4]-r[5]}</td><td><b>${r[6]}</b></td></tr>`; }).join('')}</tbody></table></div></section>`; }catch(e){ return ''; } }; }
+{ const _hti=hTiles; hTiles=function(){ const h=_hti.apply(this,arguments); if(!isYouthTier()) return h; const st=youthStats()||{apps:0,g:0,a:0}; return h.replace(/(<b>Career<\/b><span>)[^<]*(<\/span>)/,`$1${S.youth.label}: ${st.apps} apps · ${st.g} G · ${st.a} A$2`); }; }
+
+// ---- manager screen: the youth coach is your manager until you're promoted ----
+{ const _mv=VIEWS['manager:0']; VIEWS['manager:0']=()=>{ if(!isYouthTier()) return _mv(); const m=S.me, c=myClubObj(); const co=coachName(); const st=youthStats()||{apps:0,g:0,a:0}; const yf=youthForm(); const op=Math.round(m.ftOp||45);
+    const tops=['minutes','ftchance','training','praise','loan']; const lbl={minutes:'Ask for more minutes',ftchance:'Ask about a first-team chance',training:'Talk about training',praise:'Thank him for his trust',loan:'Ask about a loan'};
+    const opTxt=op>=70?'He likes what he sees. You\'re close.':op>=58?'You\'re on his radar.':op>=45?'He knows your name. Not much more yet.':'You\'re not on his mind right now.';
+    return `<div class="dash c2">${W(`${esc(co)} · ${esc(youthTeamName())} coach`,`<div class="stack">${meter('Relationship',m.rel.manager)}${meter('Tactics',m.rel.tactical,100,'%')}<p class="note">${st.apps?`${st.apps} games, ${st.g} goals, ${st.a} assists this season · form ${yf.toFixed(1)}`:'The season hasn\'t got going yet.'}</p>
+      <div class="chips">${tops.map(k=>`<button class="btn sec" data-act="talk" data-arg="${k}">${lbl[k]}</button>`).join('')}</div></div>`)}
+     ${W(`First team · ${esc(c.mgr)}`,`<div class="stack">${meter('What he thinks of you',op)}<p class="note" style="margin:0">${opTxt} He watches youth games and how you train${m.dplan&&m.dplan.k==='fy'?' with his squad':''}. Strong youth form and good call-ups move this up. When he's convinced, he'll call you in himself.</p>${m.ftCalls?`<p class="note" style="margin:0">First-team call-ups so far: ${m.ftCalls}</p>`:''}</div>`)}</div>`; }; }
+
+// ---- season review: a youth season is a youth season ----
+{ const _sp=showPending; showPending=function(){ const r=_sp.apply(this,arguments); try{ const p=S.pending; if(p&&p.kind==='season'&&p.sum&&p.sum.yt){ const s=p.sum, Y=s.yt; const h=document.querySelector('#sheet h2.disp'); if(h) h.textContent=`${Y.team}${s.pos?` · ${ordinal(s.pos)} in the ${Y.name}`:''}`;
+    document.querySelectorAll('#sheet .lines span').forEach(x=>{ if(/League apps/.test(x.textContent)) x.textContent=`${Y.label} apps / goals / assists`; }); } }catch(e){} return r; }; }
+
+// ---- legacy: its own tab ----
+(()=>{ const s=SECTIONS.find(x=>x[0]==='career'); if(s&&!s[2].includes('Legacy')) s[2].push('Legacy'); })();
+function legacyRow(cid){ const m=S.me, c=club(cid), b=bondOf(cid); if(!c||!b) return ''; const t=legacyTier(cid); const cur=cid===m.club&&!m.loan; const love=Math.round(bondLove(cid)); const tro=bondTrophies(cid);
+  const left=b.left?({forced:'Forced a move',sold:'Sold',free:'Left on a free',expired:'Contract ran out'}[b.left.how]||'Left')+(b.left.rival!=null&&club(b.left.rival)?` to ${club(b.left.rival).name}`:''):cur?'Current club':'Past club';
+  const fans=cur&&isYouthTier()&&!(b.apps)?'They don\'t know you yet':love>=80?'Adore you':love>=65?'Love you':love>=50?'Like you':love>=35?'Lukewarm':love>=20?'Unhappy':'Hostile';
+  return `<section class="w lg2"><div class="wb"><div class="lg2-h">${crest(c,true)}<div><b>${esc(c.name)}</b><span>${esc(left)}</span></div><span class="pill ${t.k==='traitor'?'r':['icon','legend'].includes(t.k)?'y':['cult','fav','servant'].includes(t.k)?'g':''}">${esc(t.n)}</span></div>
+    <p class="note" style="margin:0">${esc(t.d||'')}</p>
+    <div class="lg2-grid"><div><span>First team</span><b>${b.apps||0} apps</b><i>${b.g||0} G · ${b.a||0} A · ${(b.seas||[]).length} season${(b.seas||[]).length===1?'':'s'}</i></div><div><span>Academy</span><b>${b.yapps||0} apps</b><i>${b.yg||0} G · ${b.ya||0} A${b.acad?(cur&&isYouthTier()?' · in the academy':' · academy graduate'):''}</i></div><div><span>Trophies</span><b>${tro}</b><i>${b.cap?`Captain ${b.cap} season${b.cap>1?'s':''}`:'&nbsp;'}</i></div><div><span>Fans</span><b>${fans}</b><i><span class="ps-bar"><i style="width:${love}%"></i></span></i></div></div></div></section>`; }
+VIEWS['career:'+SECTIONS.find(x=>x[0]==='career')[2].indexOf('Legacy')]=()=>{ const m=S.me; const ids=Object.keys(m.bond||{}).map(Number).filter(id=>{ const b=m.bond[id]; return b&&((b.apps||0)+(b.yapps||0)>0||id===m.club); });
+  ids.sort((a,b)=>(b===m.club)-(a===m.club)||legacyPts(b)-legacyPts(a));
+  return `<div class="stack">${ids.length?ids.map(legacyRow).join(''):W('Legacy','<p class="empty">Play some games and your story at each club starts here.</p>')}<p class="note">Legacy comes from first-team games, goals, trophies, captaincy and how long you stay. Academy games count for a little. How you leave matters.</p></div>`; };
+legacyCard=function(){ return ''; };
+
+// ---- partnerships: their own screen ----
+(()=>{ const s=SECTIONS.find(x=>x[0]==='squad'); if(s&&!s[2].includes('Partnerships')) s[2].push('Partnerships'); })();
+VIEWS['squad:'+SECTIONS.find(x=>x[0]==='squad')[2].indexOf('Partnerships')]=()=>{ const m=S.me, c=myClubObj(); if(!c) return `<div class="dash c1">${W('Partnerships','<p class="empty">You need a club first.</p>')}</div>`;
+  if(isYouthTier()) return `<div class="dash c1">${W('Partnerships','<p class="empty">Partnerships are built in first-team games. Once you\'re playing for the first team, the players you link up with will show here.</p>')}</div>`;
+  const cands=c.squad.map(P).filter(p=>p&&partFits(p)).map(p=>({p,g:gamesWith(p.id),r:m.mates[p.id]==null?45:m.mates[p.id],pr:(m.pprog||{})[p.id]||0,on:(m.partners||[]).includes(p.id)})).sort((a,b)=>b.on-a.on||b.g-a.g||b.p.o-a.p.o).slice(0,10);
+  const row=x=>{ const inj=pInj(x.p); return `<div class="pt-row"><div class="pt-h"><span class="sqp">${x.p.p}</span><div><b>${esc(x.p.n)}</b><span>${x.g} game${x.g===1?'':'s'} together · ${relName(x.r)}${inj?' · injured':''}</span></div>${x.on?'<span class="pill g">Partnership</span>':`<button class="btn sec" data-act="partWork" data-arg="${x.p.id}"${inj||m.injury?' disabled':''}>Work on it</button>`}</div>${x.on?'':`<div class="pt-b"><div class="bar"><i style="width:${x.pr}%"></i></div><span>${x.g<10?`Needs ${10-x.g} more games together`:x.r<65?'Get closer off the pitch first':x.pr<100?'Keep working on it':'Ready'}</span></div>`}</div>`; };
+  return `<div class="dash c1">${W('Partnerships',`<p class="note" style="margin:0">A partnership means more chances and assists when you both start. You need 10 games together, positions that link up (${(PART_FIT[m.pos]||[]).join(', ')} for a ${m.pos}), a good relationship, and work on the training pitch.</p><div class="pt-list">${cands.map(row).join('')||'<p class="empty">Nobody in the squad plays in a position that links with yours.</p>'}</div>`)}</div>`; };
+ACT.partWork=pid=>{ const r=partWork(+pid); toast(r.txt); saveSoon(); render(); };
+
+// ---- youth teammates: bond with the lads you actually play with ----
+function ymRel(n){ const m=S.me; m.ymates=m.ymates||{}; return m.ymates[n]==null?45:m.ymates[n]; }
+{ const _yv=youthView; youthView=function(){ const h=_yv.apply(this,arguments); try{ if(!isYouthTier()) return h; const Y=youthSquadFor(myClubObj().id); const m=S.me; const near=Y.list.slice().sort((a,b)=>(PART_FIT[m.pos]||[]).includes(b.p)-(PART_FIT[m.pos]||[]).includes(a.p)||b.o-a.o).slice(0,6);
+    return h+W('Your teammates',`<div class="pt-list">${near.map(p=>`<div class="pt-row"><div class="pt-h"><span class="sqp">${p.p}</span><div><b>${esc(p.n)}</b><span>${relName(ymRel(p.n))}</span></div><button class="btn sec" data-act="yBond" data-arg="${esc(p.n)}">Spend time</button></div></div>`).join('')}</div><p class="note" style="margin:0">The lads you come through with often end up as friends for life. Three a week, like the first team.</p>`); }catch(e){ return h; } }; }
+ACT.yBond=n=>{ const m=S.me; if(typeof bondLeft==='function'&&bondLeft()<=0){ toast('You\'ve already made time for three teammates this week.'); return; } m.yCd=m.yCd||{}; if((m.yCd[n]||0)>=absWk()){ toast(`You saw ${n.split(' ')[0]} this week already.`); return; } m.yCd[n]=absWk(); if(m.bond&&typeof m.bond.n==='number') m.bond.n++;
+  m.ymates=m.ymates||{}; m.ymates[n]=clamp(ymRel(n)+ri(4,8),0,100); m.morale=clamp(m.morale+1,0,100); toast(pick([`Burgers after training with ${n.split(' ')[0]}.`,`Extra finishing with ${n.split(' ')[0]} until the light goes.`,`FIFA at ${n.split(' ')[0]}'s house. You lost.`])); saveSoon(); render(); };
+
+// ---- trophies: flick through the seasons ----
+let TRS='all';
+{ const _tv=VIEWS['career:2']; VIEWS['career:2']=()=>{ const m=S.me; const seasons=[...new Set((m.career||[]).map(x=>x.s).concat((m.trophies||[]).map(t=>t.s)).concat((m.awards||[]).map(a=>a.s)))].filter(x=>x!=null).sort((a,b)=>b-a);
+  const yOf=s=>{ const c=(m.career||[]).find(x=>x.s===s); return c&&c.y!=null?c.y:S.year-(S.season-s); };
+  const seg=`<div class="seg ih-tabs trs">${[['all','All seasons']].concat(seasons.map(s=>[String(s),seasonLbl(yOf(s))])).map(([k,l])=>`<button class="chip" aria-pressed="${TRS===k}" data-act="trs" data-arg="${k}">${l}</button>`).join('')}</div>`;
+  if(TRS==='all'||!seasons.includes(+TRS)) return seg+_tv();
+  const s=+TRS; const cr=(m.career||[]).find(x=>x.s===s); const tro=(m.trophies||[]).filter(t=>t.s===s); const aw=(m.awards||[]).filter(a=>a.s===s);
+  const tot=cr?seasonTotals(cr.ss||{},k=>!/^U:|^I:/.test(k)):null; const yt=cr?seasonTotals(cr.ss||{},k=>/^U:/.test(k)):null;
+  return seg+`<div class="dash c2">${W(`${seasonLbl(yOf(s))}${cr&&cr.club!=null&&club(cr.club)?' · '+esc(club(cr.club).name):''}`,`<div class="lines">${cr&&cr.pos?`<div><span>League finish</span><b>${ordinal(cr.pos)}${cr.lid&&LMETA(cr.lid)?' · '+esc(LMETA(cr.lid).name):''}</b></div>`:''}${tot&&tot.apps?`<div><span>First team</span><b>${tot.apps} apps · ${tot.g} G · ${tot.a} A</b></div>`:''}${yt&&yt.apps?`<div><span>Youth</span><b>${yt.apps} apps · ${yt.g} G · ${yt.a} A</b></div>`:''}${cr?`<div><span>Overall</span><b>${cr.ovr}</b></div><div><span>Age</span><b>${cr.age}</b></div>`:''}</div>`)}
+    ${W(`Trophies · ${tro.length}`,tro.length?`<div class="stack">${tro.map(t=>`<div class="row sb"><b>🏆 ${esc(t.name)}</b><span class="note">${t.club!=null&&club(t.club)?esc(club(t.club).name):''}</span></div>`).join('')}</div>`:'<p class="empty">No trophies that season.</p>')}
+    ${W(`Awards · ${aw.length}`,aw.length?`<div class="stack">${aw.map(a=>`<div><b>⭐ ${esc(a.name)}</b></div>`).join('')}</div>`:'<p class="empty">No individual awards that season.</p>')}</div>`; }; }
+ACT.trs=k=>{ TRS=k; render(); };
+
+// ---- offers: accept what's on the screen, or negotiate ----
+{ const _tf=VIEWS['transfers:0']; VIEWS['transfers:0']=()=>{ const h=_tf(); return h.replace(/<button class="btn" data-act="offer" data-arg="([^"]+)">Talk terms<\/button>/g,'<button class="btn" data-act="offerSign" data-arg="$1">Accept offer</button><button class="btn sec" data-act="offer" data-arg="$1">Negotiate</button>'); }; }
+ACT.offerSign=id=>{ const m=S.me; const of=(m.offers||[]).find(x=>String(x.id)===String(id)); if(!of) return; const N=acceptOffer(of.id); if(!N) return; if(N.blocked){ toast("Your club won't sell. Hand in a transfer request to force it."); return; }
+  try{ proposeTerms(Object.assign({},N.start)); }catch(e){} const X=S.nego||N; if(X.status!=='accept'){ X.terms=Object.assign({},X.start); X.status='accept'; S.nego=X; } ACT.sign(); };
+
+// ---- shirt numbers: your youth number, and the number you'd like ----
+{ const _sn=VIEWS['squad:3']; VIEWS['squad:3']=()=>{ const m=S.me; const pref=`<section class="w"><div class="wh"><span>Your number</span></div><div class="wb"><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><label class="note" for="prefNum">Preferred number</label><input id="prefNum" type="number" min="1" max="99" inputmode="numeric" value="${m.prefNum||''}" style="width:80px"><button class="btn sec" data-act="setPrefNum">Save</button></div><p class="note" style="margin:6px 0 0">When you join a club or get promoted, you'll get this number if it's free.</p></div></section>`;
+  if(isYouthTier()) return `<div class="dash c1">${W(`${esc(youthTeamName())} · you wear ${myNum()}`,`<p class="note" style="margin:0">Youth teams have their own numbers. Your first-team number comes when you're promoted.</p>`)}${pref}</div>`;
+  return _sn().replace(/<\/div>$/,pref+'</div>'); }; }
+ACT.setPrefNum=()=>{ const v=+(document.getElementById('prefNum')||{}).value; if(!(v>=1&&v<=99)){ toast('Pick a number from 1 to 99.'); return; } S.me.prefNum=v; saveSoon(); toast(`Saved. You'll ask for ${v} when it's free.`); };
+
+// ---- weekly plan shows the work you've chosen ----
+{ const _w0=VIEWS['training:0']; VIEWS['training:0']=()=>{ let h=_w0(); try{ const m=S.me; const ch=[]; if(m.rtrain&&MROLES[m.rtrain]) ch.push(`Role: ${MROLES[m.rtrain].n}`); if(m.ptrain&&m.ptrain.pos) ch.push(`Position: ${m.ptrain.pos}`); (m.tlearn||[]).forEach(t=>ch.push(`PlayStyle: ${t.t}`)); const ex=m.plan&&m.plan.extra&&PERSONAL[m.plan.extra]&&m.plan.extra!=='none'?`${PERSONAL[m.plan.extra].name} ×${m.plan.count||0}`:null;
+    if(ch.length||ex){ const block=`<div class="lbl" style="margin-top:8px">Your training focus</div><div class="chips">${ch.map(x=>`<span class="pill b">${esc(x)}</span>`).join(' ')}${ex?` <span class="pill g">Extras: ${esc(ex)}</span>`:''} <button class="chip" data-act="go" data-arg="${TR_POSK()}">Positions & roles ›</button></div>`; h=h.replace(/(<\/div><\/section>\s*<div class="days">)/,block+'$1'); } }catch(e){} return h; }; }
+
+// ---- red dots: anything new in a tab ----
+function attnItems(){ const m=S.me, out=[]; const add=(sec,sub,id)=>out.push({sec,sub,id});
+  if(m.sponsorOffer) add('fin','Sponsors','sp:'+m.sponsorOffer.brand+':'+m.sponsorOffer.tier);
+  (m.offers||[]).forEach(o=>add('transfers','Offers','of:'+o.id));
+  if(m.ptrain&&m.ptrain.pos&&m.ptrain.pos!==m.pos&&typeof posFam==='function'&&posFam(m.ptrain.pos)>=15) add('training','Positions & roles','pos:'+m.ptrain.pos);
+  (m.learnt||[]).slice(-3).forEach(x=>add('training','Traits','lt:'+x.t));
+  Object.keys(m.badges||{}).forEach(id=>add('career','Badges','b:'+id));
+  (m.trophies||[]).forEach((t,i)=>add('career','Trophies','t:'+i+':'+t.name));
+  if(m.intlCall) add('intl','Overview','ic:'+m.intlCall.code+':'+S.season+':'+(m.intlCall.level||''));
+  (m.promises||[]).filter(p=>!p.done).forEach(p=>add('manager','Promises','pr:'+p.made+':'+p.desc));
+  if(m.promoted&&m.promoted.s===S.season) add('squad','Shirt number','pn:'+m.promoted.s);
+  return out; }
+{ const _rsh=renderShell; renderShell=function(){ const r=_rsh.apply(this,arguments); try{ const m=S.me; if(!m||S.mode==='mgr') return r; m.seen=m.seen||{}; const items=attnItems();
+    if(!m.seenInit){ items.forEach(x=>m.seen[x.id]=1); m.seenInit=1; }
+    const sec=SECTIONS.find(s=>s[0]===SEC); const subName=sec?sec[2][SUB]:null; items.forEach(x=>{ if(x.sec===SEC&&x.sub===subName) m.seen[x.id]=1; });
+    const unseen=items.filter(x=>!m.seen[x.id]); const secs=new Set(unseen.map(x=>x.sec));
+    document.querySelectorAll('#nav button[data-act="sec"]').forEach(b=>{ if(secs.has(b.dataset.arg)&&!b.querySelector('.cnt,.ndot')) b.insertAdjacentHTML('beforeend','<i class="ndot"></i>'); });
+    const more=document.querySelector('#nav button.more'); const pri=['home','inbox','schedule','training']; if(more&&!more.querySelector('.cnt')&&[...secs].some(k=>!pri.includes(k))) more.insertAdjacentHTML('beforeend','<i class="ndot"></i>');
+    if(sec) document.querySelectorAll('#subs button[data-act="sub"]').forEach(b=>{ const nm=sec[2][+b.dataset.arg]; if(unseen.some(x=>x.sec===SEC&&x.sub===nm)) b.insertAdjacentHTML('beforeend','<i class="ndot"></i>'); });
+    const keep=new Set(items.map(x=>x.id)); Object.keys(m.seen).forEach(k=>{ if(!keep.has(k)) delete m.seen[k]; }); }catch(e){ console.warn('dots',e); } return r; }; }
+{ const _ms=moreSheet; moreSheet=function(secs,badge){ let secsN=new Set(); try{ const m=S.me; secsN=new Set(attnItems().filter(x=>!(m.seen||{})[x.id]).map(x=>x.sec)); }catch(e){} return _ms(secs,k=>badge(k)||(secsN.has(k)?'<i class="ndot"></i>':'')); }; }
+{ const _hh=hHero; hHero=function(){ try{ const m=S.me; const n=nextMatchDay(); if(!isYouthTier()||!n||!n.d.fx||n.d.fx.comp!=='Y') return _hh.apply(this,arguments); const det=fxDetails(n.d.fx); if(!det) return _hh.apply(this,arguments);
+    const Y=S.youth; const num=hNum(); const art=`<div class="hbg"></div><div class="hnum"><span>${esc((m.last||'').toUpperCase())}</span><b>${num||ovr()}</b></div>`; const h=club(det.h), a=club(det.a), md=gameDate(S.week,n.i); const ids=youthSorted(); const T=Y.table;
+    const team=c=>`<div class="ht">${crest(c,true)}<b>${esc(c.short&&c.name.length>13?shortName(c):c.name)} ${Y.label}</b><span>${T[c.id]&&T[c.id][0]?`${ordinal(ids.indexOf(c.id)+1)} · ${T[c.id][6]} pts`:esc(Y.name)}</span></div>`;
+    const sel=m.injury?'Injured':ovr()>=youthLevel(Y.cid)?'Starter':'In the squad';
+    return `<section class="hero" style="--oc:${club(det.opp).c1}">${art}<div class="hin"><div class="hhead"><div><div class="hk">${n.i===S.day?'MATCH DAY':'NEXT MATCH'}</div><div class="hc">${esc(Y.name)}</div></div><span class="hsel ${sel==='Starter'?'g':sel==='Injured'?'r':'y'}">${sel}</span></div>
+     <div class="hvs">${team(h)}<div class="vs"><b>VS</b><span>${det.home?'HOME':'AWAY'}</span></div>${team(a)}</div>
+     <div class="hfoot"><span>${hic('cal')}${esc(fmtDate(md)).toUpperCase()}</span><span>${hic('pin')}${esc((h.name+' training ground').toUpperCase())}</span></div></div></section>`; }catch(e){ return _hh.apply(this,arguments); } }; }
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
