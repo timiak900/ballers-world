@@ -8081,6 +8081,63 @@ function langWeek(){ const m=S.me; if(!m||m.club==null) return; const n=langNeed
 { const _fw54=financeWeek; financeWeek=function(){ const r=_fw54.apply(this,arguments); try{ const m=S.me; if(!m) return r; const st=m.staff||{}; if(st.chef) m.energy=clamp(m.energy+1.5,0,100); if(st.pa) m.morale=clamp(m.morale+.5,0,100); invWeek(); imgWeek(); langWeek(); }catch(e){ console.warn('life54',e); } return r; }; }
 { const _se54=seasonEnd; seasonEnd=function(){ const r=_se54.apply(this,arguments); try{ if(S.me&&S.mode!=='mgr'){ famYear(); propYear(); } }catch(e){} return r; }; }
 
+// ===================== v55: agents who read the situation =====================
+// An agent looks at your contract, wage, minutes, form, interest and timing before picking up the phone.
+function ctTrack(){ const m=S.me; if(!m||!m.contract) return; const sig=[m.club,m.contract.wage,m.contract.years,m.contract.role].join('|'); if(m.ctSig!==sig){ const first=m.ctSig==null; m.ctSig=sig; if(!first||m.ctAt==null) m.ctAt=absWk(); } }
+{ const _sc55=signContract; signContract=function(){ const r=_sc55.apply(this,arguments); try{ ctTrack(); S.me.ctAt=absWk(); }catch(e){} return r; }; }
+{ const _jc55=joinClub; joinClub=function(){ const r=_jc55.apply(this,arguments); try{ if(S.me&&S.mode!=='mgr'){ ctTrack(); S.me.ctAt=absWk(); } }catch(e){} return r; }; }
+{ const _ha55=hireAgent; hireAgent=function(i){ const r=_ha55.apply(this,arguments); try{ if(r&&r.ok) S.me.agAt=absWk(); }catch(e){} return r; }; }
+{ const _hf55=hireFamily; hireFamily=function(rel){ const r=_hf55.apply(this,arguments); try{ S.me.agAt=absWk(); }catch(e){} return r; }; }
+
+// what your agent sees
+function agentRead(){ const m=S.me, ag=agentObj(), c=myClubObj(); if(!ag||!c||!m.contract||m.loan) return null; ctTrack();
+  const since=absWk()-(m.ctAt==null?absWk()-52:m.ctAt); const yrs=m.contract.years||0; let market=m.contract.wage; try{ market=wageFor(c.id,ovr(),roleFor(c.id,ovr(),m.age)); }catch(e){} if(typeof youthWageCap==='function') market=Math.min(market,youthWageCap(m.age)); const yt=!!(m.contract.youth||(typeof isYouthTier==='function'&&isYouthTier()));
+  const pay=m.contract.wage/Math.max(1,market); const f=(m.form||[]).filter(x=>x!=null); const form=f.length>=3?avg(f.slice(-6)):6.8;
+  const rec=(m.results||[]).filter(r=>!r.youth&&r.s===S.season).slice(-8); const mins=rec.length>=4?rec.reduce((s,r)=>s+(r.mins||0),0)/(rec.length*90):null;
+  const lv=clubLevel(c), o=ovr(); const outgrown=o>=lv+4; const aps=(m.approaches||[]).filter(a=>a.stage!=='dead'); const bigger=aps.filter(a=>club(a.club)&&club(a.club).rep>c.rep+3);
+  const busy=!!(S.nego&&S.nego.status==='open')||(m.offers||[]).some(x=>x.type==='renew')||(m.renewCd&&m.renewCd>S.season*100+S.week);
+  return {ag,c,since,yrs,market,pay,form,mins,outgrown,aps,bigger,busy,yt,young:m.age<=21,hired:absWk()-(m.agAt||-99)}; }
+// what your agent would advise, or nothing if there's nothing to say
+function agentAdvice(){ const R=agentRead(); if(!R) return null; const t=R.ag.type, m=S.me; if(R.busy||R.hired<4) return null;
+  const greedy=t==='Greedy', loyal=t==='Loyal', mover=t==='Deal-maker'||t==='Connected', fam=t==='Family';
+  const settle=greedy?20:fam?40:26; // weeks before anyone talks about a new deal after signing one
+  if(R.yt){ if(R.since>=settle&&R.yrs<=1&&m.age>=17&&R.form>=6.9) return {k:'renew',R}; return null; }
+  if(R.since>=settle&&R.form>=6.8&&(R.pay<(greedy?.9:.8)||(R.yrs<=2&&R.form>=7.1)||(R.yrs<=1))) return {k:'renew',R};
+  if(R.since>=10&&R.mins!=null&&R.mins<.35&&!fam) return {k:R.young?'loan':'move',R};
+  if(R.since>=26&&(R.outgrown||R.bigger.length)&&!loyal&&!fam&&(mover||R.form>=7.2)) return {k:'move',R};
+  return null; }
+function agentAdviceTxt(a){ const R=a.R, m=S.me; const pay=money(m.contract.wage), mk=money(R.market); const yrs=`${R.yrs} year${R.yrs===1?'':'s'}`;
+  if(a.k==='renew') return R.pay<.85?`You're on ${pay} a week. Players doing your job at ${R.c.name} are on about ${mk}. You signed ${Math.round(R.since/4)} months ago and you've been playing well. Time to talk.`:R.yrs<=1?`Your deal runs out in ${yrs}. If we want the best terms, we talk now, not in May.`:`${yrs} left and your form is ${R.form.toFixed(1)}. The club should be tying you down. Let me open talks.`;
+  if(a.k==='loan') return `You've barely played lately. At your age you need minutes. A loan could be the best thing for you.`;
+  return R.bigger.length?`${club(R.bigger[0].club).name} are serious. That's a step up from ${R.c.name}. Do you want me to work on it?`:R.outgrown?`You're better than this level now. Clubs higher up are asking about you. Let me find you a move.`:`You're not getting the minutes you deserve. Let me see who's out there.`; }
+// rebuild the agent's phone call so it only happens when it makes sense
+(function(){ if(typeof EVENTS==='undefined') return; const E=EVENTS.find(e=>e.id==='agent_push'); if(!E) return;
+  E.cond=()=>{ try{ return S.mode!=='mgr'&&!!agentAdvice(); }catch(e){ return false; } };
+  E.make=()=>{ const a=agentAdvice(); const ag=agentObj(); const fam=ag.type==='Family'; const who=fam?ag[1]:ag[0];
+    if(!a) return {title:`${who} on the phone`,txt:'Just checking in. Nothing to report.',o:[['Thanks',()=>({txt:'Speak soon.',r:[]})]]};
+    const txt=`${fam?ag[1].replace('Your','Your')+':':'Your agent:'} "${agentAdviceTxt(a)}"`;
+    const o=[]; if(a.k==='renew') o.push(['Open talks with the club',()=>{ evLater(ri(3,8),'agent_renew',{}); return {txt:`${who} calls the sporting director.`,r:evApply({manager:-1})}; }]);
+    if(a.k==='move'||a.k==='loan') o.push([a.k==='loan'?'Look for a loan':'Find me a move',()=>{ evLater(ri(4,12),'rumour_bid',{club:null}); if(a.k==='loan') S.me.wantLoan=S.season; return {txt:a.k==='loan'?'Calls go out to clubs who need a player like you.':'Your name starts doing the rounds.',r:evApply({manager:a.k==='loan'?0:-2,media:1})}; }]);
+    o.push(['Not now',()=>{ S.me.agQuiet=absWk()+10; return {txt:fam?'"Fair enough. You know best."':'"Your call. I\'ll keep an ear out."',r:evApply({morale:1})}; }]);
+    return {title:`${who} on the phone`,txt,o}; }; })();
+// respect "not now"
+{ const _aa55=agentAdvice; agentAdvice=function(){ const m=S.me; if(m&&(m.agQuiet||0)>absWk()) return null; return _aa55.apply(this,arguments); }; }
+// the weekly agent mail says something useful too
+{ const _ml55=mail; mail=function(kind,title,body,o){ try{ if(/^Agent update/.test(title||'')&&S.me){ const R=agentRead(); const a=agentAdvice(); if(R&&R.aps.length===0){ if(a) body=agentAdviceTxt(a); else if(R.since<12) body=`You've just signed. Settle in, play well, and let the deal work for you. Nothing to chase right now.`; else if(R.pay>=1.1) body=`You're well paid for your level. The focus is on playing well.`; else if(R.form<6.5) body=`Form has dipped. Let's get back to basics before we talk about anything else.`; } } }catch(e){} return _ml55.apply(this,arguments); }; }
+// family/new-agent pitches shouldn't arrive the week you've signed with someone
+{ const _ap55=agentPitchWeek; agentPitchWeek=function(){ const m=S.me; if(m&&absWk()-(m.agAt||-99)<12) return; return _ap55.apply(this,arguments); }; }
+
+// ===================== youth players don't get the first team's paperwork =====================
+// No opposition files, manager verdicts or club bulletins from the senior side unless you've been called up.
+function ftMailBlocked(title,x){ try{ const m=S.me; if(!m||S.mode==='mgr'||typeof isYouthTier!=='function'||!isYouthTier()||m.callUp) return false; const c=myClubObj(); if(!c) return false;
+  const from=(x&&x.from)||''; if(from==='Assistant manager'||from===c.mgr) return true; if(/bulletin · week|^Opposition file|^Scouting report|^Know your opponent|^Next up:|keep going$|'s verdict$|^What .* made of it|^A word from|on your game$/.test(title||'')) return true; }catch(e){} return false; }
+{ const _ml55b=mail; mail=function(kind,title,body,x){ if(ftMailBlocked(title,x)) return {}; return _ml55b.apply(this,arguments); }; }
+// the role talk comes from the youth coach while you're in the youth team
+{ const _ra55=roleAssign; roleAssign=function(){ const m=S.me; if(m&&typeof isYouthTier==='function'&&isYouthTier()&&!m.callUp&&typeof coachName==='function'){ const c=myClubObj(); const real=c.mgr; c.mgr=coachName(); try{ return _ra55.apply(this,arguments); } finally { c.mgr=real; } } return _ra55.apply(this,arguments); }; }
+// a first-team fixture you're not involved in, while you're in the youth team
+function ftOnly(d){ try{ const m=S.me; return !!(d&&d.type==='match'&&d.fx&&d.fx.comp!=='Y'&&S.mode!=='mgr'&&typeof isYouthTier==='function'&&isYouthTier()&&!m.callUp); }catch(e){ return false; } }
+function ftPrep(d){ try{ return !!(d&&d.type==='prep'&&d.fx&&d.fx.comp!=='Y'&&S.mode!=='mgr'&&typeof isYouthTier==='function'&&isYouthTier()&&!S.me.callUp); }catch(e){ return false; } }
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
@@ -10527,7 +10584,7 @@ function subIdx(sec,name){ const s=SECTIONS.find(x=>x[0]===sec); return s?Math.m
 const ATTN_LBL={fin:{Sponsors:'Sponsor offer'},transfers:{Offers:'Transfer offers'},training:{'Positions & roles':'New position learnt',Traits:'New trait'},career:{Badges:'New badges',Trophies:'New trophy'},intl:{Overview:'International call-up'},manager:{Promises:'Manager promises'},squad:{'Shirt number':'Pick your number'}};
 function weekHub(){ const m=S.me; if(!m||S.mode==='mgr'||!S.days||!S.days.length) return ''; const WD=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const T={match:['Match','m'],intlmatch:['Intl','m'],friendly:['Friendly','m'],team:['Train','t'],intltrain:['Camp','t'],prep:['Prep','p'],recovery:['Recover','r'],off:['Day off','o'],travel:['Travel','o']};
-  const cells=S.days.map((d,i)=>{ const t=T[d.type]||[d.type==='match'?'Match':'Train','t']; const dt=gameDate(S.week,i); return `<div class="wkc ${t[1]}${i===S.day?' now':''}${i<S.day?' done':''}"><span>${WD[dt.getUTCDay()===0?6:dt.getUTCDay()-1]}</span><b>${dt.getUTCDate()}</b><i>${t[0]}</i></div>`; }).join('');
+  const cells=S.days.map((d,i)=>{ const t=typeof ftOnly==='function'&&ftOnly(d)?['1st team','o']:typeof ftPrep==='function'&&ftPrep(d)?['Train','t']:(T[d.type]||[d.type==='match'?'Match':'Train','t']); const dt=gameDate(S.week,i); return `<div class="wkc ${t[1]}${i===S.day?' now':''}${i<S.day?' done':''}"><span>${WD[dt.getUTCDay()===0?6:dt.getUTCDay()-1]}</span><b>${dt.getUTCDate()}</b><i>${t[0]}</i></div>`; }).join('');
   const seen=m.seen||{}; const items=(typeof attnItems==='function'?attnItems():[]).filter(x=>!seen[x.id]); const grp={}; items.forEach(x=>{ const k=x.sec+':'+x.sub; grp[k]=(grp[k]||0)+1; });
   const todo=Object.entries(grp).map(([k,n])=>{ const [s,sub]=k.split(':'); const l=(ATTN_LBL[s]&&ATTN_LBL[s][sub])||sub; return `<button class="todo" data-act="go" data-arg="${s}:${subIdx(s,sub)}"><i class="ndot"></i><span>${esc(l)}${n>1?` · ${n}`:''}</span><b>›</b></button>`; });
   if((m.sp||0)>0) todo.push(`<button class="todo" data-act="go" data-arg="dev:0"><i class="ndot"></i><span>${m.sp} skill point${m.sp>1?'s':''} to spend</span><b>›</b></button>`);
@@ -10545,6 +10602,11 @@ function paperCards(xs,mine){ if(!xs.length) return ''; return `<div class="pape
 { const _wv54=VIEWS['world:0']; VIEWS['world:0']=()=>{ const h=_wv54(); try{ if(typeof WNT==='undefined'||WNT!=='front') return h; const world=nwAll().filter(n=>n.kind==='world').slice(0,80); const top=world.slice().sort((a,b)=>recentScore(b)-recentScore(a)).slice(0,6);
     const car=`<section class="w nwhero"><div class="wb">${paperCards(top)}</div></section>`; return h.replace(/<section class="w nwhero">[\s\S]*?<\/section>/,car); }catch(e){ return h; } }; }
 { const _mv54=VIEWS['media:1']; VIEWS['media:1']=()=>{ const h=_mv54(); try{ const mine=(S.news||[]).filter(n=>['you','good','bad'].includes(n.kind)&&!/rewarded|Badge unlocked/i.test(n.title)).slice(0,6); if(!mine.length) return h; return h.replace(/^(<div class="[^"]*">)/,'$1'+`<section class="w"><div class="wh"><span>Today's papers</span></div><div class="wb">${paperCards(mine,true)}</div></section>`); }catch(e){ return h; } }; }
+// youth team: first-team fixtures are background, not your match day
+{ const _dl55=dayLabel; dayLabel=function(d){ try{ if(ftOnly(d)){ const x=fxDetails(d.fx); return `First team ${x?(x.home?'vs ':'at ')+club(x.opp).short:'match'}`; } if(ftPrep(d)) return 'Youth training'; }catch(e){} return _dl55.apply(this,arguments); }; }
+{ const _cl55=contLabel; contLabel=function(){ try{ if(ftOnly(S.days&&S.days[S.day])) return 'Continue'; }catch(e){} return _cl55.apply(this,arguments); }; }
+{ const _dm55=daysToMatch; daysToMatch=function(){ try{ if(S.mode!=='mgr'&&typeof isYouthTier==='function'&&isYouthTier()&&!S.me.callUp){ for(let i=S.day;i<7;i++){ const d=S.days[i]; if(d&&d.type==='match'&&d.fx&&d.fx.comp==='Y') return i-S.day; } return null; } }catch(e){} return _dm55.apply(this,arguments); }; }
+{ const _rs55=renderShell; renderShell=function(){ const r=_rs55.apply(this,arguments); try{ if(ftOnly(S.days&&S.days[S.day])) document.querySelectorAll('.cont.match').forEach(b=>b.classList.remove('match')); }catch(e){} return r; }; }
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
