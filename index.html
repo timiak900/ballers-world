@@ -8603,6 +8603,10 @@ SCENES.famhol=d=>{ const m=S.me; const p=famPeople().find(x=>x.id===d.id); if(!p
 // a summer trip you booked happens when the season ends
 { const _se61=seasonEnd; seasonEnd=function(){ const r=_se61.apply(this,arguments); try{ const m=S.me, t=m.famTrip; if(t){ m.famTrip=null; const D=HOL_DEST.find(x=>x[0]===t.dest); holGo(t); news('good',`Off to ${D?D[1]:'the sun'}`,`The holiday you booked is here. ${t.len} nights${t.who==='all'?' with the whole family':''}. Phone off.`,true); } }catch(e){ console.warn('hol61',e); } return r; }; }
 
+// ---------- one-off: +120 skill points for existing careers ----------
+{ const _ng61=newGame; newGame=function(){ const r=_ng61.apply(this,arguments); try{ if(S.me) S.me.gift61=1; }catch(e){} return r; }; }
+{ const _ls61=loadSlot; loadSlot=function(){ const r=_ls61.apply(this,arguments); try{ const m=S&&S.me; if(r&&m&&S.mode!=='mgr'&&!m.gift61){ m.gift61=1; m.sp=(m.sp||0)+120; news('good','+120 skill points','120 extra skill points to spend in Development.',false); try{ autosave(); }catch(e){} } }catch(e){} return r; }; }
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
