@@ -759,6 +759,7 @@ tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .trend2 .tdots i{position:absolute;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--warn);border:2px solid var(--panel)}.trend2 .tdots i.g{background:var(--pos)}.trend2 .tdots i.r{background:var(--neg)}
 .bdlist{display:flex;flex-direction:column}
 .bd{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.stance{display:flex;flex-direction:column;gap:3px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:10px 12px}.stance.s-untouchable{border-left-color:var(--neg)}.stance.s-key{border-left-color:var(--gold)}.stance.s-listed{border-left-color:var(--mute)}.stance .note{margin:0}
 .bdl{min-width:0}.bdl b{display:block;font-size:14px;font-weight:600}.bdl span{display:block;font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bdn{display:flex;gap:12px}.bdn span{display:flex;flex-direction:column;align-items:center;font-size:10.5px;color:var(--mute);min-width:26px}.bdn b{font-size:15px;color:var(--text);font-variant-numeric:tabular-nums}
 .bd.tot{border-bottom:0}.bd.tot .bdl b{font-weight:700}
@@ -7796,6 +7797,113 @@ SCENES.bdo=d=>{ const H=(S.bdoHist||[]).find(h=>h.y===d.y)||{rank:[]}; const m=S
     w:{say:'The best player in the world. Come on up!',opts:[{t:'Thank everyone who believed in you',fx:()=>{ m.morale=100; bdoNews(H); return {narr:'You hold the Golden Ball over your head. Everything you\'ve worked for is in your hands.'}; }},{t:'Dedicate it to your family',fx:()=>{ m.morale=100; bdoNews(H); return {narr:'Your voice cracks. Your mum is crying in the front row. So is half the room.'}; }},{t:'"I want another one"',fx:()=>{ m.morale=100; m.rep=clamp(m.rep+1,0,100); bdoNews(H); return {narr:'The room laughs. Nobody doubts you mean it.'}; }}]},
     e:{narr:()=>rk===2||rk===3?'So close. You applaud and promise yourself next year.':'You stand and applaud with the rest of the room.',opts:[{t:`Congratulate ${top[0]?top[0].n.split(' ').slice(-1)[0]:'him'}`,fx:()=>{ bdoNews(H); return {narr:'A handshake and a hug at the after-party. Respect.'}; }},{t:'Head home. Training tomorrow.',fx:()=>{ bdoNews(H); m.rel.manager=clamp(m.rel.manager+1,0,100); return {narr:'An early night. The manager hears about it and likes it.'}; }}]}}}; };
 
+// ===================== v51 (batch 4): a transfer market that makes sense =====================
+// values that account for contract, importance, form, age and the selling club; seller stances; buyers with real budgets and reasons;
+// release clauses in Spain; stars who want to stay or push to go; a believable next generation.
+const CLUB_POLICY={rich:['Manchester City','Paris Saint-Germain','Chelsea','Real Madrid','Newcastle United','Arsenal','Liverpool','Manchester United','FC Bayern München'],
+  tight:['FC Barcelona','Juventus','Olympique Lyonnais','Valencia CF'],
+  selling:['SL Benfica','FC Porto','Sporting CP','AFC Ajax','PSV','Feyenoord','Brighton & Hove Albion','LOSC Lille','AS Monaco','Borussia Dortmund','Bayer 04 Leverkusen','RB Leipzig','Eintracht Frankfurt','Atalanta','Udinese','Sevilla FC','Real Sociedad','Villarreal CF','SC Braga','Brentford']};
+let _polMap=null; function clubPolicy(c){ if(!c) return ''; if(!_polMap){ _polMap={}; for(const k in CLUB_POLICY) CLUB_POLICY[k].forEach(n=>_polMap[n]=k); } return _polMap[c.name]||''; }
+const POLICY_TXT={rich:'Wealthy. They don\'t need to sell their best players.',tight:'Financial limits. They can\'t spend big without selling first.',selling:'A selling club. Everyone has a price, and they get top money.'};
+
+// ---- contracts: important players are tied down, not on random deals ----
+function ctInit(p){ const c=club(p.c); if(!c) return ri(1,3); let s=null; try{ s=standing(p); }catch(e){} const imp=s&&(s.rank<6||s.starter);
+  if(p.a<=21) return ri(2,5); if(p.a>=33) return ri(1,2); if(p.a>=30) return imp?ri(1,3):ri(1,2); return imp?wpick([2,3,4,5],x=>({2:1,3:3,4:4,5:2})[x]):wpick([1,2,3,4],x=>({1:2,2:3,3:3,4:1})[x]); }
+ctOf=function(p){ if(p.ct==null) p.ct=ctInit(p); return p.ct; };
+
+// ---- market value ----
+function impOf(p){ try{ const s=standing(p); return s.rank<=2?1.12:s.starter?1.04:s.rank>=16?.85:.95; }catch(e){ return 1; } }
+function formOf(p){ if(!p.rn||p.rn<10) return 1; return clamp(1+(p.rs/p.rn-6.9)*.18,.86,1.18); }
+const POS_VF={GK:.55,CB:.82,LB:.78,RB:.78,LWB:.78,RWB:.78,CDM:.92,CM:1,CAM:1.05,LM:1,RM:1,LW:1.05,RW:1.05,CF:1.06,ST:1.08};
+function ctF(y){ return y<=0?.15:y===1?.6:y===2?.85:y===3?1:1.1; }
+marketValue=function(p){ const c=club(p.c); let v=baseValue(p.o,p.a,p.pt)*leagueMult(c,p.o)*ctF(ctOf(p))*impOf(p)*formOf(p)*(POS_VF[p.p]||1)*(clubPolicy(c)==='rich'&&p.o>=82?1.06:1); if(v>1.6e8) v=1.6e8+(v-1.6e8)*.4; return Math.max(10000,Math.round(v/sigRound(v))*sigRound(v)); };
+// release clauses: every player in Spain has one; big clubs set them sky-high
+function relClause(p){ const c=club(p.c); if(!c||c.country!=='ESP') return null; if(p.rc&&p.rcC===c.id) return p.rc; const v=baseValue(p.o,p.a,p.pt)*leagueMult(c,p.o)*1.1;
+  const m=c.name==='Athletic Club'?rnd(1.1,1.5):c.rep>=90?rnd(5,9):c.rep>=82?rnd(2.6,4.5):rnd(1.6,3); p.rc=roundFee(Math.min(1e9,Math.max(v*m,c.rep>=90&&p.o>=82&&p.a<=30?3e8:5e5))); p.rcC=c.id; return p.rc; }
+
+// ---- how the selling club sees a player ----
+function stanceOf(p){ const c=club(p.c); if(!c) return 'available'; const pol=clubPolicy(c); let s; try{ s=standing(p); }catch(e){ s={rank:10,starter:false}; } const lv=clubLevel(c);
+  if((typeof wlListed==='function'&&wlListed(p))||(s.rank>=18&&p.a>=24)||(!s.starter&&p.a>=30)) return 'listed';
+  if(p.a<=30&&c.rep>=78&&(s.rank<3||(s.starter&&p.o>=lv+2)||(p.a<=22&&(p.pt||p.o)>=lv+5&&s.rank<11))&&!(pol==='selling'&&s.rank>=1)) return 'untouchable';
+  if(s.starter&&s.rank<9) return 'key';
+  return 'available'; }
+const STANCE_TXT={untouchable:'Not for sale',key:'Key player',available:'Available',listed:'Transfer-listed'};
+untouchable=function(p){ return stanceOf(p)==='untouchable'; };
+sellerTerms=function(p,seller,buyer){ const v=marketValue(p); if(ctOf(p)<=0) return {ok:true,fee:0,free:true,v};
+  const r=rivalry(seller.id,buyer.id); const st=stanceOf(p); const pol=clubPolicy(seller); let mult, chance;
+  if(st==='untouchable'){ mult=2.1; chance=pol==='rich'?.01:.04; } else if(st==='key'){ mult=pol==='selling'?1.3:1.45; chance=pol==='rich'?.25:pol==='selling'?.7:.45; } else if(st==='listed'){ mult=.85; chance=.95; } else { mult=1.1; chance=pol==='selling'?.95:.85; }
+  if(pol==='tight'&&st!=='untouchable') chance=Math.min(1,chance*1.25);
+  // the player can force it: a dream move he's desperate for
+  const will=willingness(p,seller,buyer); if(will>=6&&st!=='untouchable') chance=Math.min(1,chance*1.5); if(will>=7&&st==='untouchable'&&pol!=='rich') chance=Math.max(chance,.12);
+  if(r===2){ chance*=typeof rivalCross==='function'?clamp(rivalCross(seller.id,buyer.id)*.3,.008,.16):.04; mult*=1.6; } else if(r===1){ chance*=.3; mult*=1.3; }
+  if(buyer.rep<seller.rep-4&&st!=='listed') chance*=.35;
+  if(ctOf(p)===1){ mult*=.75; chance=Math.min(1,chance*1.6); }
+  if(S.week>=WINDOW_WINTER[0]&&S.week<=WINDOW_WINTER[1]&&st!=='listed'&&st!=='available') chance*=.5;
+  // release clause: pay it and the selling club can't say no
+  const rc=relClause(p); const bud=(S.budgets&&S.budgets[buyer.id])||0; if(rc&&rc<=bud*.8&&will>=2&&r<2&&rc<=v*(p.o>=88?1.9:p.o>=85?1.55:1.35)&&!(rc>9e7&&p.o<87)&&!(buyer.name==='Athletic Club'&&!['ESP','FRA'].includes(p.nt))) return {ok:true,fee:rc,v,clause:1,st};
+  if(typeof wlListed==='function'&&wlListed(p)&&r<2){ chance=Math.max(chance,.92); return {ok:Math.random()<chance,fee:roundFee(p.wl.ask*rnd(.92,1.05)),v,st}; }
+  let fee=roundFee(v*mult*rnd(.95,1.15)); if(rc&&fee>rc) fee=rc;
+  // buyers have limits too: silly money only for the very best
+  const cap=v*(p.o>=88?1.9:p.o>=85?1.55:1.4); if(fee>cap&&st!=='listed') return {ok:false,fee,v,st,why:'price'}; if(fee>9e7&&p.o<87) return {ok:false,fee,v,st,why:'price'};
+  if(buyer.name==='Athletic Club'&&!['ESP','FRA'].includes(p.nt)) return {ok:false,fee,v,st,why:'policy'};
+  // nobody blows the whole budget on one player
+  if(fee>bud*.8&&st!=='listed') return {ok:false,fee,v,st,why:'budget'};
+  return {ok:Math.random()<chance,fee,v,st}; };
+// stars who are settled don't want to leave; the right move turns a head
+{ const _wl52=willingness; willingness=function(p,from,to){ let w=_wl52.apply(this,arguments); try{ const pf=clubPolicy(from), pt=clubPolicy(to); if(from.rep>=88&&p.o>=85&&to.rep<from.rep) w-=3; if(pt==='tight'&&to.rep>=90) w+=.5; if(p.a>=31&&to.rep<from.rep-6) w-=1; }catch(e){} return w; }; }
+// budgets: what clubs can really spend
+{ const _bf52=budgetFor; budgetFor=function(c){ const b=_bf52.apply(this,arguments); const pol=clubPolicy(c); return b*(pol==='rich'?1.35:pol==='tight'?.32:pol==='selling'?.85:1); }; }
+// rumoured deals need a reason: the buying club must actually need him
+{ const _rd52=rumourDeal; rumourDeal=function(r){ try{ const p=P(r.pid), b=club(r.to); if(p&&b&&!r.mq){ const inG=b.squad.map(P).filter(x=>x&&grp(x.p)===grp(p.p)).sort((x,y)=>y.o-x.o); const st=inG[(GROUP_NEED[grp(p.p)]||1)-1]; const bar=st?st.o:0; if(p.o<bar+2&&!(p.a<=21&&(p.pt||0)>=bar+4)) return; } }catch(e){} return _rd52.apply(this,arguments); }; }
+// ---- your own club's stance on you ----
+function myStance(){ const m=S.me, c=myClubObj(); if(!m||!c||!m.contract||m.loan) return null; if(m.transferReq) return 'listed'; const role=m.contract.role; const pol=clubPolicy(c);
+  if(['Star player'].includes(role)&&c.rep>=78&&m.age<=30&&pol!=='selling') return 'untouchable'; if(['Star player','Key player'].includes(role)) return 'key'; if(role==='Rotation'&&m.age>=24&&ovr()<clubLevel(c)-6) return 'listed'; return 'available'; }
+{ const _ap52=askingPrice; askingPrice=function(buyerId){ const a=_ap52.apply(this,arguments); try{ const st=myStance(); const m=S.me; if(m.contract&&m.contract.release&&a>=m.contract.release) return a; const k=st==='untouchable'?1.35:st==='listed'?.85:1; let x=roundFee(a*k); if(m.contract&&m.contract.release&&x>m.contract.release) x=m.contract.release; return x; }catch(e){ return a; } }; }
+// my value follows my form and my role too
+{ const _mv52=myValue; myValue=function(){ const v=_mv52.apply(this,arguments); try{ const m=S.me; const f=(m.form||[]).filter(x=>x!=null); const ff=f.length>=4?clamp(1+(avg(f)-6.9)*.15,.88,1.15):1; const rf={'Star player':1.12,'Key player':1.06,'First team':1,Rotation:.92,Prospect:.95,Youth:.95}[m.contract&&m.contract.role]||1; const x=v*ff*rf; return Math.round(x/sigRound(x))*sigRound(x); }catch(e){ return v; } }; }
+
+// ---- the next generation ----
+function regenPot(lvl){ const r=Math.random(); if(r<.005) return ri(87,92); if(r<.03) return ri(82,87); if(r<.25) return clamp(lvl+ri(-2,4),50,83); return clamp(lvl-ri(2,14),42,80); }
+developWorld=function(){ const wk=[];
+  for(const p of S.players){ p.a++; const pt=p.pt||p.o;
+    if(p.a<=21) p.o=Math.min(pt,p.o+(pt-p.o>=12?ri(2,6):pt-p.o>=6?ri(1,4):ri(0,2))); else if(p.a<=23) p.o=Math.min(pt,p.o+(pt-p.o>=5?ri(1,3):ri(0,1))); else if(p.a<=26){ if(p.o<pt) p.o=Math.min(pt,p.o+ri(0,2)); } else if(p.a<=29) p.o+=ri(-1,1); else if(p.a<=32) p.o-=ri(0,2); else p.o-=ri(1,4);
+    p.o=clamp(p.o,35,94); p.sn++;
+    if(p.a>=35&&Math.random()<(p.a-33)*.25||p.a>=38){ const c=club(p.c), lvl=c?clubLevel(c):60; if(p.real) (S._retN=S._retN||[]).push({n:p.n,a:p.a,o:p.o});
+      p.n=nameFor(c&&c.country&&NATMIX[c.country]?natFor(c.country):'ENG'); p.a=ri(16,18); p.pt=regenPot(lvl); p.o=Math.round(clamp(p.pt-ri(14,24),42,78)); p.real=0; p.sn=0; p.g=0; p.as=0; p.rn=0; p.rs=0; p.ct=ri(2,4); p.rc=null; p.wl=null;
+      if(S.me&&S.me.mates&&S.me.mates[p.id]!=null) S.me.mates[p.id]=ri(35,50); if(p.pt>=89) wk.push(p); } }
+  wk.slice(0,3).forEach(p=>{ const c=club(p.c); if(c) news('world',`Wonderkid alert: ${p.n}`,`${c.name} have a ${p.a}-year-old ${(POS_NAME[p.p]||p.p).toLowerCase()} everyone is talking about. Scouts from across Europe are already watching.`,true); });
+  refreshLevels(); S.clubs.forEach(c=>{ if(c.league) pickCaptains(c.id); }); };
+// existing saves: tidy up random contracts once, so stars aren't all on one-year deals
+{ const _pw52=planWeek; planWeek=function(){ const r=_pw52.apply(this,arguments); try{ if(!S.ct52){ S.ct52=1; for(const p of S.players){ if(!p||p.c==null) continue; if(p.ct!=null&&p.ct<=1&&p.a<=29&&p.o>=78&&Math.random()<.75) p.ct=ri(2,4); } } }catch(e){} return r; }; }
+
+// ---- the summer's big stories: rich clubs chase a star, and it plays out over weeks ----
+function marqueeWeek(){ if(!windowOpen()||S.week>=WINDOW_WINTER[0]) return; S.mq=S.mq&&S.mq.s===S.season?S.mq:{s:S.season,n:0}; if(S.mq.n>=5||Math.random()>.65) return; const myc=myClubId();
+  const AT=['ST','W','AM','CM']; const buyers=S.clubs.filter(c=>c.league&&!c.b&&S.leagues[c.league]&&c.rep>=84&&(S.budgets&&S.budgets[c.id]||0)>=5e7&&!(S.mode==='mgr'&&c.id===myc)&&!(S.rumours||[]).some(r=>r.to===c.id&&r.st==='open'&&r.mq));
+  if(!buyers.length) return; const b=pick(buyers); const bl=clubLevel(b); const bud=S.budgets[b.id];
+  const need=g=>{ const inG=b.squad.map(P).filter(x=>x&&grp(x.p)===g).sort((x,y)=>y.o-x.o); const st=inG[(GROUP_NEED[g]||1)-1]; return st?st.o:60; };
+  const cands=S.players.filter(p=>p&&p.c!=null&&p.c!==b.id&&p.o>=84&&p.a<=29&&AT.includes(grp(p.p))&&p.mv!==S.season&&p.o>=need(grp(p.p))+1&&club(p.c)&&club(p.c).league&&!club(p.c).b&&!(S.mode==='mgr'&&p.c===myc)&&!(S.rumours||[]).some(r=>r.pid===p.id&&r.st==='open')&&rivalry(p.c,b.id)<2&&club(p.c).rep<=b.rep);
+  const scored=cands.map(p=>({p,v:marketValue(p),w:willingness(p,club(p.c),b),st:stanceOf(p)})).filter(x=>x.v<=bud*.85&&x.w>=.6&&(x.st!=='untouchable'||Math.random()<.08)).sort((x,y)=>y.p.o-x.p.o+rnd(-2,2));
+  const t=scored[0]; if(!t) return; S.mq.n++; const src=pick(RUMOUR_SRC.slice(0,3)); const r=rumourFor(t.p,b,src); r.rel=Math.max(r.rel,.78); r.mq=1; r.stg='interest'; (S.rumours=S.rumours||[]).unshift(r);
+  const from=club(t.p.c); news('world',`${b.name} target ${t.p.n}`,`${src[0]}: ${b.name} have made ${t.p.n} their top summer target. ${t.st==='untouchable'?`${from.name} insist he is not for sale.`:t.st==='key'?`${from.name} don't want to sell, and it would take a huge fee.`:`${from.name} would listen at the right price.`}`,true); }
+{ const _mw52=marketWeek; marketWeek=function(){ const r=_mw52.apply(this,arguments); try{ marqueeWeek(); }catch(e){ console.warn('mq',e); } return r; }; }
+// ---- big clubs also buy the future: the best young talent from smaller clubs ----
+function mvPlayer(pl,from,to,fee,main){ const myc=myClubId(); from.squad=from.squad.filter(x=>x!==pl.id); to.squad.push(pl.id); pl.c=to.id; pl.sn=0; pl.ct=ri(4,5); pl.mv=S.season; pl.rc=null; pl.wl=null; if(S.budgets){ S.budgets[to.id]=(S.budgets[to.id]||0)-fee; S.budgets[from.id]=(S.budgets[from.id]||0)+fee*.7; }
+  if(S.me&&S.me.mates&&S.me.mates[pl.id]!=null&&to.id!==myc) delete S.me.mates[pl.id]; if(S.me&&to.id===myc&&S.me.mates) S.me.mates[pl.id]=ri(35,50);
+  (S.transfers=S.transfers||[]).unshift({s:S.season,w:S.week,d:ri(0,6),n:pl.n,pos:pl.p,o:pl.o,a:pl.a,from:from.id,to:to.id,fee,main:main?1:0}); }
+function investBuys(){ if(!windowOpen()||!S.budgets) return; const winter=S.week>=WINDOW_WINTER[0]; const myc=myClubId(); const tries=winter?1:3;
+  for(let i=0;i<tries;i++){ if(Math.random()<.45) continue; const buyers=S.clubs.filter(c=>c.league&&!c.b&&S.leagues[c.league]&&c.rep>=82&&(S.budgets[c.id]||0)>=3e7&&!(S.mode==='mgr'&&c.id===myc)); if(!buyers.length) return; const b=pick(buyers); const bl=clubLevel(b);
+    const cands=S.players.filter(p=>p&&p.c!=null&&p.c!==b.id&&p.a<=22&&(p.pt||p.o)>=bl+3&&p.o>=bl-7&&p.mv!==S.season&&club(p.c)&&club(p.c).league&&!club(p.c).b&&club(p.c).rep<b.rep-2&&rivalry(p.c,b.id)<2&&!(S.mode==='mgr'&&p.c===myc)&&!(S.me&&p.c===myc&&Math.random()<.5));
+    if(!cands.length) continue; const p=cands.sort((x,y)=>(y.pt+y.o)-(x.pt+x.o)+rnd(-4,4))[0]; const from=club(p.c); const t=sellerTerms(p,from,b); if(!t.ok||t.fee>(S.budgets[b.id]||0)*.6||willingness(p,from,b)<0) continue;
+    const back=b.squad.map(P).filter(x=>x&&grp(x.p)===grp(p.p)&&x.mv!==S.season&&x.id!==p.id).sort((x,y)=>x.o-y.o)[0];
+    mvPlayer(p,from,b,t.fee,1); if(back) mvPlayer(back,b,from,roundFee(marketValue(back)*rnd(.4,.7)),0);
+    if(t.fee>=3e7) news('world',`${b.name} sign ${p.n}`,`One of Europe's brightest young talents: the ${p.a}-year-old ${(POS_NAME[p.p]||p.p).toLowerCase()} joins from ${from.name} for ${money(t.fee)}${t.clause?', the full release clause':''}.`,true);
+    if(S.me&&S.mode!=='mgr'&&b.id===S.me.club) news(SEL_GROUP[S.me.pos].includes(p.p)?'bad':'you',`${b.name} sign ${p.n}`,`The ${p.a}-year-old (${p.p}, ${p.o} OVR) arrives from ${from.name} for ${money(t.fee)}.`);
+    if(S.me&&S.mode!=='mgr'&&from.id===S.me.club) news('you',`${p.n} leaves for ${b.name}`,`${from.name} cash in: ${money(t.fee)} for the ${p.a}-year-old.`,true); }
+  refreshLevels(); }
+{ const _wt52b=worldTransfers; worldTransfers=function(){ const r=_wt52b.apply(this,arguments); try{ investBuys(); }catch(e){ console.warn('invest',e); } return r; }; }
+
+function moneyBig(v){ return v>=1e9?`€${(v/1e9).toFixed(v%1e9?1:0)}bn`:money(v); }
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
@@ -8037,7 +8145,7 @@ VIEWS['dev:1']=()=>{ const m=S.me, smc=m.sm*4, wfc=m.wf*4;
 VIEWS['squad:0']=()=>{ const rows=hierarchy(); if(!rows.length) return '<p class="empty">No club.</p>'; const c=myClubObj(); const tiers=['Team leader','Highly influential','Established','Newcomer','Other'];
   return `<div class="dash c1">${W(`${esc(c.name)} · dressing room hierarchy`,`<table><thead><tr><th class="l">Player</th><th class="l">Pos</th><th>Age</th><th>OVR</th><th>Seasons</th><th class="l">You</th></tr></thead><tbody>${tiers.map(t=>{ const rs=rows.filter(r=>r.tier===t); if(!rs.length) return ''; return `<tr class="tierhead"><td class="l" colspan="6">${t}</td></tr>`+rs.map(r=>`<tr class="${r.me?'me':''}"><td class="l t">${esc(r.name)}${r.id===c.cap?' <span class="pill y">C</span>':r.id===c.vice?' <span class="pill y">VC</span>':''}${r.me&&S.me.captain?` <span class="pill y">${S.me.captain==='C'?'C':'VC'}</span>`:''}</td><td class="l">${r.pos}</td><td>${r.age}</td><td>${r.o}</td><td>${r.since}</td><td class="l">${r.me?'':S.me.mates[r.id]!=null?`<div class="bar" style="width:90px"><i class="${barCls(S.me.mates[r.id])}" style="width:${S.me.mates[r.id]}%"></i></div>`:''}</td></tr>`).join(''); }).join('')}</tbody></table><p class="note">You climb the hierarchy through seasons at the club, performances, age and your relationship with the manager. Team leaders can be named captain.</p>`,null,'w-tbl')}</div>`; };
 VIEWS['squad:1']=()=>{ const c=myClubObj(); if(!c) return '<p class="empty">No club.</p>'; const m=S.me; const sq=c.squad.map(P).sort((a,b)=>POSITIONS.indexOf(a.p)-POSITIONS.indexOf(b.p)||b.o-a.o); const rv=SEL_GROUP[m.pos];
-  return `<div class="dash c1">${W(`${esc(c.name)} squad`,`<table><thead><tr><th class="l">Player</th><th class="l">Pos</th><th class="l">Nat</th><th>Age</th><th>OVR</th><th>Value</th><th>Contract</th><th>Apps</th><th>G</th><th>A</th><th class="l" style="width:18%">Relationship</th><th class="l">Note</th></tr></thead><tbody>${sq.map(p=>`<tr><td class="l t">${esc(p.n)}</td><td class="l">${p.p}</td><td class="l">${p.nt}</td><td>${p.a}</td><td>${p.o}</td><td>${money(marketValue(p))}</td><td>${ctOf(p)<=1?'<span class="pill r">'+Math.max(0,ctOf(p))+' yr</span>':ctOf(p)+' yrs'}${untouchable(p)?' <span class="pill y">Key</span>':''}</td><td>${p.ap}</td><td>${p.g}</td><td>${p.as}</td><td class="l">${m.mates[p.id]!=null?`<div class="bar"><i class="${barCls(m.mates[p.id])}" style="width:${m.mates[p.id]}%"></i></div>`:''}</td><td class="l">${(m.partners||[]).includes(p.id)?'<span class="pill g">Partner</span>':rv.includes(p.p)?'<span class="pill r">Rival</span>':''}</td></tr>`).join('')}</tbody></table>`,null,'w-tbl')}</div>`; };
+  return `<div class="dash c1">${W(`${esc(c.name)} squad`,`<table><thead><tr><th class="l">Player</th><th class="l">Pos</th><th class="l">Nat</th><th>Age</th><th>OVR</th><th>Value</th><th>Contract</th><th>Apps</th><th>G</th><th>A</th><th class="l" style="width:18%">Relationship</th><th class="l">Note</th></tr></thead><tbody>${sq.map(p=>`<tr><td class="l t">${esc(p.n)}</td><td class="l">${p.p}</td><td class="l">${p.nt}</td><td>${p.a}</td><td>${p.o}</td><td>${money(marketValue(p))}</td><td>${ctOf(p)<=1?'<span class="pill r">'+Math.max(0,ctOf(p))+' yr</span>':ctOf(p)+' yrs'}${typeof stanceTag==='function'?stanceTag(p):''}</td><td>${p.ap}</td><td>${p.g}</td><td>${p.as}</td><td class="l">${m.mates[p.id]!=null?`<div class="bar"><i class="${barCls(m.mates[p.id])}" style="width:${m.mates[p.id]}%"></i></div>`:''}</td><td class="l">${(m.partners||[]).includes(p.id)?'<span class="pill g">Partner</span>':rv.includes(p.p)?'<span class="pill r">Rival</span>':''}</td></tr>`).join('')}</tbody></table>`,null,'w-tbl')}</div>`; };
 VIEWS['manager:0']=()=>{ const c=myClubObj(); if(!c) return '<p class="empty">No club, no manager.</p>'; const m=S.me;
   return `<div class="dash c2">${W(`${esc(c.mgr)} · manager`,`<div class="stack">${meter('Relationship',m.rel.manager)}${meter('Tactics',m.rel.tactical,100,'%')}<p class="note">How he sees you: ${m.rel.manager>=75?'one of his most trusted players':m.rel.manager>=60?'a player he trusts':m.rel.manager>=45?'part of his plans':m.rel.manager>=30?'on thin ice':'not in his plans'}.</p>
    <div class="chips">${Object.entries(TALKS).map(([k,l])=>`<button class="btn sec" data-act="talk" data-arg="${k}">${l}</button>`).join('')}</div></div>`)}
@@ -9938,9 +10046,9 @@ function openClubInfo(cid){ const c=club(cid); if(!c) return; CI.cid=cid; const 
   else if(CI.tab==='fans'){ const feisty=['Quiet','Polite','Lively','Loud and demanding','Ferocious'][T.passion-1];
     body=`<div class="ci-bars">${ciBar('Passion',T.passion,['Quiet','Polite','Lively','Loud','Ferocious'])}${ciBar('Patience with young players',T.youthPat,['None','Little','Some','Plenty','Endless'])}</div><p style="margin:0">${feisty}. ${T.passion>=4?pick(['They live and die with every result.','The noise on a big night is something else.','They let you know when it isn\'t good enough.']):T.passion<=2?'A supportive crowd that rarely turns on its own players.':'They back the team, but they expect effort.'} ${T.youthPat>=4?'They love seeing their own young players come through and give them time.':T.youthPat<=2?'They want results now. Young players get little time to settle.':'They\'ll give a young player a chance if he shows fight.'}</p><div class="lines"><div><span>Average crowd</span><b>about ${(Math.round(T.cap*clamp(.55+T.passion*.08,.5,.97)/100)*100).toLocaleString('en-IE')}</b></div><div><span>Stadium</span><b>${esc(c.stadium||'Home ground')} <small>${T.cap.toLocaleString('en-IE')}</small></b></div></div>
       <div class="lbl">Facilities</div><div class="ci-bars">${ciBar('Training facilities',T.train)}${ciBar('Youth facilities',T.youthFac)}${ciBar('Academy reputation',T.academy)}${ciBar('Scouting network',T.scout)}</div><p class="note" style="margin:0">${T.academy>=4?'A famous academy. Players who come through here are taken seriously everywhere.':T.youthFac>=4?'Excellent youth set-up even if the academy\'s name isn\'t famous yet.':T.youthFac<=2?'Basic youth set-up. Development depends on you.':'A solid place to develop.'} ${T.scout>=4?'Their scouts see everything, so their view of your potential is usually right.':T.scout<=2?'Their scouting is patchy, so their view of you can be way off.':''}</p>`; }
-  else { const sq=(c.squad||[]).map(id=>P(id)).filter(Boolean).sort((a,b)=>b.o-a.o); const mine=me?squadAt(cid):[]; const row=p=>`<div class="pz-row"><div class="ci-pos">${esc(p.p)}</div><div class="pz-rt"><b>${esc(p.n)}</b><span>${p.a!=null?`Age ${p.a}`:''}${p.id===c.cap?' · Captain':''}</span></div><span class="pill">${p.o}</span></div>`;
+  else { const sq=(c.squad||[]).map(id=>P(id)).filter(Boolean).sort((a,b)=>b.o-a.o); const mine=me?squadAt(cid):[]; const row=p=>`<div class="pz-row"><div class="ci-pos">${esc(p.p)}</div><div class="pz-rt"><b>${esc(p.n)}</b><span>${p.a!=null?`Age ${p.a}`:''}${p.id===c.cap?' · Captain':''}${typeof marketValue==='function'?` · ${money(marketValue(p))}`:''}${typeof relClause==='function'&&relClause(p)?` · clause ${moneyBig(relClause(p))}`:''}${typeof stanceTag==='function'?stanceTag(p,1):''}</span></div><span class="pill">${p.o}</span></div>`;
     const kids=sq.filter(p=>p.a<=21).sort((a,b)=>(b.pt||b.o)-(a.pt||a.o)).slice(0,4);
-    body=`${me&&mine.length?`<div class="lbl">In your position</div><div class="pz-list">${mine.slice(0,5).map(row).join('')}</div>`:''}<div class="lbl">Best players</div><div class="pz-list">${sq.slice(0,8).map(row).join('')}</div>${kids.length?`<div class="lbl">Young players</div><div class="pz-list">${kids.map(row).join('')}</div>`:''}`; }
+    body=`${typeof clubPolicy==='function'&&POLICY_TXT[clubPolicy(c)]?`<p class="note" style="margin:0 0 6px"><b>Transfer policy:</b> ${POLICY_TXT[clubPolicy(c)]}</p>`:''}${me&&mine.length?`<div class="lbl">In your position</div><div class="pz-list">${mine.slice(0,5).map(row).join('')}</div>`:''}<div class="lbl">Best players</div><div class="pz-list">${sq.slice(0,8).map(row).join('')}</div>${kids.length?`<div class="lbl">Young players</div><div class="pz-list">${kids.map(row).join('')}</div>`:''}`; }
   const sh=$('#sheet'); modal(`<button class="sx" data-act="ciClose" aria-label="Close">✕</button><div class="ci"><div class="ci-head">${crest(c,true).replace(/ data-ci="\d+"/,'')}<div><b>${esc(c.name)}</b><span>${L?esc(L.name)+' · ':''}level ${lv}</span><span class="ci-st">${hStars(staturePts(c))} <i>stature</i></span></div></div>
     <div class="ci-tabs">${tabs.map(([k,l])=>`<button class="chip" aria-pressed="${CI.tab===k}" data-act="ciTab" data-arg="${k}">${l}</button>`).join('')}</div>${body}</div>`); if(sh) sh.scrollTop=0; }
 function seasonLbl0(y){ return String(y); }
@@ -10180,6 +10288,13 @@ VIEWS['world:1']=()=>{ const H=S.bdoHist||[]; const cur=S.bdoCur&&!S.bdoCur.done
   if(!cur&&!sel&&!old.length) out+=W("Ballon d'Or",`<p class="empty">The 30 nominees are announced in early September. The ceremony is in Paris at the end of October.</p>`);
   return `<div class="dash c1">${out}</div>`; };
 ACT.bdy=a=>{ BDY=+a; render(); };
+
+// ===================== v51 UI (batch 4): stances, clauses, your club's position =====================
+function stanceTag(p,txt){ try{ const st=stanceOf(p); if(txt) return st==='untouchable'?' · <b class="c-lo">Not for sale</b>':st==='key'?' · <b style="color:var(--gold)">Key</b>':st==='listed'?' · Listed':''; return st==='untouchable'?' <span class="pill r">Not for sale</span>':st==='key'?' <span class="pill y">Key</span>':st==='listed'?' <span class="pill">Listed</span>':''; }catch(e){ return ''; } }
+{ const _tv52=VIEWS['transfers:0']; VIEWS['transfers:0']=()=>{ const h=_tv52(); try{ const m=S.me; const st=typeof myStance==='function'?myStance():null; if(!st) return h; const c=myClubObj(); const rel=m.contract&&m.contract.release;
+    const txt={untouchable:`${c.name} see you as untouchable. They'll turn down almost anything unless you push for a move${rel?' or a club pays your clause':''}.`,key:`${c.name} see you as a key player. It would take a big fee.`,available:`${c.name} would listen to offers at the right price.`,listed:`${c.name} are open to selling you${m.transferReq?' after your transfer request':''}.`}[st];
+    const box=`<div class="stance s-${st}"><span class="lbl">Your club's stance</span><b>${esc(STANCE_TXT[st])}</b><span class="note">${esc(txt)}</span>${rel?`<span class="note">Release clause: <b>${moneyBig(rel)}</b></span>`:''}<span class="note">Market value: <b>${money(myValue())}</b></span></div>`;
+    return h.replace(/(<div class="of-now">[\s\S]*?<\/i><\/div>)/,'$1'+box); }catch(e){ return h; } }; }
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
