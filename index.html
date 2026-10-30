@@ -834,6 +834,7 @@ tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .tli{display:grid;grid-template-columns:62px 28px minmax(0,1fr);gap:10px;align-items:start;padding:9px 0;border-bottom:1px solid var(--line)}.tli:last-child{border-bottom:0}
 .tld{font-size:12px;color:var(--dim);padding-top:4px}.tlo{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--panel-2);border:1px solid var(--line-2)}.tlo .hi{width:14px;height:14px;color:var(--accent-2)}
 .tli.k-trophy .tlo .hi,.tli.k-tour .tlo .hi,.tli.k-award .tlo .hi{color:var(--gold)}.tli b{display:block;font-size:14px}.tli div span{font-size:12.5px;color:var(--mute)}
+.bdl{display:flex;flex-direction:column}.bdr{display:flex;justify-content:space-between;gap:8px;padding:7px 2px;border-bottom:1px solid var(--line);font-size:14px;min-width:0}.bdr{align-items:center}.bdw{display:flex;flex-direction:column;min-width:0}.bdw b,.bdw small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bdw small{color:var(--mute);font-size:12px}.bdk{font-style:normal;color:var(--mute);font-weight:600;margin-right:6px}.bds{flex-shrink:0;color:var(--mute);font-size:12px}.bdr.me b{color:var(--accent-2)}.bdpod{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px;align-items:end;margin:6px 0 12px}.bdp{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;border:1px solid var(--line);border-radius:12px;padding:10px 6px;background:var(--glass);min-width:0}.bdp b{font-size:13px;line-height:1.25;overflow-wrap:anywhere}.bdp .note{font-size:11px}.bdp.p1{padding:16px 6px;border-color:var(--gold);background:linear-gradient(180deg,rgba(227,179,36,.22),transparent)}.bdp.me{outline:2px solid var(--accent-2)}.bdn{font-family:var(--cond);font-size:22px;font-weight:800;color:var(--gold)}.bdo3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}.bdo3>div{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:10px;padding:10px}.bdo3>div.me{border-color:var(--accent-2)}
 .awd{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}.awr{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:3px 0}.awr.win span:first-child{font-weight:700}.awr.me span:first-child{color:var(--accent-2)}
 
 /* ===================== light mode ===================== */
@@ -2718,10 +2719,7 @@ function seasonEnd(){
   const st=lid?m.ss['L:'+lid]:null; const top=lid?A.leagues[lid].top:null;
   if(st&&top&&top.g[0]&&top.g[0].me){ m.awards.push({s:S.season,y:S.year,name:`${LMETA(lid).name} Golden Boot`}); awards.push('Golden Boot'); }
   const ar=st?avg(st.rat):0;
-  if(st&&st.apps>=20&&ar>=7.35){ m.awards.push({s:S.season,y:S.year,name:`${LMETA(lid).name} Team of the Season`}); awards.push('Team of the Season'); }
-  if(st&&st.apps>=20&&ar>=7.65&&(st.g+st.a)>=15){ m.awards.push({s:S.season,y:S.year,name:`${LMETA(lid).name} Player of the Season`}); awards.push('Player of the Season'); m.rep=clamp(m.rep+4,0,100); }
-  if(st&&st.apps>=15&&m.age<=21&&ar>=7.1){ m.awards.push({s:S.season,y:S.year,name:`${LMETA(lid).name} Young Player of the Season`}); awards.push('Young Player of the Season'); }
-  const bdo=ballonDor(); A.ballon=bdo.slice(0,30); const myRank=bdo.findIndex(x=>x.me)+1; if(myRank&&myRank<=30){ m.awards.push({s:S.season,y:S.year,name:`Ballon d'Or · ${ordinal(myRank)}`}); awards.push(`Ballon d'Or ${ordinal(myRank)}`); if(myRank===1){ m.rep=100; news('good','BALLON D\'OR WINNER',`You are the best player in the world.`); } }
+  // league awards are judged against everyone else in awardsNight; the Ballon d'Or happens live in the autumn
   // career log
   const c=myClubObj();
   m.career.push({s:S.season,y:S.year,club:cid,loan:!!m.loan,lid,pos:lid?leaguePos(cid):null,ss:JSON.parse(JSON.stringify(m.ss)),ovr:ovr(),age:m.age,awards});
@@ -7688,6 +7686,116 @@ try{ const f=profileMatch; profileMatch=function(){ if(isFriendly()) return; ret
     else if(c.sim&&c.sim.events.some(e=>e.me&&e.type==='save'&&e.good)&&Math.random()<.6) rx.posts.push({h:fan(),txt:pick([`${m.last} did everything right there, the keeper just pulled off a worldie`,`Unlucky ${m.last}. Great movement, great strike, better save`,`Keeper's save of the season on ${m.last}. Nothing more he could do`]),l:lk,kind:'fan'});
   }catch(e){} return rx; }; }
 
+// ===================== v50 (batch 3): awards judged on football. A live Ballon d'Or night, Kopa, Yashin, Gerd Müller. Fair season awards and Player of the Month =====================
+const POSG=p=>p==='GK'?'G':['CB','LB','RB','LWB','RWB'].includes(p)?'D':['CDM','CM','CAM','LM','RM'].includes(p)?'M':'F';
+const GW={F:.55,M:.7,D:.9,G:0}, AW={F:.4,M:.5,D:.55,G:.2};
+function lvlF(cid){ const c=club(cid); return c?clamp((clubLevel(c)-58)/27,.15,1):.3; }
+function lgGames(lid){ const L=S.leagues[lid]; return L?Math.max(10,(L.clubs.length-1)*2):34; }
+function lgPos(lid,cid){ try{ return sortedTable(lid).indexOf(cid)+1; }catch(e){ return 0; } }
+
+// ---------- season awards: compared against everyone in the league ----------
+function awardScore(x,lid,kind){ const G=lgGames(lid); const g=POSG(x.p); const apF=clamp((x.ap||0)/(G*.55),0,1); const r=(x.r||6.5);
+  let s=(r-6.6)*14*apF+((x.g||0)*GW[g]+(x.as||0)*AW[g])+(g==='D'?(x.cs||0)*.12:g==='G'?(x.cs||0)*.3:0);
+  const pos=lgPos(lid,x.c), n=(S.leagues[lid]||{clubs:[]}).clubs.length; s+=pos===1?4:pos<=3?2:pos<=n/2?.5:pos>n-3?-1:0;
+  s+=x.me?(S.me.rep||0)*.03:((x.o||55)-55)*.04; if(kind==='pfa') s+=(r-6.6)*3; return s+(x.nz||0); }
+function awardsNight(snap){ const m=S.me; if(!m) return; const night={y:snap.y,list:[]}; const L=snap.lid?LMETA(snap.lid):null; const lid=snap.lid; const won=[];
+  const youthOnly=typeof isYouthTier==='function'&&m.tier==='youth';
+  const give=(name,rep)=>{ if(m.awards.some(a=>a.s===snap.s&&a.name===name)) return; m.awards.push({s:snap.s,y:snap.y,name}); won.push(name); m.rep=clamp(m.rep+(rep||0),0,100); };
+  const award=(name,cands,kind,rep)=>{ if(!cands.length) return null; const sh=cands.map(x=>({...x,sc:awardScore(x,lid,kind)})).sort((a,b)=>b.sc-a.sc).slice(0,6); const w=sh[0];
+    night.list.push({name,sh:sh.map(x=>({n:x.n,c:x.c,me:!!x.me,st:`${x.g} G · ${x.as} A · ${(x.r||0).toFixed(2)}`})),win:w.n,meNom:sh.some(x=>x.me),meWon:!!w.me}); if(w.me) give(name,rep); return w; };
+  if(snap.league&&snap.league.length&&L){ const G=lgGames(lid); const ps=snap.league.map(x=>({...x,nz:rnd(-.8,.8)})).filter(x=>!(x.me&&youthOnly&&(x.ap||0)<8));
+    const el=ps.filter(x=>(x.ap||0)>=G*.4);
+    award(`${L.name} Player of the Season`,el,'pots',4);
+    award(`${L.name} Young Player of the Season`,ps.filter(x=>x.a<=21&&(x.ap||0)>=G*.3),'ypots',2);
+    { const sh=ps.filter(x=>x.g>0).sort((a,b)=>b.g-a.g||(b.r||0)-(a.r||0)).slice(0,6); const meGB=m.awards.some(a=>a.s===snap.s&&a.name===`${L.name} Golden Boot`); const w=meGB?sh.find(x=>x.me)||sh[0]:sh[0];
+      if(sh.length) night.list.push({name:`${L.name} Golden Boot`,sh:sh.map(x=>({n:x.n,c:x.c,me:!!x.me,st:`${x.g} G · ${x.as} A · ${(x.r||0).toFixed(2)}`})),win:w.n,meNom:sh.some(x=>x.me),meWon:!!w.me}); }
+    if(snap.lid==='ENG1') award("PFA Players' Player of the Year",el,'pfa',2);
+    // team of the season: the best at each position
+    const tots=[]; [['G',1],['D',4],['M',3],['F',3]].forEach(([g,k])=>el.filter(x=>POSG(x.p)===g).map(x=>({...x,sc:awardScore(x,lid)})).sort((a,b)=>b.sc-a.sc).slice(0,k).forEach(x=>tots.push(x)));
+    if(tots.length){ night.list.push({name:`${L.name} Team of the Season`,sh:tots.map(x=>({n:x.n,c:x.c,me:!!x.me,st:`${x.p} · ${(x.r||0).toFixed(2)}`})),win:null,team:1,meNom:tots.some(x=>x.me),meWon:tots.some(x=>x.me)}); if(tots.some(x=>x.me)) give(`${L.name} Team of the Season`,1); } }
+  // Golden Boy, as before
+  if(snap.gb&&snap.gb.length){ const me=snap.gb.find(x=>x.me); const gbWin=snap.gb[0]&&snap.gb[0].me; (S.gbWinners=S.gbWinners||[]).push(snap.gb[0].n); night.list.push({name:'Golden Boy',sh:snap.gb.map(x=>({n:x.n,c:x.c,me:!!x.me,st:`${x.a} · ${x.o} OVR · ${x.g} G · ${x.as} A`})),win:snap.gb[0].n,meNom:!!me,meWon:gbWin});
+    if(gbWin){ give('Golden Boy',6); if(typeof wrepAdd==='function') wrepAdd(12); news('good','You win the Golden Boy!','Voted the best under-21 player in Europe.'); }
+    else if(me) news('you','Golden Boy shortlist',`You're among Europe's top 10 under-21 players this year. ${snap.gb[0].n} takes the award.`); }
+  // what you won, and what you were close to
+  const lc=(m.career||[]).slice(-1)[0]; if(lc&&lc.s===snap.s){ lc.awards=lc.awards||[]; won.forEach(n=>{ const short=n.replace(L?L.name+' ':'',''); if(!lc.awards.includes(short)) lc.awards.push(short); }); }
+  night.list.filter(a=>a.meNom&&!a.meWon&&!a.team).forEach(a=>{ if(/Player of the Season|Young Player/.test(a.name)) news('you',`${a.win} wins ${a.name}`,`You were on the shortlist. ${a.sh.find(x=>x.n===a.win).st} for the winner.`,true); });
+  won.filter(n=>n!=='Golden Boy').forEach(n=>news('good',n,/Team of the Season/.test(n)?'Named in the best XI in the league.':/Golden Boot/.test(n)?'Top scorer in the league.':'Voted the best in the league this season.'));
+  (m.awardNights=m.awardNights||[]).unshift(night); if(m.awardNights.length>20) m.awardNights.length=20; }
+
+// ---------- Player of the Month: the best in the league that month, not a target to hit ----------
+function potmSnapTake(){ const lid=myLeague(); if(!lid||!S.leagues[lid]) { S.potmSnap=null; return; } const d={}; for(const cid of S.leagues[lid].clubs) for(const pid of club(cid).squad){ const p=P(pid); if(p) d[pid]=[p.g||0,p.as||0,p.rs||0,p.rn||0,p.cs||0]; } S.potmSnap={lid,s:S.season,d}; }
+{ const _ma51=monthAwards; monthAwards=function(){ const m=S.me; const L=myLeague(); const Sn=S.potmSnap; try{ if(!m||!L||!Sn||Sn.lid!==L||Sn.s!==S.season||!S.leagues[L]){ const r=_ma51.apply(this,arguments); potmSnapTake(); return r; }
+    const cands=[]; for(const cid of S.leagues[L].clubs) for(const pid of club(cid).squad){ const p=P(pid), o=Sn.d[pid]; if(!p||!o) continue; const rn=(p.rn||0)-o[3]; if(rn<3) continue; cands.push({n:p.n,c:cid,p:p.p,g:(p.g||0)-o[0],as:(p.as||0)-o[1],r:((p.rs||0)-o[2])/rn,ap:rn,cs:(p.cs||0)-o[4],o:p.o}); }
+    const mr=(m.monthR||[]).filter(x=>x.r!=null); if(mr.length>=3) cands.push({n:`${m.first} ${m.last}`,c:myClubId(),p:m.pos,g:mr.reduce((s,x)=>s+x.g,0),as:mr.reduce((s,x)=>s+x.a,0),r:avg(mr.map(x=>x.r)),ap:mr.length,cs:0,o:ovr(),me:1});
+    const sc=x=>(x.r-6.6)*10+(x.g*GW[POSG(x.p)]+x.as*AW[POSG(x.p)])*1.6+(POSG(x.p)==='G'?x.cs*.8:POSG(x.p)==='D'?x.cs*.3:0)+rnd(-.5,.5); const sh=cands.map(x=>({...x,s:sc(x)})).sort((a,b)=>b.s-a.s); const w=sh[0]; const name=`${LMETA(L).name} Player of the Month`;
+    if(w&&w.me){ m.awards.push({s:S.season,y:S.year,name}); news('good',`${name}!`,`Average rating ${w.r.toFixed(2)}, ${w.g} goals and ${w.as} assists this month. Best in the league.`); m.rep=clamp(m.rep+2,0,100); gainXP(120); m.followers=Math.round(m.followers*1.04); }
+    else if(w){ (S.potmHist=S.potmHist||[]).unshift({s:S.season,w:S.week,n:w.n,c:w.c,st:`${w.g} G · ${w.as} A · ${w.r.toFixed(2)}`}); if(S.potmHist.length>12) S.potmHist.length=12; const myRank=sh.findIndex(x=>x.me)+1; if(myRank&&myRank<=3) news('you',`${w.n} is ${name}`,`${club(w.c)?club(w.c).name:"Their"}'s ${w.n} edges it: ${w.g} goals, ${w.as} assists, ${w.r.toFixed(2)} average. You were ${ordinal(myRank)} in the running.`,true); }
+    m.monthR=[]; }catch(e){ console.warn('potm',e); m.monthR=[]; } potmSnapTake(); }; }
+
+// ---------- Ballon d'Or: judged on last season, announced in September, presented at the end of October ----------
+function bdoClubAch(){ const ach={}; const add=(cid,k,v)=>{ (ach[cid]=ach[cid]||{})[k]=v; };
+  for(const lid in S.leagues){ try{ const t=sortedTable(lid); if(t[0]!=null) add(t[0],'lg',1); }catch(e){} }
+  for(const k in S.cups) if(S.cups[k].winner!=null) add(S.cups[k].winner,'cup',(ach[S.cups[k].winner]&&ach[S.cups[k].winner].cup||0)+1);
+  for(const k in S.euro){ const E=S.euro[k]; (E.log||[]).forEach(l=>{ const st=Object.keys(KO_NAME).find(x=>KO_NAME[x]===l.stage); const d=KO_ORDER.indexOf(st); if(d<0) return; (l.matches||[]).forEach(x=>[x.h,x.a].forEach(id=>{ if(id==null) return; const a=ach[id]=ach[id]||{}; a['e'+k]=Math.max(a['e'+k]||0,d+1); })); }); if(E.winner!=null){ const a=ach[E.winner]=ach[E.winner]||{}; a['e'+k]=6; } }
+  return ach; }
+function bdoTroph(a,lf){ if(!a) return 0; let s=0; if(a.lg) s+=4*lf; if(a.cup) s+=1.5*lf*a.cup; const u=a.eUCL||0; s+=u>=6?7:u===5?4:u===4?2:u===3?.8:0; const e=a.eUEL||0; s+=e>=6?3:e===5?1:0; const c=a.eUECL||0; s+=c>=6?1.5:0; return s; }
+function bdoSnapTake(){ const ach=bdoClubAch(); const pool=[];
+  for(const p of S.players){ if(!p||!(p.o>=79||p.a<=21&&p.o>=72||p.p==='GK'&&p.o>=77)||(p.rn||0)<12||p.c==null) continue; const lf=lvlF(p.c); pool.push({id:p.id,n:p.n,nt:p.nt,c:p.c,p:p.p,a:p.a,o:p.o,g:p.g||0,as:p.as||0,ap:p.rn||0,r:p.rs/p.rn,cs:p.cs||0,lf,tr:bdoTroph(ach[p.c],lf),nz:rnd(-1,1)}); }
+  let me=null; const m=S.me; if(m&&S.mode!=='mgr'&&m.club!=null&&!(m.tier==='youth')){ const cid=myClubId(); const lid=myLeague(); const st=lid&&m.ss?m.ss['L:'+lid]:null; const all=Object.entries(m.ss||{}).filter(([k])=>!k.startsWith('U')&&!k.startsWith('I:')).map(([,v])=>v);
+    const tot=all.reduce((s,x)=>({ap:s.ap+x.apps,g:s.g+x.g,a:s.a+x.a}),{ap:0,g:0,a:0}); const big=(m.results||[]).filter(x=>x.s===S.season&&!x.youth&&(/Champions|Final|Semi|Europa/.test(x.comp||'')||(x.ol||0)>=80)&&x.rating!=null);
+    if(st&&st.apps>=10){ const lf=lvlF(cid); me={me:1,n:`${m.first} ${m.last}`,nt:m.intlNat||m.nat,c:cid,p:m.pos,a:m.age,o:ovr(),g:st.g,as:st.a,ap:st.apps,r:avg(st.rat||[]),cs:st.cs||0,lf,tr:bdoTroph(ach[cid],lf),tot,big:big.length>=3?avg(big.map(x=>x.rating)):null,bigN:big.length,rep:m.rep,nz:rnd(-1,1)}; pool.push(me); } }
+  pool.forEach(x=>x.base=bdoBase(x)); pool.sort((a,b)=>b.base-a.base); const keep=new Set(pool.slice(0,70)); pool.filter(x=>x.a<=21).slice(0,15).forEach(x=>keep.add(x)); pool.filter(x=>x.p==='GK').slice(0,12).forEach(x=>keep.add(x)); if(me) keep.add(me); S.bdoSnap={s:S.season,y:S.year,pool:pool.filter(x=>keep.has(x)),done:0}; }
+function bdoBase(x){ const apF=clamp(x.ap/24,0,1); const g=POSG(x.p); let s=(x.r-6.6)*16*apF*x.lf+(x.g*GW[g]+x.as*AW[g])*.7*x.lf+x.tr+(x.me?x.o*.28+x.rep*.04:x.o*.3)+x.nz;
+  if(g==='G') s+=(x.cs||0)*.25*x.lf; if(x.me&&x.big!=null) s+=(x.big-7)*4*Math.min(1,x.bigN/5); return s; }
+// a summer tournament: winners and its best players get a boost
+function bdoTourBoost(x){ try{ const t=S.tour&&S.tour.awards&&S.tour.y===S.bdoSnap.y+1?S.tour:null; let b=0; const m=S.me;
+    if(x.me){ const h=(m.tourHist||[])[0]; if(h&&h.y===S.bdoSnap.y+1&&h.lvl!=='U21'&&h.lvl!=='U19'&&h.lvl!=='U17'){ if(h.won) b+=8; else if(/Final/.test(h.out||'')) b+=4; else if(/Semi/.test(h.out||'')) b+=2; const A=h.awards||{}; const nm=`${m.first} ${m.last}`; if(A.ball&&A.ball.n===nm) b+=6; if(A.boot&&A.boot.n===nm) b+=3; } return b; }
+    if(t){ const A=t.awards; const champ=A.champ; const row=(NATIONS||[]).find(n=>n[1]===champ||n[0]===champ); if(row&&x.nt===row[0]) b+=8; if(A.ball&&A.ball.n===x.n) b+=6; if(A.boot&&A.boot.n===x.n) b+=3; } return b; }catch(e){ return 0; } }
+function bdoRank(){ const B=S.bdoSnap; if(!B) return null; const pool=B.pool.map(x=>({...x,sc:x.base+bdoTourBoost(x)})); pool.sort((a,b)=>b.sc-a.sc); return pool; }
+function bdoEntry(x){ return {n:x.n,c:x.c,cn:club(x.c)?club(x.c).name:'',nt:x.nt,p:x.p,a:x.a,g:x.g,as:x.as,r:Math.round((x.r||0)*100)/100,me:!!x.me}; }
+function bdoWeeks(){ const y=S.year; let sw=null,cw=null; for(let w=1;w<=40;w++){ const d=gameDate(w,0); if(sw==null&&d>=new Date(Date.UTC(y,8,1))) sw=w; if(cw==null&&d>=new Date(Date.UTC(y,9,26))) cw=w; } return {sw,cw}; }
+function bdoShortlist(){ const B=S.bdoSnap; let pool=bdoRank(); const fb=!B; if(fb){ pool=S.players.filter(p=>p&&p.o>=83&&p.c!=null).map(p=>({id:p.id,n:p.n,nt:p.nt,c:p.c,p:p.p,a:p.a,o:p.o,g:0,as:0,r:0,sc:p.o+rnd(-2.5,2.5)})).sort((a,b)=>b.sc-a.sc); }
+  const top=pool.slice(0,30); const kopa=pool.filter(x=>x.a<=21).slice(0,10); const yashin=pool.filter(x=>x.p==='GK').slice(0,10);
+  const H={y:S.year,s:B?B.s:S.season-1,fb,short:top.map(x=>({...bdoEntry(x),sc:x.sc})),kopa:kopa.map(x=>({...bdoEntry(x),sc:x.sc})),yashin:yashin.map(x=>({...bdoEntry(x),sc:x.sc})),muller:B?(()=>{ const t=B.pool.slice().sort((a,b)=>b.g-a.g)[0]; return t?{...bdoEntry(t)}:null; })():null,done:0};
+  S.bdoCur=H; return H; }
+function bdoCeremony(quiet){ const H=S.bdoCur||bdoShortlist(); if(H.done) return H; const jury=x=>x.sc+rnd(-.6,.6); const r=H.short.map(x=>({...x,j:jury(x)})).sort((a,b)=>b.j-a.j); H.rank=r.map(x=>{ const {j,sc,...e}=x; return e; });
+  const pk=L=>L.length?L.map(x=>({...x,j:jury(x)})).sort((a,b)=>b.j-a.j)[0]:null; const kp=pk(H.kopa), ya=pk(H.yashin); H.kopaW=kp?{n:kp.n,c:kp.c,cn:kp.cn,me:kp.me}:null; H.yashinW=ya?{n:ya.n,c:ya.c,cn:ya.cn,me:ya.me}:null; H.done=1;
+  (S.bdoHist=S.bdoHist||[]).unshift({y:H.y,s:H.s,rank:H.rank,kopa:H.kopa.map(x=>({n:x.n,c:x.c,cn:x.cn,me:x.me})),kopaW:H.kopaW,yashinW:H.yashinW,muller:H.muller,fb:H.fb}); if(S.bdoHist.length>15) S.bdoHist.length=15;
+  // what it means for you
+  const m=S.me; if(m&&S.mode!=='mgr'){ const sy=S.bdoSnap?S.bdoSnap.y:S.year-1; const rk=H.rank.findIndex(x=>x.me)+1; H.myRank=rk||null;
+    if(rk){ m.awards.push({s:H.s,y:sy,name:`Ballon d'Or · ${ordinal(rk)}`}); if(rk===1){ m.rep=clamp(Math.max(m.rep,96)+2,0,100); m.followers=Math.round(m.followers*1.25); } else if(rk<=3){ m.rep=clamp(m.rep+4,0,100); m.followers=Math.round(m.followers*1.08); } else if(rk<=10) m.rep=clamp(m.rep+2,0,100); else m.rep=clamp(m.rep+.8,0,100); }
+    if(H.kopaW&&H.kopaW.me){ m.awards.push({s:H.s,y:sy,name:'Kopa Trophy'}); m.rep=clamp(m.rep+3,0,100); }
+    if(H.yashinW&&H.yashinW.me){ m.awards.push({s:H.s,y:sy,name:'Yashin Trophy'}); m.rep=clamp(m.rep+3,0,100); }
+    if(H.muller&&H.muller.me){ m.awards.push({s:H.s,y:sy,name:'Gerd Müller Trophy'}); m.rep=clamp(m.rep+2,0,100); }
+    try{ if(typeof honoursCheck==='function') honoursCheck(); }catch(e){} }
+  if(!quiet) bdoNews(H);
+  return H; }
+function bdoNews(H){ const w=H.rank[0]; if(!w) return; news(w&&w.me?'good':'world',w&&w.me?'BALLON D\'OR WINNER':`${w?w.n:'?'} wins the Ballon d'Or`,w&&w.me?'You are the best player in the world.':`${w.n} (${w.cn}) wins the ${H.y} Ballon d'Or. ${H.rank[1]?H.rank[1].n+' is second, '+(H.rank[2]?H.rank[2].n+' third.':''):''}${H.kopaW?` Kopa Trophy: ${H.kopaW.n}.`:''}${H.yashinW?` Yashin Trophy: ${H.yashinW.n}.`:''}`); }
+{ const _as51=archiveSeason; archiveSeason=function(){ try{ bdoSnapTake(); }catch(e){ console.warn('bdoSnap',e); } return _as51.apply(this,arguments); }; }
+{ const _pw51=planWeek; planWeek=function(){ const r=_pw51.apply(this,arguments); try{ if(S.mode!=='mgr'&&S.me&&(!S.potmSnap||S.potmSnap.s!==S.season||S.potmSnap.lid!==myLeague())) potmSnapTake(); }catch(e){} try{ const {sw,cw}=bdoWeeks(); S.bdoDone=S.bdoDone||{};
+    if(S.week===sw&&S.bdoDone.sh!==S.year){ S.bdoDone.sh=S.year; const H=bdoShortlist(); const m=S.me; const meIn=H.short.some(x=>x.me), meK=H.kopa.some(x=>x.me), meY=H.yashin.some(x=>x.me);
+      news(meIn?'good':'world',`Ballon d'Or ${H.y}: the 30 nominees`,`${H.short.slice(0,5).map(x=>x.n).join(', ')} and 25 more. The ceremony is in Paris at the end of October.${meIn?' And you\'re on the list.':''}`);
+      if(m&&S.mode!=='mgr'){ if(meIn) news('you','You\'re a Ballon d\'Or nominee',`One of the 30 best players in the world last season. The ceremony is on ${fmtDate(gameDate(cw,0))}.`); else if(meK) news('you','Kopa Trophy nominee','You\'re on the 10-man shortlist for the best young player in the world.'); else if(meY) news('you','Yashin Trophy nominee','You\'re on the shortlist for the best goalkeeper in the world.'); } }
+    if(S.week===cw&&S.bdoDone.c!==S.year){ S.bdoDone.c=S.year; if(!S.bdoCur||S.bdoCur.y!==S.year) bdoShortlist(); const H=S.bdoCur; const m=S.me; const inv=m&&S.mode!=='mgr'&&(H.short.some(x=>x.me)||H.kopa.some(x=>x.me)||H.yashin.some(x=>x.me)); bdoCeremony(inv); if(inv) sceneQueue('bdo',{y:H.y}); } }catch(e){ console.warn('bdo',e); } return r; }; }
+// honours for the new trophies
+{ const _hv51=honourValue; honourValue=function(kind,x){ const nm=String(x&&x.name||''); if(kind==='a'){ if(/Kopa Trophy/.test(nm)) return [5,500,0]; if(/Yashin Trophy/.test(nm)) return [6,600,0]; if(/Gerd Müller/.test(nm)) return [4,400,0]; } return _hv51.apply(this,arguments); }; }
+// the night itself
+SCENES.bdo=d=>{ const H=(S.bdoHist||[]).find(h=>h.y===d.y)||{rank:[]}; const m=S.me; const rk=H.rank.findIndex(x=>x.me)+1; const top=H.rank; const nm=`${m.first} ${m.last}`;
+  const kopaMe=H.kopaW&&H.kopaW.me, yaMe=H.yashinW&&H.yashinW.me; const inKopa=(H.kopa||[]).some(x=>x.me);
+  const line=x=>`${x.n} (${x.cn})`;
+  return {title:`Ballon d'Or ${H.y}`,label:'Théâtre du Châtelet, Paris',who:'The host',intro:`Paris. Flashbulbs, a red carpet that seems to go on forever, and every big name in football in one room.${rk?' Your name is on the list of 30.':inKopa?' You\'re here for the Kopa Trophy.':''}`,start:'a',nodes:{
+    a:{say:'Welcome to the red carpet! Who are you wearing tonight?',opts:[
+      {t:'Classic black tie',fx:()=>({narr:'Clean, sharp, timeless. The fashion pages call it "understated".',go:'b'})},
+      {t:'A bold statement suit',fx:()=>{ m.followers=Math.round(m.followers*1.03); return {narr:'Velvet, a colour nobody can name. Your phone doesn\'t stop buzzing. Half the internet loves it.',go:'b'}; }},
+      {t:'Bring your family on the carpet',fx:()=>{ m.morale=clamp(m.morale+6,0,100); return {narr:'Your mum is more nervous than you are. The photographers love it.',go:'b'}; }}]},
+    b:{narr:()=>`The lights go down. First, the Yashin Trophy: ${H.yashinW?line(H.yashinW):'—'}${yaMe?'. That\'s you!':'.'} Then the Gerd Müller Trophy for the top scorer: ${H.muller?line(H.muller):'—'}.`,opts:()=>[{t:kopaMe?'The Kopa Trophy is next…':'Applaud',fx:()=>{ if(kopaMe) return {narr:`"The Kopa Trophy, for the best young player in the world, goes to… ${nm}!" You walk up on stage. Your legs are shaking.`,go:'k'}; return {narr:`The Kopa Trophy goes to ${H.kopaW?line(H.kopaW):'—'}.${inKopa?' You clap. Next year.':''}`,go:'c'}; }}]},
+    k:{say:'A few words?',opts:[{t:'Thank your family',fx:()=>{ m.morale=clamp(m.morale+5,0,100); return {narr:'You thank your mum and dad and everyone who drove you to training in the rain. The room applauds.',go:'c'}; }},{t:'Thank your teammates',fx:()=>{ m.rel.team=clamp((m.rel.team||50)+3,0,100); return {narr:'"This is for the dressing room." The lads go mad in the group chat.',go:'c'}; }},{t:'"This is just the start"',fx:()=>{ m.rep=clamp(m.rep+.5,0,100); return {narr:'Bold. The headlines love it, and so do the fans.',go:'c'}; }}]},
+    c:{narr:()=>`The big screen counts down from 30. ${rk>10?`Your face comes up: ${ordinal(rk)}. ${rk<=20?'Not bad at all.':'You\'re in the room. That\'s something.'}`:rk?'Number after number, and your name hasn\'t come up yet. Your heart is going.':''}`,opts:[{t:'Keep watching',fx:p=>{ const t10=top.slice(3,10).reverse(); p.log.push(['narr',t10.map((x,i)=>`${10-i}. ${x.n}${x.me?' — you':''}`).join(' · ')]); return {go:'d'}; }}]},
+    d:{say:()=>`And now, the top three…`,opts:[{t:'Hold your breath',fx:p=>{ p.log.push(['narr',`Third: ${top[2]?line(top[2]):'—'}${top[2]&&top[2].me?'. That\'s you. A podium!':''}`]); p.log.push(['narr',`Second: ${top[1]?line(top[1]):'—'}${top[1]&&top[1].me?'. That\'s you! So close.':''}`]); p.log.push(['narr',`"And the ${H.y} Ballon d'Or goes to… ${top[0]?top[0].n:''}!"`]); return {go:top[0]&&top[0].me?'w':'e'}; }}]},
+    w:{say:'The best player in the world. Come on up!',opts:[{t:'Thank everyone who believed in you',fx:()=>{ m.morale=100; bdoNews(H); return {narr:'You hold the Golden Ball over your head. Everything you\'ve worked for is in your hands.'}; }},{t:'Dedicate it to your family',fx:()=>{ m.morale=100; bdoNews(H); return {narr:'Your voice cracks. Your mum is crying in the front row. So is half the room.'}; }},{t:'"I want another one"',fx:()=>{ m.morale=100; m.rep=clamp(m.rep+1,0,100); bdoNews(H); return {narr:'The room laughs. Nobody doubts you mean it.'}; }}]},
+    e:{narr:()=>rk===2||rk===3?'So close. You applaud and promise yourself next year.':'You stand and applaud with the rest of the room.',opts:[{t:`Congratulate ${top[0]?top[0].n.split(' ').slice(-1)[0]:'him'}`,fx:()=>{ bdoNews(H); return {narr:'A handshake and a hug at the after-party. Respect.'}; }},{t:'Head home. Training tomorrow.',fx:()=>{ bdoNews(H); m.rel.manager=clamp(m.rel.manager+1,0,100); return {narr:'An early night. The manager hears about it and likes it.'}; }}]}}}; };
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
@@ -8804,7 +8912,7 @@ function timelineItems(){ const m=S.me, it=[]; const yOf=s=>{ const c=(m.career|
 VIEWS['career:4']=()=>{ const m=S.me; const L=legacyScore(); const it=timelineItems(); const ic={badge:'star',move:'swap',trophy:'star',award:'star',intl:'pin',tour:'star',retire:'cal'};
   return `<div class="dash c1">${W(m.retired?'Career over':'Legacy so far',`<div class="stand"><div class="sbox" style="width:auto;padding:0 16px"><b>${L.sc}</b><span>legacy points</span></div><div><div class="stier">${L.tier}</div><p class="note" style="margin:2px 0 0">${legacyLine(L)}</p>${m.retired?`<p class="note">Retired at ${m.retired.age}${m.retired.after==='pundit'?', now a TV pundit':m.retired.after==='ambassador'?', now a club ambassador':m.retired.after==='coach'?', now coaching':''}.</p>`:''}</div></div>`)}
    ${W('Timeline',it.length?`<div class="tl">${it.map(x=>`<div class="tli k-${x.k}"><span class="tld">${x.y?`${x.y}/${String(x.y+1).slice(2)}`:esc(x.when||'')}</span><span class="tlo">${hic(ic[x.k]||'star')}</span><div><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:''}</div></div>`).join('')}</div>`:'<p class="empty">Your big moments will appear here.</p>')}</div>`; };
-{ const _c2=VIEWS['career:2']; VIEWS['career:2']=()=>{ const n=(S.me.awardNights||[]); const b=_c2(); if(!n.length) return b; const card=W(`Awards night ${n[0].y}/${String(n[0].y+1).slice(2)}`,`<div class="stack">${n[0].list.map(a=>`<div class="awd"><div class="row sb"><b>${esc(a.name)}</b>${a.meWon?'<span class="pill g">You won</span>':a.meNom?'<span class="pill y">Nominated</span>':''}</div>${a.sh.map(x=>`<div class="awr ${x.me?'me':''} ${x.n===a.win?'win':''}"><span>${esc(x.n)}${x.n===a.win?' <span class="pill y">Winner</span>':''}</span><span class="note">${esc(club(x.c)?club(x.c).short||club(x.c).name:'')} · ${esc(x.st)}</span></div>`).join('')}</div>`).join('')}</div>`); return b.replace(/^<div class="dash c2">/,'<div class="dash c2">'+card); }; }
+{ const _c2=VIEWS['career:2']; VIEWS['career:2']=()=>{ const n=(S.me.awardNights||[]); const b=_c2(); if(!n.length) return b; const card=W(`Awards night ${n[0].y}/${String(n[0].y+1).slice(2)}`,`<div class="stack">${n[0].list.map(a=>`<div class="awd"><div class="row sb"><b>${esc(a.name)}</b>${a.meWon?(a.team?'<span class="pill g">In the team</span>':'<span class="pill g">You won</span>'):a.meNom?'<span class="pill y">Nominated</span>':''}</div>${a.sh.map(x=>`<div class="awr ${x.me?'me':''} ${x.n===a.win?'win':''}"><span>${esc(x.n)}${x.n===a.win?' <span class="pill y">Winner</span>':''}</span><span class="note">${esc(club(x.c)?club(x.c).short||club(x.c).name:'')} · ${esc(x.st)}</span></div>`).join('')}</div>`).join('')}</div>`); return b.replace(/^<div class="dash c2">/,'<div class="dash c2">'+card); }; }
 
 // ---------- light / dark mode (remembered on this device) ----------
 function themePref(){ try{ return localStorage.getItem('bw-theme')||'dark'; }catch(e){ return 'dark'; } }
@@ -10056,6 +10164,22 @@ function attnItems(){ const m=S.me, out=[]; const add=(sec,sub,id)=>out.push({se
 { const _sp50=showPending; showPending=function(){ const r=_sp50.apply(this,arguments); try{ const p=S.pending, L=S.lastMatch; if(!p||p.kind!=='result'||!L||!L.red) return r; const sh=document.querySelector('#sheet'); if(!sh) return r;
     const lab=[...sh.querySelectorAll('.label')].find(x=>/^(Started|Came off the bench)/.test(x.textContent)); if(lab) lab.textContent=lab.textContent.replace(/^(Started|Came off the bench)/,L.red==='2y'?'Sent off (two yellows)':'Sent off');
     const dp=sh.querySelector('.mdrep p'); if(dp) dp.textContent=L.red==='dogso'?pick(['A couple of the lads tell you that you had to do it. The manager doesn\'t say anything.','"Took one for the team," says the captain. You\'re still gutted.']):L.red==='2y'?pick(['The manager walks past you without a word. You know what that means.','"Two silly yellows," the captain mutters. He\'s right.']):pick(['Silence when you walk in. The manager wants a word tomorrow.','You let the team down and everyone in that room knows it. You apologise to the lads.']); }catch(e){} return r; }; }
+
+// ===================== v50 UI (batch 3): the Ballon d'Or page =====================
+let BDY=null;
+VIEWS['world:1']=()=>{ const H=S.bdoHist||[]; const cur=S.bdoCur&&!S.bdoCur.done?S.bdoCur:null; const old=(S.archive||[]).filter(a=>a.ballon);
+  const {cw}=typeof bdoWeeks==='function'?bdoWeeks():{}; const when=cw?fmtDate(gameDate(cw,0),true):'the end of October';
+  const yrs=H.map(h=>h.y); const sel=H.find(h=>h.y===BDY)||H[0]; const flag=nt=>{ const r=typeof nationRow==='function'&&nt?nationRow(nt):null; return r?r[1]:(nt||''); };
+  const chips=yrs.length>1?`<div class="trs">${yrs.map(y=>`<button class="chip${sel&&sel.y===y?' on':''}" data-act="bdy" data-arg="${y}">${y}</button>`).join('')}</div>`:'';
+  let out='';
+  if(cur) out+=W(`Ballon d'Or ${cur.y} · the 30 nominees`,`<p class="note" style="margin:0 0 8px">Judged on last season: performances, goals and assists, big games, trophies, a summer tournament, and a little reputation. The ceremony is in Paris on ${esc(when)}.</p><div class="bdl">${cur.short.slice().sort((a,b)=>a.n.split(' ').slice(-1)[0].localeCompare(b.n.split(' ').slice(-1)[0])).map(x=>`<div class="bdr${x.me?' me':''}"><span class="bdw"><b>${esc(x.n)}</b><small>${esc(x.cn)}</small></span>${cur.fb?'':`<span class="bds">${x.g} G · ${x.as} A</span>`}</div>`).join('')}</div>${cur.kopa.length?`<div class="lbl" style="margin-top:10px">Kopa Trophy nominees · under-21</div><p class="note" style="margin:0">${cur.kopa.map(x=>x.me?`<b style="color:var(--accent-2)">${esc(x.n)}</b>`:esc(x.n)).join(' · ')}</p>`:''}${cur.yashin.length?`<div class="lbl" style="margin-top:10px">Yashin Trophy nominees · goalkeepers</div><p class="note" style="margin:0">${cur.yashin.map(x=>x.me?`<b style="color:var(--accent-2)">${esc(x.n)}</b>`:esc(x.n)).join(' · ')}</p>`:''}`);
+  if(sel){ const r=sel.rank||[]; const pod=[r[1],r[0],r[2]].map((x,i)=>x?`<div class="bdp p${[2,1,3][i]}${x.me?' me':''}"><div class="bdn">${[2,1,3][i]}</div><b>${esc(x.n)}</b><span class="note">${esc(x.cn)}</span></div>`:'').join('');
+    out+=W(`Ballon d'Or ${sel.y}`,`${chips}<div class="bdpod">${pod}</div><div class="bdl">${r.slice(3).map((x,i)=>`<div class="bdr${x.me?' me':''}"><span class="bdw"><b><i class="bdk">${i+4}</i>${esc(x.n)}</b><small>${esc(x.cn)}</small></span>${sel.fb?'':`<span class="bds">${x.g} G · ${x.as} A</span>`}</div>`).join('')}</div>
+      <div class="bdo3">${sel.kopaW?`<div class="${sel.kopaW.me?'me':''}"><span class="lbl">Kopa Trophy</span><b>${esc(sel.kopaW.n)}</b><span class="note">${esc(sel.kopaW.cn||'')}</span></div>`:''}${sel.yashinW?`<div class="${sel.yashinW.me?'me':''}"><span class="lbl">Yashin Trophy</span><b>${esc(sel.yashinW.n)}</b><span class="note">${esc(sel.yashinW.cn||'')}</span></div>`:''}${sel.muller?`<div class="${sel.muller.me?'me':''}"><span class="lbl">Gerd Müller Trophy</span><b>${esc(sel.muller.n)}</b><span class="note">${sel.muller.g} league goals</span></div>`:''}</div>`); }
+  else if(old.length){ const o=old[old.length-1]; out+=W(`Ballon d'Or ${o.year+1}`,`<table><thead><tr><th>#</th><th class="l">Player</th><th class="l">Club</th></tr></thead><tbody>${o.ballon.map((b,i)=>`<tr class="${b.me?'me':''}"><td>${i+1}</td><td class="l">${esc(b.n)}</td><td class="l t">${cname(b.c)}</td></tr>`).join('')}</tbody></table>`,null,'w-tbl'); }
+  if(!cur&&!sel&&!old.length) out+=W("Ballon d'Or",`<p class="empty">The 30 nominees are announced in early September. The ceremony is in Paris at the end of October.</p>`);
+  return `<div class="dash c1">${out}</div>`; };
+ACT.bdy=a=>{ BDY=+a; render(); };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
