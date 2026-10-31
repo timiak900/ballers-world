@@ -1280,6 +1280,16 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .armb{display:inline-block;background:#1d4ed8;color:#fff;border-radius:3px;padding:1px 5px;font-size:11px;font-weight:800;vertical-align:middle}
 .wkb{font-style:normal;color:#f5c518;font-size:.9em;margin-left:2px}.wkcard .wb{border-left:4px solid #f5c518}
 .lg2-grid .ps-bar i{background:var(--good,#2fbf71)}
+.mbrief .mb-row{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.45}.mbrief .mb-row:first-of-type{border-top:0}
+.mbrief .mb-row>span{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}.mbrief i{font-style:normal;color:var(--mute)}
+.mk-who{font-weight:700}.mk-who small{color:var(--mute);font-weight:600;margin-left:4px}.mk-tr{margin-top:2px}.unk{color:var(--mute);font-weight:600}
+.mb-jobs,.mb-st{margin:0;padding-left:18px}.mb-jobs li,.mb-st li{margin:2px 0}
+.ans em.band.g{color:#2fbf71}.ans em.band.y{color:#e3b324}.ans em.band.o{color:#f08c2e}.ans em.band.r{color:#e5484d}.ans em.blind{color:var(--mute)}
+.mk-line{margin:6px 0 2px;font-size:13px;color:var(--mute);line-height:1.5}.mk-line b{color:var(--text)}.mk-line b.up{color:#2fbf71}.mk-line b.dn{color:#e5484d}
+.mclock{position:relative;height:6px;border-radius:999px;background:var(--panel-3);margin:16px 0 10px}.mclock i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:#2fbf71;transition:width .1s linear}.mclock i.y{background:#e3b324}.mclock i.r{background:#e5484d}
+.mclock span{position:absolute;right:0;top:-18px;font-size:11px;font-weight:700;color:var(--mute)}
+.jobs45,.jobs45r{display:flex;flex-direction:column;gap:4px;margin-top:4px}.jobs45 .j,.jobs45r .j{display:grid;grid-template-columns:18px 1fr;gap:6px;font-size:12.5px;line-height:1.35;color:var(--mute)}
+.jobs45 .j.ok,.jobs45r .j.ok{color:var(--text)}.j.ok span{color:#2fbf71;font-weight:800}.j.no span{color:#e5484d;font-weight:800}.jobs45r{margin:10px 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}
 </style>
 
 <div class="app" id="app" hidden>
@@ -8693,6 +8703,177 @@ function acadTotals(cid){ const m=S.me; const t={apps:0,g:0,a:0,seas:new Set()};
 function acadSync(){ const m=S.me; if(!m||!m.bond) return; const ids=new Set(Object.keys(m.bond).map(Number)); (m.career||[]).forEach(c=>{ if(c.club!=null&&!c.loan) ids.add(c.club); }); if(m.club!=null) ids.add(m.club);
   ids.forEach(cid=>{ const t=acadTotals(cid); if(!t.apps) return; const b=bondOf(cid,true); b.yapps=Math.max(b.yapps||0,t.apps); b.yg=Math.max(b.yg||0,t.g); b.ya=Math.max(b.ya||0,t.a); if(!b.acad&&(m.career||[]).some(c=>c.club===cid&&c.age<=18)) b.acad=1; }); }
 
+// ===================== v63: match day with a brain =====================
+// difficulty · your direct opponent has a profile you have to read · he adapts · moves chain together ·
+// off-the-ball calls · a decision clock · the manager's jobs, graded · a rival for your shirt · real stakes
+
+// ---------- difficulty ----------
+const DIFFS={normal:{n:'Normal',d:'The odds are shown. Generous.',p:0,mul:1,dd:0,sur:0,r:0,timer:9,show:'pct'},
+  hard:{n:'Hard',d:'No percentages. Read your man, the keeper and the game.',p:.02,mul:.93,dd:.05,sur:.006,r:.1,timer:6,show:'band'},
+  legend:{n:'Legend',d:'No hints at all. Brutal ratings. Four seconds to decide.',p:.04,mul:.86,dd:.09,sur:.009,r:.2,timer:4,show:'none'}};
+function diffK(){ return (S&&DIFFS[S.diffK])?S.diffK:'hard'; }
+function DF(){ return DIFFS[diffK()]; }
+function timerOn(){ return !(S&&S.timerOff); }
+{ const _ng63=newGame; newGame=function(){ const r=_ng63.apply(this,arguments); try{ if(S&&!S.diffK) S.diffK='hard'; }catch(e){} return r; }; }
+
+// ---------- what kind of action an option is ----------
+const AGRP={acc:'pace',spd:'pace',dri:'skill',agi:'skill',bal:'skill',bc:'skill',rea:'skill',com:'skill',str:'power',agg:'power',stm:'power',hea:'air',jum:'air',sho:'pass',lpa:'pass',vis:'pass',cro:'pass',fk:'shoot',fin:'shoot',pow:'shoot',lon:'shoot',vol:'shoot',pen:'shoot',cur:'shoot',sta:'tackle',sli:'tackle',int:'read',def:'read',pos:'read'};
+function optGrp(o){ const t=String(o[0]||'').toLowerCase(); if(/knock it past|race |outpace|sprint|burst|in behind|turn and run|pace/.test(t)) return 'pace'; if(/header|head it|flick it on|aerial|nod /.test(t)||['hea','jum'].includes(o[1])) return 'air';
+  if(o[3]==='g') return 'shoot'; if(o[3]==='a') return 'pass'; return AGRP[o[1]]||'skill'; }
+const GRP_NAME={pace:'pace',skill:'skill',power:'strength',air:'in the air',pass:'passing',shoot:'shooting',tackle:'tackling',read:'reading the game'};
+
+// ---------- your direct opponent ----------
+// when you attack, he's a defender; when you defend, he's an attacker. Same player, same profile, every time you meet him.
+const MK_VS_ATT={quick:{n:'Quick',d:'Rapid. You won\'t outrun him.',m:{pace:-.15,skill:.03},x:'slow'},slow:{n:'Slow on the turn',d:'Get it past him and you\'re gone.',m:{pace:.12,skill:.04},x:'quick'},
+  strong:{n:'Strong',d:'Built like a wall. Don\'t try to bully him.',m:{power:-.12,skill:.04},x:'light'},light:{n:'Lightweight',d:'Put your body on him.',m:{power:.1},x:'strong'},
+  aerial:{n:'Dominant in the air',d:'You won\'t win headers against him.',m:{air:-.15,skill:.02},x:'short'},short:{n:'Weak in the air',d:'Get it in the air around him.',m:{air:.12},x:'aerial'},
+  rash:{n:'Dives in',d:'Make him commit and he\'ll go to ground.',m:{skill:.08},x:'patient'},patient:{n:'Patient',d:'Never dives in. Stays on his feet.',m:{skill:-.08,pass:.04},x:'rash'},
+  reader:{n:'Reads the game',d:'He sees the through ball before you play it.',m:{pass:-.09,pace:.03}}};
+const MK_VS_DEF={quick:{n:'Quick',d:'Lightning quick. Don\'t let him turn.',m:{tackle:-.1,pace:-.12,read:.04},x:'slow'},slow:{n:'Lacks pace',d:'Stand him up. He can\'t go past you.',m:{tackle:.06,pace:.1},x:'quick'},
+  tricky:{n:'Tricky',d:'Quick feet. Stay on yours.',m:{tackle:-.1,read:.06},x:'heavy'},heavy:{n:'Heavy touch',d:'Step in when it bounces off him.',m:{read:.1,tackle:.05},x:'tricky'},
+  strong:{n:'Strong',d:'Holds the ball up well. Don\'t get too tight.',m:{power:-.1,air:-.04,read:.03}},aerial:{n:'Dominant in the air',d:'Every cross is for him.',m:{air:-.14}},
+  lazy:{n:'Doesn\'t track back',d:'You\'ll have time on the ball.',m:{pass:.05,skill:.05,shoot:.03}}};
+const GK_HAB={offline:{n:'Comes off his line',d:'Chips and lobs are on.',rx:/chip|lob|dink|round the keeper|over him/i,m:.12},big:{n:'Huge, fills the goal',d:'Go low. Don\'t go high.',rx:/low|bottom|under|near post|side-foot|placed/i,m:.06,rx2:/top|roof|power|blast|high/i,m2:-.06},
+  small:{n:'Small for a keeper',d:'Go high. Top corners.',rx:/top|roof|high|over|corner/i,m:.08},spill:{n:'Spills shots',d:'Hit it hard. Follow it in.',rx:/power|hard|drive|blast|smash|lash|thump/i,m:.07},
+  sharp:{n:'Sharp reflexes',d:'Point-blank, he saves everything. Pick a corner.',rx:/corner|placed|curl|finesse/i,m:.04,rx2:/power|blast|smash/i,m2:-.06}};
+function defensivePos(){ return ['CB','LB','RB','LWB','RWB','CDM','GK'].includes(S.me.pos); }
+function mdInit(c){ if(!c||!c.sim||!c.sim.meSide||c.mk) return; const m=S.me; const tbl=defensivePos()?MK_VS_DEF:MK_VS_ATT; const nm=c.duel?c.duel.n:'their man';
+  const R=r45(h45('mk|'+nm+'|'+saveSeed())); const keys=Object.keys(tbl); const t1=keys[Math.floor(R()*keys.length)]; let t2; let g=0; do{ t2=keys[Math.floor(R()*keys.length)]; g++; }while((t2===t1||tbl[t1].x===t2||tbl[t2].x===t1)&&g<30);
+  const known={}; known[t1]=true; if((m.rel.tactical||50)>=82) known[t2]=true;
+  c.mk={n:nm,slot:c.duel?c.duel.slot:'',tbl:defensivePos()?'def':'att',t:[t1,t2],known}; c.ad={}; c.adSaid={};
+  const other=c.sim.meSide==='h'?'a':'h'; const gk=(c.sim[other].xi.find(p=>p.slot==='GK')||{}).n||'their keeper'; const gks=Object.keys(GK_HAB); const gR=r45(h45('gk|'+gk+'|'+saveSeed()));
+  c.gkH={n:gk,k:gks[Math.floor(gR()*gks.length)],known:(m.rel.tactical||50)>=55||Math.random()<.5};
+  c.ratingNoise=(c.ratingNoise||0)-DF().r; jobsInit(c); stakesInit(c); }
+function mkTbl(c){ return c.mk.tbl==='def'?MK_VS_DEF:MK_VS_ATT; }
+{ const _smd63=setupMatchDay; setupMatchDay=function(){ const r=_smd63.apply(this,arguments); try{ if(S.mode!=='mgr') mdInit(S.mctx); }catch(e){ console.warn('md63',e); } return r; }; }
+
+// how much the situation changes an option, using everything or only what you know
+function mdMod(o,c,knownOnly){ if(!c||!c.mk||!o||o[3]==='x'||o[3]==='s'||o[3]==='n'||o[3]==='f') return 0; const g=optGrp(o); let d=0; const T=mkTbl(c);
+  if(g!=='shoot'||o[3]!=='g'){ c.mk.t.forEach(k=>{ if(knownOnly&&!c.mk.known[k]) return; d+=(T[k].m[g]||0); }); d-=Math.min(.14,(c.ad[g]||0)*.06); }
+  if(o[3]==='g'&&c.gkH&&(!knownOnly||c.gkH.known)){ const H=GK_HAB[c.gkH.k]; const t=String(o[0]); if(H.rx&&H.rx.test(t)) d+=H.m; if(H.rx2&&H.rx2.test(t)) d+=H.m2; }
+  if(c.curEv&&c.curEv.chain&&c.chainB) d+=c.chainB;
+  return d; }
+{ const _mc63=momentChance; momentChance=function(o){ let p=_mc63.apply(this,arguments); if(p==null) return p; const c=S.mctx; if(!c||S.mode==='mgr') return p; try{
+    p+=mdMod(o,c,!!c.est); const D=DF(); p=p*D.mul-D.p; if(o[3]==='d') p-=D.dd; const lvl=c.oppLvl!=null?c.oppLvl:65; const sur=ovr()-lvl-5; if(sur>0) p-=sur*D.sur;
+    if(c.hes) p*=.3; return clamp(p,.03,.9); }catch(e){ return p; } }; }
+// what YOU think your chances are: only what you know, plus a bit of guesswork
+function momentEst(o,ev){ const c=S.mctx; if(!c) return momentChance(o); c.est=1; let p; try{ p=momentChance(o); } finally { c.est=0; } if(p==null) return p; const R=r45(h45(String(o[0])+'|'+(ev?ev.t:0)+'|'+saveSeed())); return clamp(p+(R()-.5)*.16,.03,.95); }
+function obEst(o,ev){ const R=r45(h45(String(o[0])+'|ob|'+(ev?ev.t:0)+'|'+saveSeed())); return clamp(obChance(o)+(R()-.5)*.16,.03,.95); }
+const BANDS={g:[.36,.25,.15],a:[.42,.3,.18],x:[.62,.48,.33],d:[.6,.45,.3]};
+function estTier(p,o){ if(p==null) return -1; const b=BANDS[o&&o[5]&&o[5].ob?'x':o?o[3]:'d']||BANDS.d; return p>=b[0]?3:p>=b[1]?2:p>=b[2]?1:0; }
+function estBand(p,o){ const t=estTier(p,o); return t<0?'Safe':['Long shot','Risky','Decent','Good look'][t]; }
+
+// ---------- picking: track the current moment, the clock, your instinct ----------
+{ const _dm63=dressMoment; dressMoment=function(e){ const r=_dm63.apply(this,arguments); try{ const c=S.mctx; if(c&&e) c.curEv=e; if(e&&e.ob&&!e.obFilled&&c&&c.sim){ const x=momCtx(e); e.mo={...e.mo,t:fillT(e.mo.t,x)}; e.obFilled=true; } }catch(err){} return r; }; }
+{ const _mp63=momentPick; momentPick=function(ix,ev){ const c=S.mctx; if(!c||!ev||S.mode==='mgr') return _mp63.apply(this,arguments);
+    if(ev.obIf==='lead1'&&!ev.done){ const [h,a]=liveScore(ev.t); const us=c.sim.meSide==='h'?h:a, th=c.sim.meSide==='h'?a:h; if(us-th!==1||!meOnPitch(ev.t)){ ev.done=true; ev.type='skip63'; return {txt:'',kind:null}; } } try{ dressMoment(ev); }catch(e){} c.curEv=ev; const M=ev.mo||{}; const k0=c.keyOk;
+    let hes=false; if(ix==='hes'){ hes=true; if(M.sit){ ix='auto'; hes=false; } else { c.hes=1; ix=Math.max(0,M.o.findIndex(o=>!['s','n'].includes(o[3]))); } }
+    else if((ix==null||ix==='auto')&&!M.sit&&diffK()!=='normal'){ let bi=0,bv=-1; M.o.forEach((o,j)=>{ const v=o[5]&&o[5].ob?obEst(o,ev):o[3]==='x'?.5:momentEst(o,ev); if(v!=null&&v>bv){ bv=v; bi=j; } }); ix=bi; }
+    const o=M.o&&M.o[+ix]; const g=o?optGrp(o):null; const wasChain=!!ev.chain; let res;
+    try{ res=_mp63.call(this,ix,ev); } finally { c.hes=0; }
+    try{ const ok=c.keyOk>k0;
+      if(wasChain) c.chainB=0;
+      if(hes){ c.rAdj=(c.rAdj||0)-.15; res.txt='Too slow! '+(ok?'You get away with it. ':`${c.mk?c.mk.n.split(' ').slice(-1)[0]:'He'} closes you down. `)+res.txt; ev.result=res.txt; c.hesN=(c.hesN||0)+1; }
+      if(o&&!['x','s','n','f'].includes(o[3])){ const giv=!ok&&['k','c','a'].includes(o[3]); if(giv) c.give=(c.give||0)+1;
+        // a good first action sets up the next one in the move
+        const chained=c.sim.events.some(e=>e.chain&&!e.done&&e.t>ev.t&&e.t<ev.t+.1); if(chained) c.chainB=ok?(['skill','pace','pass'].includes(g)?.08:.05):-.05;
+        // you learn about him by testing him
+        if(c.mk&&g&&g!=='shoot'){ const T=mkTbl(c); const hit=c.mk.t.find(k=>!c.mk.known[k]&&(T[k].m[g]||0)!==0); if(hit){ c.mk.known[hit]=true; res.txt+=` (${T[hit].n}: ${T[hit].d})`; ev.result=res.txt; c.mkLearn=(c.mkLearn||0)+1; }
+          if(ok){ c.ad[g]=(c.ad[g]||0)+1; if(c.ad[g]===2&&!c.adSaid[g]){ c.adSaid[g]=1; res.txt+=` ${c.mk.n.split(' ').slice(-1)[0]} has worked out your ${GRP_NAME[g]}. Try something else.`; ev.result=res.txt; } } }
+        if(c.gkH&&o[3]==='g'&&!c.gkH.known){ c.gkH.known=true; const H=GK_HAB[c.gkH.k]; res.txt+=` (Their keeper: ${H.n.toLowerCase()}.)`; ev.result=res.txt; } }
+      const L=c.momentLog; if(L&&L.length) L[L.length-1].txt=ev.result||res.txt; }catch(e){ console.warn('mp63',e); }
+    return res; }; }
+
+// ---------- off the ball ----------
+const OFFB=[
+ {id:'overlap',g:['ATT','MID'],t:'Their full-back {fb} bombs forward on the overlap. {mgr} is screaming at you to track him. Your legs are heavy.',o:[
+   ['Track him all the way','stm',{base:.6,conc:.35,mgr:2,mgrBad:3,job:'track',good:'You get back and block the cross. {mgr} applauds from the touchline.',bad:'You\'re a yard short. Cross, header.'}],
+   ['Stay high for the counter','pos',{base:.48,conc:.45,counter:.6,mgrBad:4,good:'They waste the overlap, and you\'re the out ball. Counter on!',bad:'Nobody tracks him. Cross, header.'}],
+   ['Pass him on and hold your zone','def',{base:.56,conc:.3,job:'track',good:'You hand him on and close the space inside. Nothing comes of it.',bad:'Confusion. He\'s free.'}]]},
+ {id:'cpress',g:['ATT','MID'],t:'You lose the ball on halfway and {cm} is about to break.',o:[
+   ['Counter-press straight away','sta',{base:.5,conc:.3,regain:.6,job:'press',good:'You snap into the tackle and win it straight back!',bad:'He rides it and plays through. They\'re in.'}],
+   ['Drop back into shape','def',{base:.66,conc:.2,good:'You recover your position. The attack fizzles out.',bad:'Too slow getting back. They get round you.'}],
+   ['Take one for the team','agg',{base:.95,y:1,good:'A cynical foul. Yellow card, but the break is dead.',bad:'Booked.',mgr:1}]]},
+ {id:'setpc',g:['ATT','MID','DEF'],t:'Corner against. You\'re marking {st} and he\'s starting to drift off you.',o:[
+   ['Stay touch-tight','str',{base:.55,conc:.36,good:'You stay glued to him. He doesn\'t get near it.',bad:'He spins off you.'}],
+   ['Zone the near post','hea',{base:.58,conc:.3,good:'You attack the near post and head it clear.',bad:'It flies over your head to the man you left.'}],
+   ['Go and attack the ball','jum',{base:.48,conc:.45,counter:.3,good:'You beat everyone to it and head it away. Counter on!',bad:'You miss it. So does everyone. It drops to him.'}]]},
+ {id:'line',g:['DEF'],t:'Their striker {st} drops deep to collect. Follow him into midfield or hold the line?',o:[
+   ['Follow him, stay tight','sta',{base:.55,conc:.3,regain:.35,job:'duels',good:'You\'re through the back of him. Ball won.',bad:'He rolls you and he\'s away. A gap behind you.'}],
+   ['Hold the line','def',{base:.62,conc:.25,good:'You hold. He has nobody to pass to.',bad:'He turns and runs at you. You\'re backing off.'}],
+   ['Step up, play offside','int',{base:.5,conc:.5,good:'Flag up. Perfectly timed.',bad:'No flag. He\'s through on goal.'}]]},
+ {id:'press',g:['ATT'],t:'Their centre-back {def} takes a heavy touch. {mgr} wants you pressing.',o:[
+   ['Press him now','acc',{base:.5,conc:.15,chance:.45,job:'press',good:'You\'re on him in a flash. He panics.',bad:'He gets it away just before you arrive. They play through your press.'}],
+   ['Show him inside','pos',{base:.62,conc:0,job:'press',good:'You cut off the pass. He has to go backwards.',bad:'He finds the angle anyway.'}],
+   ['Stay in shape','def',{base:.75,conc:0,good:'You hold your position. They keep the ball.',bad:'They play round you.'}]]},
+ {id:'lead',g:['ATT','MID','DEF'],w:x=>x.diff===1&&x.min>=78,t:'{min}\'. One goal up. They\'re throwing everything forward and the ball breaks to you deep in your own half.',o:[
+   ['Clear it, row Z','str',{base:.75,conc:.15,good:'Into the stands. The crowd cheers a clearance like a goal.',bad:'It goes straight back to them.'}],
+   ['Carry it out and win a foul','dri',{base:.52,conc:.25,mgr:1,good:'You drive out and get fouled. Precious seconds.',bad:'Dispossessed in a dangerous place.'}],
+   ['Keep it, play out calmly','com',{base:.5,conc:.3,good:'Composed. You find a teammate and the pressure is off.',bad:'Caught dawdling. Turned over.'}]]}];
+// put one or two off-ball calls into your game
+{ const _bs63=buildSim; buildSim=function(H,A,meSide,meOn){ const sim=_bs63.apply(this,arguments); try{ if(!sim||!sim.meSide||S.mode==='mgr') return sim; const grp=momentGroup(); const pool=OFFB.filter(z=>z.g.includes(grp)); if(!pool.length) return sim;
+    const n=Math.random()<.7?(Math.random()<.3?2:1):0; const T=sim.T; const start=meOn?meOn+sim.st1+2:8; const used=sim.events.filter(e=>e.type==='moment').map(e=>e.t); const picks=shuffle(pool.filter(z=>!z.w)).slice(0,n);
+    picks.forEach(z=>{ let t,k=0; do{ t=rnd(start,T-3); k++; }while(used.some(u=>Math.abs(u-t)<5)&&k<25); if(k>=25) return; used.push(t); const hm=tToHalfMin(t,sim); sim.events.push({t,half:hm.half,min:hm.min,type:'moment',ob:z.id,dressed:true,mo:{t:z.t,o:z.o.map(([tx,at,X])=>[tx,at,0,'x',null,{tag:'Off the ball',ob:X}]),obId:z.id}}); });
+    // a late lead to protect
+    const lz=OFFB.find(z=>z.id==='lead'); if(lz&&Math.random()<.5){ const t=Math.max(start,78+sim.st1+rnd(1,8)); if(t<T-1&&!used.some(u=>Math.abs(u-t)<3)){ const hm=tToHalfMin(t,sim); sim.events.push({t,half:hm.half,min:hm.min,type:'moment',ob:'lead',obIf:'lead1',dressed:true,mo:{t:lz.t,o:lz.o.map(([tx,at,X])=>[tx,at,0,'x',null,{tag:'Off the ball',ob:X}]),obId:'lead'}}); } }
+    sim.events.sort((a,b)=>a.t-b.t); }catch(e){ console.warn('bs63',e); } return sim; }; }
+// the late-lead call only happens if you really are one up
+{ const _ae63=typeof afterEventCheck==='function'?afterEventCheck:null; if(_ae63) afterEventCheck=function(e,t){ try{ if(e&&e.obIf==='lead1'&&!e.done){ const c=S.mctx, sim=c.sim; const [h,a]=liveScore(t); const us=sim.meSide==='h'?h:a, th=sim.meSide==='h'?a:h; if(us-th!==1||!meOnPitch(t)){ e.done=true; e.type='skip63'; return null; } } }catch(err){} return _ae63.apply(this,arguments); }; }
+function obChance(o){ const m=S.me, c=S.mctx; const X=o[5].ob; const a=m.attrs[o[1]]!=null?m.attrs[o[1]]:ovr(); const en=S.live&&typeof energyAt==='function'?energyAt(S.live.t):m.energy; const lvl=c&&c.oppLvl!=null?c.oppLvl:65;
+  let p=X.base+((a+ovr())/2-lvl)*.012+(o[1]==='stm'?(en-60)*.005:0)+((m.rel.tactical||50)-50)*.002-DF().p*.6; if(c&&c.hes) p*=.4; return clamp(p,.05,.95); }
+{ const _mx63=momentExtra; momentExtra=function(o,ev,res,pushE){ const X=o&&o[5]&&o[5].ob; if(!X) return _mx63.apply(this,arguments); const c=S.mctx, sim=c.sim, m=S.me; const other=sim.meSide==='h'?'a':'h'; const x=momCtx(ev); const F=s=>fillT(s||'',x);
+  c.ob=c.ob||{ok:0,bad:0,conc:0,press:0,track:0,trackBad:0,duels:0};
+  if(X.y){ c.yellow=(c.yellow||0)+1; pushE({type:'card',side:sim.meSide,who:meEntry().n,me:true}); if(X.mgr) m.rel.manager=clamp(m.rel.manager+X.mgr,0,100); res.txt=F(X.good); res.kind=null; c.ob.ok++; return res; }
+  const ok=Math.random()<obChance(o);
+  if(ok){ c.keyOk++; c.ob.ok++; c.rAdj=(c.rAdj||0)+.1; if(X.mgr) m.rel.manager=clamp(m.rel.manager+X.mgr,0,100); if(X.job==='press') c.ob.press++; if(X.job==='track') c.ob.track++; if(X.job==='duels') c.ob.duels++;
+    res.txt=F(X.good);
+    if(X.counter&&Math.random()<X.counter) insertChain(ev,FOLLOW2.counter); else if(X.regain&&Math.random()<X.regain) insertChain(ev,FOLLOW2.build); else if(X.chance&&Math.random()<X.chance) insertChain(ev,{t:'He gives it away to you on the edge of the box!',o:[['Shoot first time','fin',62,'g','Finesse Shot'],['Take a touch, pick your spot','com',58,'g'],['Square it to {stM}','sho',55,'a']]});
+    return res; }
+  c.keyFail++; c.ob.bad++; c.rAdj=(c.rAdj||0)-.15; if(X.job==='track') c.ob.trackBad++;
+  if(X.conc&&Math.random()<X.conc){ const sc=scorerName(other); pushE({type:'goal',side:other,who:sc,ast:null}); c.ob.conc++; c.rAdj-=.15; if(X.mgrBad) m.rel.manager=clamp(m.rel.manager-X.mgrBad,0,100); res.txt=`${F(X.bad)} ${sc} scores.`; res.kind='conceded'; return res; }
+  res.txt=`${F(X.bad)} ${pick(['They waste it. Lucky.','Your keeper bails you out.','Their final ball is poor. Phew.'])}`; return res; }; }
+
+// ---------- the manager's jobs ----------
+const JOBS={
+ shots:{t:'Get your shots off. At least two.',ok:c=>(c.shots||0)>=2,g:['ATT','MID']},
+ score:{t:'Score or set one up.',ok:(c,L)=>(L.g||0)+(L.a||0)>=1,g:['ATT']},
+ press:{t:'Press their centre-backs. Make them uncomfortable.',ok:c=>(c.ob&&c.ob.press>=1)||(c.duel&&c.duel.won>=2),g:['ATT']},
+ duels:{t:'Win your battle with {mk}.',ok:c=>!c.duel||(c.duel.won>=c.duel.lost&&c.duel.won>0),g:['ATT','MID','DEF']},
+ simple:{t:'Keep it simple. No cheap giveaways.',ok:c=>(c.give||0)<=1,g:['ATT','MID']},
+ create:{t:'Create chances for the strikers.',ok:(c,L)=>(c.kp||0)>=2||(L.a||0)>=1,g:['MID']},
+ track:{t:'Track your runner. Don\'t get caught off the ball.',ok:c=>!(c.ob&&(c.ob.trackBad||c.ob.conc)),g:['MID','DEF','ATT']},
+ clean:{t:'No silly cards.',ok:c=>!(c.yellow>0)&&!c.sentOff,g:['DEF','MID']},
+ cs:{t:'Keep a clean sheet.',ok:(c,L)=>L.them===0,g:['DEF']},
+ impact:{t:'Make an impact off the bench.',ok:(c,L)=>(c.keyOk||0)>=1||(L.g||0)+(L.a||0)>=1,g:['ATT','MID','DEF']}};
+function jobsInit(c){ if(!c||!c.sim||!c.sim.meSide||c.jobs||c.friendly) return; if(c.sel&&c.sel.status==='bench'){ c.jobs=['impact']; return; } const grp=momentGroup(); const sets={ATT:[['shots','score'],['press','duels','simple','track']],MID:[['create','shots'],['simple','track','duels','clean']],DEF:[['cs','duels'],['clean','track']]}[grp]||[['duels'],['simple']];
+  c.jobs=sets.map(s=>pick(s)).filter((v,i,a)=>a.indexOf(v)===i); }
+function jobText(k,c){ return (JOBS[k]?JOBS[k].t:'').replace('{mk}',c&&c.mk?c.mk.n:'your man'); }
+function jobsLive(c){ const L={g:0,a:0,them:0}; try{ const {g,a}=myStatsAt(S.live?S.live.t:999); const [h,aw]=liveScore(S.live?S.live.t:999); L.g=g; L.a=a; L.them=c.sim.meSide==='h'?aw:h; }catch(e){} return (c.jobs||[]).map(k=>({k,t:jobText(k,c),ok:!!(JOBS[k]&&JOBS[k].ok(c,L))})); }
+
+// ---------- stakes: a rival for your shirt, make-or-break games, scouts ----------
+function rivalFor(){ const m=S.me, c=myClubObj(); if(!c) return null; const grp=(typeof SEL_GROUP!=='undefined'&&SEL_GROUP[m.pos])||[m.pos]; const ps=(c.squad||[]).map(P).filter(p=>p&&p.n&&grp.includes(p.p)).sort((a,b)=>(b.o||0)-(a.o||0)); return ps[0]||null; }
+function stakesInit(c){ const m=S.me; if(!c||c.intl||c.youth||c.friendly||m.club==null) return; const r=rivalFor(); if(r){ if(!m.rival||m.rival.id!==r.id) m.rival={id:r.id,n:r.n,heat:m.rival?m.rival.heat||0:0}; }
+  c.stakes=[]; if(m.rival&&m.rival.heat>=1&&c.sel&&c.sel.status==='start') c.stakes.push(`Make or break. Another poor game and ${m.rival.n} takes your shirt.`);
+  const rum=(S.rumours||[]).find(x=>x.me&&x.st==='open'&&club(x.to)); if(rum&&Math.random()<.5){ c.scouts=rum.to; c.stakes.push(`Scouts from ${club(rum.to).name} are in the stands.`); }
+  if(c.mday&&c.mday.lvl>=2) c.stakes.push('A big one. A good game here gets noticed.'); }
+// after the game: grade the jobs, move the rival, reward the big nights
+{ const _fm63=finishMyMatch; finishMyMatch=function(){ const c=S.mctx; const r=_fm63.apply(this,arguments); try{ const L=S.lastMatch, m=S.me; if(!c||!L||!L.played||!L.mins||S.mode==='mgr') return r;
+    if(c.jobs&&c.jobs.length){ const res=c.jobs.map(k=>({k,t:jobText(k,c),ok:!!(JOBS[k]&&JOBS[k].ok(c,L))})); L.jobs=res; const n=res.filter(x=>x.ok).length;
+      if(!c.intl&&!c.youth){ const d=n===res.length?3:n===0?-3:0; if(d) m.rel.manager=clamp(m.rel.manager+d,0,100); if(n===res.length) m.selBoost={v:1.5,until:absWk()+2}; else if(n===0) m.selBoost={v:-2,until:absWk()+2}; }
+      L.jobsMsg=n===res.length?pick(['"That\'s exactly what I asked for."','"Did everything I wanted. Good."','"Spot on today."']):n===0?pick(['"I gave you two jobs. You did neither."','"Did you listen to anything I said before the game?"','"Not good enough. We\'ll talk."']):pick(['"Half of it. I need all of it."','"Some good, some not. Watch it back."']); }
+    if(m.rival&&!c.intl&&!c.youth&&!c.friendly){ const poor=(L.rating||6.5)<6.3||(L.jobs&&L.jobs.every(x=>!x.ok)); if(poor) m.rival.heat=Math.min(3,(m.rival.heat||0)+1); else if((L.rating||0)>=7.1) m.rival.heat=Math.max(0,(m.rival.heat||0)-1); }
+    if(c.scouts&&(L.rating||0)>=7.5){ m.rep=clamp(m.rep+1,0,100); const rm=(S.rumours||[]).find(x=>x.me&&x.to===c.scouts&&x.st==='open'); if(rm) rm.rel=Math.min(1,(rm.rel||.5)+.15); L.scoutNote=`The ${club(c.scouts).name} scouts will have liked that.`; }
+    L.diff=diffK(); L.mkSeen=c.mk?{n:c.mk.n,t:c.mk.t.map(k=>mkTbl(c)[k].n),known:c.mk.t.filter(k=>c.mk.known[k]).length}:null; }catch(e){ console.warn('fm63',e); } return r; }; }
+// lose your shirt: two poor games and the rival starts (Hard and Legend)
+{ const _sel63=selection; selection=function(fx){ const s=_sel63.apply(this,arguments); try{ const m=S.me; if(!s||!fx||fx.comp==='F'||fx.comp==='Y'||S.mode==='mgr'||diffK()==='normal') return s; if(s.status!=='start'||!m.rival||(m.rival.heat||0)<2) return s;
+    const k='rv'+absWk()+'|'+fx.comp; m.rvMap=m.rvMap&&m.rvMap.w===absWk()?m.rvMap:{w:absWk()}; if(m.rvMap[k]) return m.rvMap[k]; let out=s;
+    if(Math.random()<.65){ out={status:'bench',on:ri(58,75),rival:true}; m.rival.heat=1; const c=myClubObj(); if(c) mail('you',`${c.mgr}: ${m.rival.n} starts`,`"You've had two poor games. ${m.rival.n} has earned a go. Show me something from the bench and the shirt's yours again."`,{from:c.mgr,role:'Manager',cat:'manager'}); }
+    m.rvMap[k]=out; return out; }catch(e){ return s; } }; }
+
+// studying clips of your opponent before the game tells you everything about him
+{ const _ar63=typeof applyRoutine==='function'?applyRoutine:null; if(_ar63) applyRoutine=function(k){ const r=_ar63.apply(this,arguments); try{ const c=S.mctx; if(k==='clips'&&c&&c.mk){ c.mk.t.forEach(x=>c.mk.known[x]=true); if(c.gkH) c.gkH.known=true; } }catch(e){} return r; }; }
+{ const R=ROUTINES.find(r=>r[0]==='clips'); if(R) R[2]='Learn everything about your man and their keeper before kick-off.'; }
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
@@ -11347,6 +11528,60 @@ sceneHTML=function(p){ const who=p.who||''; const lines=p.log.map(([w,t,nm])=>w=
   const opts=p.done?'':`<div class="answers">${(p.opts||[]).map((o,i)=>`<button class="ans one" data-act="scPick" data-arg="${i}"><span>${esc(o)}</span></button>`).join('')}</div>`;
   const fx=p.done&&p.fx.length?`<div class="effects">${p.fx.map(([l,v])=>`<span class="eff ${typeof v==='number'&&v<0?'down':typeof v==='number'?'up':''}">${esc(l)} ${typeof v==='number'?(l==='Fine'||l==='Cost'||l==='Cash'?money(v):(v>0?'+':'')+v):esc(v)}</span>`).join('')}</div>`:'';
   return `<div class="label">${esc(p.label||'')}</div><h2 class="disp">${esc(p.title||'')}</h2><div class="dlg">${lines}</div>${opts}${fx}${p.done?'<button class="btn" data-act="next">Continue</button>':''}`; };
+
+// ===================== v63 UI: the match brief, reading your man, the clock, the manager's jobs =====================
+function mkLine(c,full){ if(!c||!c.mk) return ''; const T=mkTbl(c); const tr=c.mk.t.map(k=>c.mk.known[k]?`<b>${esc(T[k].n)}</b>${full?`<i> · ${esc(T[k].d)}</i>`:''}`:'<b class="unk">?</b>').join(full?'<br>':' · ');
+  return full?`<div class="mk-who">${esc(c.mk.n)}${c.mk.slot?` <small>${esc(c.mk.slot)}</small>`:''}</div><div class="mk-tr">${tr}</div>`:`vs ${esc(c.mk.n)}: ${tr}`; }
+function gkLine(c,full){ if(!c||!c.gkH) return ''; const H=GK_HAB[c.gkH.k]; return c.gkH.known?`${full?`<b>${esc(c.gkH.n)}</b> · `:''}${esc(H.n)}${full?`<i> · ${esc(H.d)}</i>`:''}`:`${full?`<b>${esc(c.gkH.n)}</b> · `:''}<span class="unk">Unknown. Your first shot will tell you.</span>`; }
+
+// ---------- pre-match: the brief ----------
+{ const _rp45=renderPrematch; renderPrematch=function(){ const r=_rp45.apply(this,arguments); try{ const c=S.mctx; if(!c||!c.mk||S.mode==='mgr') return r; const g=mv().querySelector('.mgrid.one'); if(!g||g.querySelector('.mbrief')) return r;
+    const jobs=(c.jobs||[]).map(k=>`<li>${esc(jobText(k,c))}</li>`).join(''); const stakes=(c.stakes||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+    const html=`<section class="mb mbrief"><div class="lbl">Match brief · ${esc(DF().n)}</div>
+      <div class="mb-row"><span>Your man</span><div>${mkLine(c,true)}<p class="note" style="margin:4px 0 0">${c.mk.t.some(k=>!c.mk.known[k])?'The analysts couldn\'t tell you everything. Study the clips in your routine, or test him early to find out.':'The analysts have him figured out.'}</p></div></div>
+      <div class="mb-row"><span>Their keeper</span><div>${gkLine(c,true)}</div></div>
+      ${jobs?`<div class="mb-row"><span>${esc(c.mgr||'The manager')}'s jobs for you</span><div><ol class="mb-jobs">${jobs}</ol></div></div>`:''}
+      ${stakes?`<div class="mb-row"><span>What's at stake</span><div><ul class="mb-st">${stakes}</ul></div></div>`:''}</section>`;
+    const first=g.querySelector('section.mb'); if(first) first.insertAdjacentHTML('afterend',html); else g.insertAdjacentHTML('afterbegin',html); }catch(e){ console.warn('rp45',e); } return r; }; }
+
+// ---------- the key moment: no free percentages, a clock, what you know about him ----------
+let MCLK=null; function mclkStop(){ if(MCLK){ clearInterval(MCLK.id); MCLK=null; } }
+{ const _sm45=showMoment; showMoment=function(e){ mclkStop(); const r=_sm45.apply(this,arguments); try{ const c=S.mctx; if(!c||S.mode==='mgr') return r; const D=DF(); const sh=document.querySelector('#sheet'); if(!sh) return r;
+    const btns=[...sh.querySelectorAll('.ans[data-act=pickMoment]')]; const M=e.mo;
+    btns.forEach((b,i)=>{ const o=M.o[i]; if(!o) return; const em=b.querySelector('em'); if(!em) return; const ob=o[5]&&o[5].ob;
+      if(D.show==='pct'){ if(ob) em.textContent=Math.round(obChance(o)*100)+'%'; return; }
+      if(o[3]==='x'&&!ob) return; // situations keep their tag
+      if(D.show==='none'){ em.textContent=ob?'Off the ball':o[3]==='s'?'Safe':'Your call'; em.classList.add('blind'); return; }
+      const v=ob?obEst(o,e):momentEst(o,e); em.textContent=estBand(v,o); em.className='band '+(['r','o','y','g'][estTier(v,o)]||''); });
+    const auto=sh.querySelector('.btn.sec[data-act=pickMoment]'); if(auto&&D.show!=='pct') auto.textContent='Trust your instinct';
+    const info=[]; if(c.mk&&!M.sit) info.push(mkLine(c,false)); if(c.gkH&&!M.sit&&M.o.some(o=>o[3]==='g')) info.push(`Keeper: ${gkLine(c,false)}`);
+    if(c.curEv&&c.curEv.chain&&c.chainB) info.push(c.chainB>0?'<b class="up">Good build-up. You\'re in a great spot.</b>':'<b class="dn">Scrappy. You\'re on the back foot.</b>');
+    const q=sh.querySelector('.press-q'); if(q&&info.length) q.insertAdjacentHTML('afterend',`<p class="mk-line">${info.join('<br>')}</p>`);
+    if(e.ob){ const h=sh.querySelector('h2.disp'); if(h) h.textContent='Off the ball'; }
+    if(timerOn()&&!M.sit){ const dur=(D.timer+(e.ob?2:0))*1000; sh.insertAdjacentHTML('afterbegin','<div class="mclock"><i></i><span></span></div>'); const bar=sh.querySelector('.mclock i'), lab=sh.querySelector('.mclock span'); const t0=Date.now(); const et=e.t;
+      MCLK={id:setInterval(()=>{ const left=Math.max(0,dur-(Date.now()-t0)); if(bar) bar.style.width=(left/dur*100)+'%'; if(lab) lab.textContent=Math.ceil(left/1000)+'s'; if(bar) bar.className=left<dur*.34?'r':left<dur*.67?'y':'';
+        if(left<=0){ mclkStop(); if(S.live&&S.live.pendingMoment===et&&!$('#modal').hidden) pickMomentUI('hes'); } },100)}; } }catch(err){ console.warn('sm45',err); } return r; }; }
+{ const _pm45=pickMomentUI; pickMomentUI=function(a){ mclkStop(); return _pm45.apply(this,arguments); }; }
+{ const _cm45=closeModal; closeModal=function(){ mclkStop(); return _cm45.apply(this,arguments); }; }
+
+// ---------- live: your jobs and your man ----------
+{ const _rl45=renderLive; renderLive=function(){ const r=_rl45.apply(this,arguments); try{ const c=S.mctx; if(!c||!c.involved||S.mode==='mgr'||!c.mk) return r; const me=mv().querySelector('section.mb.me'); if(!me) return r;
+    let box=me.querySelector('[data-k=jobs45]'); if(!box){ me.insertAdjacentHTML('beforeend','<div data-k="jobs45"></div>'); box=me.querySelector('[data-k=jobs45]'); }
+    const js=jobsLive(c); const L=S.live; const done=L&&L.mode==='ft';
+    box.innerHTML=`<p class="mk-line" style="margin-top:10px">${mkLine(c,false)}</p>${js.length?`<div class="lbl" style="margin-top:6px">Your jobs</div><div class="jobs45">${js.map(j=>`<div class="j ${j.ok?'ok':done?'no':''}"><span>${j.ok?'✓':done?'✗':'…'}</span>${esc(j.t)}</div>`).join('')}</div>`:''}`; }catch(e){} return r; }; }
+
+// ---------- full-time: the manager grades you ----------
+{ const _sp45=showPending; showPending=function(){ const r=_sp45.apply(this,arguments); try{ const p=S.pending, L=S.lastMatch; if(p&&p.kind==='result'&&L&&L.jobs&&L.jobs.length){ const sh=document.querySelector('#sheet'); if(sh&&!sh.querySelector('.jobs45r')){ const sc=sh.querySelector('.scoreline');
+      const html=`<section class="jobs45r"><div class="lbl">The manager's verdict</div>${L.jobs.map(j=>`<div class="j ${j.ok?'ok':'no'}"><span>${j.ok?'✓':'✗'}</span>${esc(j.t)}</div>`).join('')}<p class="quote" style="margin:6px 0 0">${esc(L.jobsMsg||'')}</p>${L.mkSeen?`<p class="note" style="margin:4px 0 0">${esc(L.mkSeen.n)}: ${esc(L.mkSeen.t.join(', '))}.</p>`:''}${L.scoutNote?`<p class="note" style="margin:4px 0 0">${esc(L.scoutNote)}</p>`:''}</section>`;
+      if(sc) sc.insertAdjacentHTML('afterend',html); } } }catch(e){} return r; }; }
+
+// ---------- settings ----------
+{ const _sv45=VIEWS['saves:0']; VIEWS['saves:0']=()=>{ const h=_sv45(); try{ if(S.mode==='mgr'||!S.me) return h; const k=diffK();
+    const card=W('Match difficulty',`<div class="stack"><div class="seg">${Object.entries(DIFFS).map(([id,D])=>`<button class="chip" aria-pressed="${k===id}" data-act="setDiff" data-arg="${id}">${D.n}</button>`).join('')}</div><p class="note" style="margin:0">${esc(DIFFS[k].d)}</p>
+      <div class="row sb"><span>Decision clock (${DIFFS[k].timer}s)</span><button class="chip" aria-pressed="${timerOn()}" data-act="setTimer">${timerOn()?'On':'Off'}</button></div></div>`);
+    return h.replace(/^(<div class="dash[^"]*">)/,'$1'+card); }catch(e){ return h; } }; }
+ACT.setDiff=k=>{ if(DIFFS[k]){ S.diffK=k; toast(`Difficulty: ${DIFFS[k].n}`); render(); } };
+ACT.setTimer=()=>{ S.timerOff=!S.timerOff; render(); };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
