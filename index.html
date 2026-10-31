@@ -8705,15 +8705,15 @@ function acadSync(){ const m=S.me; if(!m||!m.bond) return; const ids=new Set(Obj
 
 // ===================== v63: match day with a brain =====================
 // difficulty · your direct opponent has a profile you have to read · he adapts · moves chain together ·
-// off-the-ball calls · a decision clock · the manager's jobs, graded · a rival for your shirt · real stakes
+// off-the-ball calls · the manager's jobs, graded · a rival for your shirt · real stakes
 
 // ---------- difficulty ----------
 const DIFFS={normal:{n:'Normal',d:'The odds are shown. Generous.',p:0,mul:1,dd:0,sur:0,r:0,timer:9,show:'pct'},
   hard:{n:'Hard',d:'No percentages. Read your man, the keeper and the game.',p:.02,mul:.93,dd:.05,sur:.006,r:.1,timer:6,show:'band'},
-  legend:{n:'Legend',d:'No hints at all. Brutal ratings. Four seconds to decide.',p:.04,mul:.86,dd:.09,sur:.009,r:.2,timer:4,show:'none'}};
+  legend:{n:'Legend',d:'No hints at all. Brutal ratings.',p:.04,mul:.86,dd:.09,sur:.009,r:.2,timer:4,show:'none'}};
 function diffK(){ return (S&&DIFFS[S.diffK])?S.diffK:'hard'; }
 function DF(){ return DIFFS[diffK()]; }
-function timerOn(){ return !(S&&S.timerOff); }
+function timerOn(){ return false; } // the decision clock is gone for good
 { const _ng63=newGame; newGame=function(){ const r=_ng63.apply(this,arguments); try{ if(S&&!S.diffK) S.diffK='hard'; }catch(e){} return r; }; }
 
 // ---------- what kind of action an option is ----------
@@ -11577,11 +11577,9 @@ let MCLK=null; function mclkStop(){ if(MCLK){ clearInterval(MCLK.id); MCLK=null;
 
 // ---------- settings ----------
 { const _sv45=VIEWS['saves:0']; VIEWS['saves:0']=()=>{ const h=_sv45(); try{ if(S.mode==='mgr'||!S.me) return h; const k=diffK();
-    const card=W('Match difficulty',`<div class="stack"><div class="seg">${Object.entries(DIFFS).map(([id,D])=>`<button class="chip" aria-pressed="${k===id}" data-act="setDiff" data-arg="${id}">${D.n}</button>`).join('')}</div><p class="note" style="margin:0">${esc(DIFFS[k].d)}</p>
-      <div class="row sb"><span>Decision clock (${DIFFS[k].timer}s)</span><button class="chip" aria-pressed="${timerOn()}" data-act="setTimer">${timerOn()?'On':'Off'}</button></div></div>`);
+    const card=W('Match difficulty',`<div class="stack"><div class="seg">${Object.entries(DIFFS).map(([id,D])=>`<button class="chip" aria-pressed="${k===id}" data-act="setDiff" data-arg="${id}">${D.n}</button>`).join('')}</div><p class="note" style="margin:0">${esc(DIFFS[k].d)}</p></div>`);
     return h.replace(/^(<div class="dash[^"]*">)/,'$1'+card); }catch(e){ return h; } }; }
 ACT.setDiff=k=>{ if(DIFFS[k]){ S.diffK=k; toast(`Difficulty: ${DIFFS[k].n}`); render(); } };
-ACT.setTimer=()=>{ S.timerOff=!S.timerOff; render(); };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
