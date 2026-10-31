@@ -1278,6 +1278,8 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .ih-open{position:relative;padding-right:24px;cursor:pointer}.ih-open:hover b{text-decoration:underline}.ih-open em{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--mute);font-size:20px;line-height:1}
 .ih-kind{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;letter-spacing:.02em;padding:1px 7px;border-radius:999px;background:rgba(80,140,255,.16);color:#8fb4ff;width:max-content;max-width:100%;overflow-wrap:anywhere}.ih-kind.f{background:rgba(160,160,170,.16);color:var(--mute)}
 .armb{display:inline-block;background:#1d4ed8;color:#fff;border-radius:3px;padding:1px 5px;font-size:11px;font-weight:800;vertical-align:middle}
+.wkb{font-style:normal;color:#f5c518;font-size:.9em;margin-left:2px}.wkcard .wb{border-left:4px solid #f5c518}
+.lg2-grid .ps-bar i{background:var(--good,#2fbf71)}
 </style>
 
 <div class="app" id="app" hidden>
@@ -8571,7 +8573,7 @@ famActs=function(id){ const m=S.me; const here=famHere(id); const p=famPeople().
 SCENES.fammoney=d=>{ const m=S.me; const p=famPeople().find(x=>x.id===d.id); if(!p) return null; const fn=p.n; const w=m.contract?(m.contract.wage||0):0; const now=evDayAbs(); m.fcd=m.fcd||{};
   const amts=[[Math.max(200,roundWage(w)),'Something to help with the bills',3],[Math.max(800,roundWage(w*4)),'A proper boost',6],[Math.max(5000,roundWage(Math.max(w*20,(m.bank||0)*.1))),'Life-changing money',10]];
   const send=([a,l,b])=>()=>{ if((m.fcd[d.id+':money']||0)>now) return {narr:'You only just sent some. They\'ll tell you if they need more.'}; if(m.bank<a) return {narr:`You don't have ${money(a)} spare right now.`}; m.bank-=a; m.fcd[d.id+':money']=now+21; m.fbond=m.fbond||{}; m.fbond[d.id]=clamp(famBond(d.id)+b,0,100); m.morale=clamp(m.morale+Math.ceil(b/3),0,100);
-    const parent=d.id==='mum'||d.id==='dad'; return {narr:b>=10?(parent?`${fn} rings you in tears. "You didn't have to." You did, though.`:`${fn} goes quiet on the phone. Then: "Are you serious?" You are.`):b>=6?`${fn} sends back a voice note that's mostly screaming.`:`${fn}: "You're a good one. Don't tell your ${parent?'brother':'mum'} I said that."`,fx:[['Cost',-a],[fn,b]]}; };
+    const parent=d.id==='mum'||d.id==='dad'; return {narr:b>=10?(parent?`${fn} rings you in tears. "You didn't have to." You did, though.`:`${fn} goes quiet on the phone. Then: "Are you serious?" You are.`):b>=6?`${fn} sends back a voice note that's mostly screaming.`:(()=>{ const sb=(famInit().sibs||[])[0]; return parent?(sb?`${fn}: "You're a good one. Don't tell ${sb.n} I said that."`:`${fn}: "You're a good one. Always have been."`):`${fn}: "You're a good one. Don't tell Mum I said that."`; })(),fx:[['Cost',-a],[fn,b]]}; };
   return {title:`Send money to ${fn}`,label:`${p.r} · bank ${money(m.bank)}`,who:'',intro:`How much do you want to send ${fn}?`,start:'a',nodes:{a:{opts:amts.map(x=>({t:`${x[1]} · ${money(x[0])}`,fx:send(x)})).concat([{t:'Not now',fx:()=>({narr:'Maybe another time.'})}])}}}; };
 const HOL_DEST=[['dubai','Dubai','Desert, sun, rooftop dinners.',7,1.2,1],['maldives','The Maldives','Overwater villas and nothing to do.',10,1.6,1],['ibiza','Ibiza','Beach clubs and sunsets.',2.5,1,1],['mykonos','Mykonos','White walls, blue sea, a lot of footballers.',3.5,1.15,1],['marbella','Marbella','Every player\'s summer spot.',2.5,1,1],['algarve','The Algarve','Golf, beaches, easy.',2.5,.8,1],['como','Lake Como','Boats, villas, old money.',2,1.25,0],['miami','Miami','South Beach and courtside seats.',9,1.3,1],['ny','New York','Shopping, shows, the city that never sleeps.',8,1.2,0],['bali','Bali','Temples, surf and smoothie bowls.',16,.9,1],['cancun','Cancún','All-inclusive and turquoise water.',11,.9,1],['orlando','Orlando','Theme parks. The kids in the family will lose it.',9,1,0],['santorini','Santorini','Sunsets over the caldera.',3.5,1.1,1],['tenerife','Tenerife','Guaranteed sun, short flight.',4,.75,1],['tokyo','Tokyo','A different planet. Incredible food.',14,1.15,0]];
 const HOL_LEN=[[3,'Long weekend (3 nights)'],[7,'One week'],[14,'Two weeks']];
@@ -8606,6 +8608,90 @@ SCENES.famhol=d=>{ const m=S.me; const p=famPeople().find(x=>x.id===d.id); if(!p
 // ---------- one-off: +120 skill points for existing careers ----------
 { const _ng61=newGame; newGame=function(){ const r=_ng61.apply(this,arguments); try{ if(S.me) S.me.gift61=1; }catch(e){} return r; }; }
 { const _ls61=loadSlot; loadSlot=function(){ const r=_ls61.apply(this,arguments); try{ const m=S&&S.me; if(r&&m&&S.mode!=='mgr'&&!m.gift61){ m.gift61=1; m.sp=(m.sp||0)+120; news('good','+120 skill points','120 extra skill points to spend in Development.',false); try{ autosave(); }catch(e){} } }catch(e){} return r; }; }
+
+// ===================== v62: real siblings only, promoted players stay up, debut hype and wonderkid status, academy legacy =====================
+
+// ---------- one-off: +300 skill points ----------
+{ const _ng62=newGame; newGame=function(){ const r=_ng62.apply(this,arguments); try{ if(S.me) S.me.gift62=1; }catch(e){} return r; }; }
+{ const _ls62=loadSlot; loadSlot=function(){ const r=_ls62.apply(this,arguments); try{ const m=S&&S.me; if(r&&m&&S.mode!=='mgr'&&!m.gift62){ m.gift62=1; m.gift61=1; m.sp=(m.sp||0)+300; if(m.bc&&m.bc.debutG&&m.age<=20&&!m.wkTag) hypeAdd(50); news('good','+300 skill points','300 extra skill points to spend in Development.',false); try{ autosave(); }catch(e){} } }catch(e){} return r; }; }
+
+// ---------- family events only mention people who exist ----------
+function famSibs(f){ return (famInit().sibs||[]).filter(f||(()=>true)); }
+{ const E=EVENTS.find(e=>e.id==='fam_sibling'); if(E){ E.cond=()=>{ try{ return S.me.club!=null&&famSibs(s=>s.age<S.me.age&&s.age>=6&&s.age<=16).length>0; }catch(e){ return false; } };
+  E.make=()=>{ const ys=famSibs(s=>s.age<S.me.age&&s.age>=6&&s.age<=16); if(!ys.length) return {title:'Your old club\'s cup final',txt:'The kids at the club where you started have a cup final at the weekend. The coach asks if you could come and watch, or at least send something.',o:[['Go and watch',()=>({txt:'The kids go mad when you turn up. Selfies for an hour.',r:evApply({morale:4,energy:-3,fans:1})})],['Send signed shirts',()=>({txt:'They post a photo of the whole team holding them up.',r:evApply({morale:2})})]]}; const s=pick(ys); const his=s.rel==='brother'?'his':'her';
+    return {title:`${s.n}'s big game`,txt:`${s.n}, your little ${s.rel}, has a cup final with ${his} under-${Math.min(16,s.age+1)}s at the weekend. Could you come and watch, or at least send something?`,
+      o:[['Go and watch',()=>({txt:`The whole team mob you after the game. ${s.n} is the most popular kid in school for a month.`,r:evApply({morale:5,energy:-3,fans:1})})],['Send a signed shirt',()=>({txt:`${s.n} frames it. You get a video of ${his==='his'?'him':'her'} opening it.`,r:evApply({morale:2})})]]}; }; } }
+
+// ---------- once you're promoted, you play for the first team ----------
+// a youth or reserve game only happens when the manager wants it: coming back from injury, or short of match sharpness
+{ const _sel62=selection; selection=function(fx){ const s=_sel62.apply(this,arguments); try{ const m=S.me; if(!s||!fx||fx.comp==='Y'||fx.comp==='F'||S.mode==='mgr'||m.loan||m.club==null) return s; if(typeof isYouthTier==='function'&&isYouthTier()) return s;
+    if(!['youth','reserves'].includes(s.status)||s.frozen) return s;
+    if(s.fit){ ftDropNote(fx,'fit'); return s; }
+    const recent=(m.results||[]).filter(r=>!r.youth).slice(-3); const noMins=recent.length>=3&&recent.every(r=>!r.mins); const lowSharp=(m.sharp||60)<45;
+    let ok=''; try{ const dt=fxDetails(fx); ok=dt?dt.opp:''; }catch(e){} const k='dd'+absWk()+'|'+fx.comp+'|'+ok; m.dropMap=m.dropMap&&m.dropMap.w===absWk()?m.dropMap:{w:absWk()}; if(m.dropMap[k]) return m.dropMap[k];
+    let res={status:'out'}; if((noMins||lowSharp)&&(m.dropCd||0)<=absWk()&&Math.random()<.55){ res=s; m.dropCd=absWk()+3; ftDropNote(fx,lowSharp?'sharp':'mins'); }
+    m.dropMap[k]=res; return res; }catch(e){ return s; } }; }
+function ftDropNote(fx,why){ const m=S.me, c=myClubObj(); if(!c) return; const k='dn'+absWk(); if(m.dropNote===k) return; m.dropNote=k; const yt=S.youth?youthTeamName():'the reserves';
+  const txt={fit:`You're not ready for 90 minutes with us yet. You'll play for ${yt} this weekend to build your fitness back up.`,sharp:`You haven't played enough. I want you getting 90 minutes with ${yt} this weekend. Match sharpness. Then you're back with us.`,mins:`You've not had minutes for a few weeks. Go and play for ${yt} at the weekend, get the legs going, then you're straight back in my squad.`}[why];
+  mail('you',`${c.mgr}: playing for ${yt} this week`,`"${txt}"`,{from:c.mgr,role:'Manager',cat:'manager'}); }
+
+// ---------- hype: how much noise there is around you ----------
+function hype(){ return S.me.hype||0; }
+function hypeAdd(v){ const m=S.me; m.hype=clamp((m.hype||0)+v,0,100); if(m.age<=20&&m.hype>=45&&!m.wkTag){ m.wkTag=S.season; news('you',`Wonderkid: ${m.first} ${m.last}`,`${outlet()}: "There's a new name on everyone's lips. At ${m.age}, ${m.first} ${m.last} looks the real deal. Scouts across Europe have taken notice."`); } }
+function isWonderkid(){ const m=S.me; return !!m&&!!m.wkTag&&m.age<=20; }
+{ const _pt62=playerType; playerType=function(){ const t=_pt62.apply(this,arguments); try{ if(isWonderkid()&&t.k==='youngster') return {k:'youngster',n:'Wonderkid'}; }catch(e){} return t; }; }
+{ const _pp62=ppot; ppot=function(){ const v=_pp62.apply(this,arguments); try{ return clamp(v+hype()*.05,35,99); }catch(e){ return v; } }; }
+{ const _pw62=planWeek; planWeek=function(){ const r=_pw62.apply(this,arguments); try{ const m=S.me; if(m&&S.mode!=='mgr'&&m.hype){ m.hype=Math.max(0,m.hype*.92-.5); } }catch(e){} return r; }; }
+// press: the more noise, the more they want you, unless the manager is shielding you
+{ const _pk62=pressPickMe; pressPickMe=function(){ const m=S.me; if((m.pressShield||0)>absWk()) return 0; return Math.min(.95,_pk62.apply(this,arguments)+hype()/160); }; }
+{ const _bg62=bigGameFx; bigGameFx=function(fx,det){ const t=_bg62.apply(this,arguments); try{ const m=S.me; if(hype()>=50&&(m.pressShield||0)<=absWk()&&det&&!det.youth&&Math.random()<.5) return (t||[]).concat('hype'); }catch(e){} return t; }; }
+{ const _pq62=pressQsBig; pressQsBig=function(inv){ const qs=_pq62.apply(this,arguments); try{ if((inv.tags||[]).includes('hype')){ const m=S.me; const A=(h,c,d,f)=>[['humble',h],['confident',c],['deflect',d],['fiery',f]];
+      qs.unshift(pick([{q:`Everyone's calling you the next big thing. How do you handle that at ${m.age}?`,a:A('I don\'t read it. I just want to train and play.','I believe in myself. I always have.','My family keep my feet on the ground.','Let them talk. I\'ll keep scoring.')},
+        {q:`Big clubs are already watching you. Is your future here?`,a:A('I\'m happy here. This club gave me my chance.','I want to play at the highest level. I\'m not hiding that.','That\'s for my agent and the club.','Write what you want. I\'m focused on Saturday.')}])); } }catch(e){} return qs.slice(0,3); }; }
+
+// ---------- big moments for a young player make noise ----------
+{ const _fm62=finishMyMatch; finishMyMatch=function(){ const c=S.mctx; const m=S.me; let before=0; try{ before=careerTot(SENIOR).apps; }catch(e){} const r=_fm62.apply(this,arguments);
+  try{ const L=S.lastMatch; if(!c||!L||!L.played||!L.mins||c.youth||c.intl||c.friendly||m.club==null) return r; const after=careerTot(SENIOR).apps;
+    const deb=(c.mday&&(c.mday.tags||[]).includes('debut'))||(before===0&&after>=1); if(deb&&!m.debutDone){ m.debutDone=S.season; debutNoise(c,L); return r; }
+    if(m.age<=20){ let h=(L.g||0)*(m.age<=18?7:5)+(L.g>=2?8:0)+(L.rating>=8?5:0)+((c.mday&&c.mday.lvl>=2&&L.g)?6:0); if(h) hypeAdd(h); } }catch(e){ console.warn('hype62',e); } return r; }; }
+function debutNoise(c,L){ const m=S.me, cl=myClubObj(); if(!cl) return; const g=L.g||0, a=L.a||0; const young=m.age<=19;
+  const h=(young?14:6)+g*(m.age<=17?32:26)+a*10+(L.rating>=7.5?8:0)+(g>=2?15:0); hypeAdd(h);
+  const fol=Math.round((g?ri(25000,70000)*g:a?ri(6000,15000):ri(1500,5000))*(young?1.4:1)*(cl.rep>=80?2:1)); m.followers=(m.followers||0)+fol; m.rep=clamp(m.rep+(g?3+g:1),0,100); m.rel.fans=clamp(m.rel.fans+(g?8+g*2:3),0,100); m.morale=clamp(m.morale+(g?10:5),0,100);
+  const opp=club(c.oppCid)?club(c.oppCid).name:'them';
+  if(g){ news('you',pick([`Dream debut! ${m.last} scores on first ${cl.name} appearance`,`${m.age}-year-old ${m.last} marks debut with a goal`,`What a debut: ${m.last} on target against ${opp}`]),`${outlet()}: ${m.first} ${m.last}${g>=2?` scored ${g}`:' scored'} on ${m.age<=18?'his':'a'} senior debut against ${opp}. ${pick([`The academy staff were in tears in the stands.`,`Social media went into meltdown within minutes.`,`The supporters were singing his name by full-time.`])}`);
+    news('you',`${m.last} the talk of ${cl.name}`,`${outlet()}: pundits can't stop talking about ${m.first} ${m.last}. "${pick(['You don\'t see that very often from a kid on his debut. Composure, movement, finish. Special.','The way he took that goal, he\'s been doing it his whole life. Big future.','Calm down everyone, it\'s one game. But wow.'])}"`); }
+  else news('you',`${m.last} makes ${cl.name} debut`,`${outlet()}: ${m.age}-year-old ${m.first} ${m.last} made his senior debut against ${opp}${a?', and set up a goal':''}.`);
+  sceneQueue('debutbuzz',{g,a,r:L.rating,opp,res:L.res,us:L.us,them:L.them,fol});
+  sceneQueue('debutmgr',{g}); }
+SCENES.debutbuzz=d=>{ const m=S.me, cl=myClubObj(); if(!cl) return null; const f=famInit(); const g=d.g, a=d.a; const sib=famSibs(); const mates=(cl.squad||[]).map(P).filter(p=>p&&p.n).sort((x,y)=>(y.o||0)-(x.o||0)); const cap=(cl.cap!=null&&P(cl.cap))||mates[0]; const mate=mates.find(p=>p!==cap&&p.a<=24)||mates[1];
+  const big=g>0; const open=[];
+  open.push(['narr',big?`Full-time, ${d.us}-${d.them}. In the dressing room the lads go mad. ${cap?cap.n.split(' ').slice(-1)[0]:'The captain'} grabs your head: "Remember this one forever." Then they stand you on a chair and make you sing. It's tradition. You're terrible.`:`Full-time. ${cap?cap.n.split(' ').slice(-1)[0]:'The captain'} shakes your hand: "Welcome to the first team." A couple of the lads ruffle your hair on the way past.`]);
+  open.push(['narr',`Your phone has ${big?'gone mental':'been buzzing'}. ${d.fol.toLocaleString('en-GB')} new followers since kick-off.`]);
+  open.push(['him',big?`I'M SHAKING. Your dad is crying, don't tell him I told you. So proud of you ❤️`:`We watched every minute. So proud of you ❤️`,`${f.mum} (Mum)`]);
+  open.push(['him',big?`Watched it 20 times already. That's my boy.`:`First of many. Proud of you, son.`,`${f.dad} (Dad)`]);
+  const SL={ob:big?['Bro WHAT WAS THAT 😭 everyone at work is showing me the clip','You absolute legend. I\'m telling everyone I taught you that.']:['Saw you on the telly!! Big man now','Proper footballer now. Don\'t go getting a big head.'],os:big?['I literally screamed. The neighbours came round 😭','Crying at a football match. Never thought I\'d see the day. Proud of you x']:['Saw you on TV!! So proud x','My little brother on the telly. Mad.'],y:big?['my whole class saw it!!! everyone wants your autograph','CAN YOU GET ME A SIGNED SHIRT FROM EVERYONE']:['I saw you on TV!!!','you were on TV!! can I come to the next one']};
+  sib.slice(0,3).forEach((s,i)=>{ const k=s.age>m.age?(s.rel==='brother'?'ob':'os'):'y'; const L=SL[k]; open.push(['him',L[i%L.length],`${s.n} (${s.rel==='brother'?'Brother':'Sister'})`]); });
+  if(S.youth&&S.youth.coach) open.push(['him',big?'Told you. Now go and do it again.':'Good. That\'s the first one. Plenty more.',`${S.youth.coach} (youth coach)`]);
+  if(mate) open.push(['him',big?`Get in kid!! First of many 🔥`:`Well played today, kid.`,mate.n]);
+  if(big) open.push(['him',pick(['MATE. YOU\'RE ON SKY SPORTS NEWS','The group chat has lost its mind. You\'re famous now. Don\'t forget us.']),'Your best mate from school']);
+  const ag=typeof agentObj==='function'?agentObj():null; if(ag&&big) open.push(['him','My phone hasn\'t stopped. I\'m handling it. Enjoy tonight.',`${ag[0]} (agent)`]);
+  return {title:big?'Dream debut':'Your debut',label:`${cl.name} · after the game`,who:'',intro:'',open,start:'a',nodes:{a:{opts:[
+    {t:'Call home',fx:()=>{ m.fbond=m.fbond||{}; famPeople().forEach(x=>m.fbond[x.id]=clamp(famBond(x.id)+3,0,100)); m.morale=clamp(m.morale+4,0,100); return {narr:`Your mum answers on the first ring. Everyone's there, shouting over each other. You can hear ${big?'the clip playing in the background, again':'the telly in the background'}.`,fx:[['Family',3],['Morale',4]]}; }},
+    {t:'Post the shirt on Instagram',fx:()=>{ const v=Math.round(d.fol*.3); m.followers+=v; hypeAdd(3); m.rel.fans=clamp(m.rel.fans+1,0,100); return {narr:`"Day one. Dream come true." It's the most-liked post you've ever made by a mile.`,fx:[['Followers',`+${v.toLocaleString('en-GB')}`],['Fans',1]]}; }},
+    {t:'Reply to everyone, then phone off',fx:()=>{ m.energy=clamp(m.energy+5,0,100); m.rel.manager=clamp(m.rel.manager+1,0,100); return {narr:'It takes an hour. Then the phone goes in a drawer. Recovery starts tonight.',fx:[['Energy',5],['Manager',1]]}; }}]}}}; };
+SCENES.debutmgr=d=>{ const m=S.me, cl=myClubObj(); if(!cl) return null; const mg=cl.mgr; const noise=hype(); const rel=m.rel.manager;
+  if(noise<40) return {title:'The morning after',label:`${cl.name} · training ground`,who:mg,intro:`${mg} catches you on the way into the canteen.`,start:'a',nodes:{a:{say:pick(['Good debut. Enjoy it, then forget it. Training\'s at ten.','That\'s the first one. Now show me it wasn\'t a one-off.']),opts:[{t:'Yes, gaffer',fx:()=>({fx:evApply({manager:2})})}]}}};
+  return {title:'The noise',label:`${cl.name} · manager's office`,who:mg,intro:`The papers are on ${mg}'s desk. Your face is on most of them.`,start:'a',nodes:{a:{say:`You've seen this? "Wonderkid." "The next big thing." The phone's been ringing all morning: TV, podcasts, sponsors. Here's how it goes. No interviews for now. You keep your head down and you train. Understood?`,opts:[
+    {t:'Understood, gaffer',fx:()=>{ m.pressShield=absWk()+5; return {say:'Good lad. The noise is their job. Football is yours.',fx:evApply({manager:4,morale:1})}; }},
+    {t:'Could I do one interview? My family would love it',fx:()=>{ if(rel>=55||d.g>=2){ m.pressShield=absWk()+5; S.queue=S.queue||[]; S.queue.push({kind:'press',press:'pre',q:{q:`Your debut ${d.g?'goal':''} has been watched millions of times. What did your family say?`,a:[['humble','"My mum cried. My dad pretended he didn\'t. I owe them everything."'],['confident','"They always knew. So did I."'],['deflect','"I just want to keep working. One game is one game."'],['fiery','"They said the doubters can be quiet now."']]},outlet:outlet(),chain:[{q:'What\'s next for you?',a:[['humble','"Learn from the senior lads every day."'],['confident','"More goals. Lots more."'],['deflect','"That\'s up to the manager."'],['fiery','"Whatever I want."']]}],big:true}); return {say:'One. Club channel, our press officer in the room. Then that\'s it.',fx:evApply({manager:1})}; }
+        return {say:'No. You\'ll thank me in five years.',fx:evApply({manager:-1})}; }},
+    {t:'I\'ve earned this. Let me enjoy it',fx:()=>{ hypeAdd(5); return {say:'You\'ve earned one game. I\'ll decide when you\'ve earned more.',fx:evApply({manager:-4,fans:1})}; }}]}}}; };
+
+// ---------- legacy: academy numbers come from your actual seasons ----------
+function acadTotals(cid){ const m=S.me; const t={apps:0,g:0,a:0,seas:new Set()}; const add=(ss,s)=>{ for(const k in ss||{}){ if(!k.startsWith('U:')) continue; const x=ss[k]; if(!x||!x.apps) continue; t.apps+=x.apps; t.g+=x.g||0; t.a+=x.a||0; t.seas.add(s); } };
+  (m.career||[]).forEach(c=>{ if(c.club===cid&&!c.loan) add(c.ss,c.s); }); if(cid===m.club&&!m.loan) add(m.ss,S.season); return t; }
+function acadSync(){ const m=S.me; if(!m||!m.bond) return; const ids=new Set(Object.keys(m.bond).map(Number)); (m.career||[]).forEach(c=>{ if(c.club!=null&&!c.loan) ids.add(c.club); }); if(m.club!=null) ids.add(m.club);
+  ids.forEach(cid=>{ const t=acadTotals(cid); if(!t.apps) return; const b=bondOf(cid,true); b.yapps=Math.max(b.yapps||0,t.apps); b.yg=Math.max(b.yg||0,t.g); b.ya=Math.max(b.ya||0,t.a); if(!b.acad&&(m.career||[]).some(c=>c.club===cid&&c.age<=18)) b.acad=1; }); }
 
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
@@ -11250,6 +11336,17 @@ ACT.ihPtab=k=>{ IH.ptab=k; render(); };
 // ---------- life: money and holidays open a planner; the Image tab is gone ----------
 { const L=SECTIONS.find(s=>s[0]==='life'); if(L){ const i=L[2].indexOf('Image'); if(i>=0) L[2].splice(i,1); } }
 { const _fa43=ACT.famAct; ACT.famAct=a=>{ const [id,k]=String(a).split(':'); if(k==='money'||k==='holiday'){ const p=sceneMake(k==='money'?'fammoney':'famhol',{id}); if(p){ S.pending=p; showPending(); } return; } return _fa43(a); }; }
+
+// ===================== v62 UI: wonderkid tag, legacy academy numbers, first-team talk menu =====================
+{ const _mv44=VIEWS['manager:0']; VIEWS['manager:0']=()=>{ const h=_mv44(); try{ if(!isYouthTier()) return h.replace(/<button[^>]*data-arg="ftchance"[^>]*>[^<]*<\/button>/g,''); }catch(e){} return h; }; }
+{ const L=SECTIONS.find(x=>x[0]==='career'); const i=L?L[2].indexOf('Legacy'):-1; if(i>=0){ const k='career:'+i; const _lv44=VIEWS[k]; VIEWS[k]=()=>{ try{ acadSync(); }catch(e){} return _lv44(); }; } }
+{ const _rs44=renderShell; renderShell=function(){ const r=_rs44.apply(this,arguments); try{ if(S.mode!=='mgr'&&isWonderkid()){ const b=document.querySelector('#top .crumb b'); if(b&&!b.querySelector('.wkb')) b.insertAdjacentHTML('beforeend',' <i class="wkb" title="Wonderkid">★</i>'); } }catch(e){} return r; }; }
+{ const _hp44=VIEWS['home:1']; if(_hp44) VIEWS['home:1']=()=>{ const h=_hp44(); try{ if(isWonderkid()){ const m=S.me; const card=`<section class="w wkcard"><div class="wb"><div class="row sb"><b>★ Wonderkid</b><span class="pill y">Hype ${Math.round(hype())}</span></div><p class="note" style="margin:4px 0 0">The papers have you down as one of the best young players around. ${m.pressShield&&m.pressShield>absWk()?'Your manager is keeping you away from the press for now.':'Every journalist wants a word.'}</p></div></section>`; return h.replace(/^(<div class="dash[^"]*">)/,'$1'+card); } }catch(e){} return h; }; }
+// scene lines can name their own speaker (texts from family, teammates)
+sceneHTML=function(p){ const who=p.who||''; const lines=p.log.map(([w,t,nm])=>w==='narr'?`<p class="dl narr">${esc(t)}</p>`:`<div class="dl ${w}"><span>${w==='you'?'You':esc(nm||who)}</span><p>${esc(t)}</p></div>`).join('');
+  const opts=p.done?'':`<div class="answers">${(p.opts||[]).map((o,i)=>`<button class="ans one" data-act="scPick" data-arg="${i}"><span>${esc(o)}</span></button>`).join('')}</div>`;
+  const fx=p.done&&p.fx.length?`<div class="effects">${p.fx.map(([l,v])=>`<span class="eff ${typeof v==='number'&&v<0?'down':typeof v==='number'?'up':''}">${esc(l)} ${typeof v==='number'?(l==='Fine'||l==='Cost'||l==='Cash'?money(v):(v>0?'+':'')+v):esc(v)}</span>`).join('')}</div>`:'';
+  return `<div class="label">${esc(p.label||'')}</div><h2 class="disp">${esc(p.title||'')}</h2><div class="dlg">${lines}</div>${opts}${fx}${p.done?'<button class="btn" data-act="next">Continue</button>':''}`; };
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
