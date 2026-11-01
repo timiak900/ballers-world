@@ -2898,7 +2898,7 @@ function buildSim(H,A,meSide,meOn,homeAdv){
   const lh=bestXI(H.players), la=bestXI(A.players); sim.h.xi=lh.xi; sim.h.bench=lh.bench; sim.a.xi=la.xi; sim.a.bench=la.bench;
   if(meSide){ const side=sim[meSide]; const me=meEntry(); if(meOn===0){ let ix=side.xi.findIndex(p=>p.slot===S.me.pos); if(ix<0) ix=side.xi.findIndex(p=>(SEL_GROUP[S.me.pos]||[]).includes(p.slot)); if(ix<0) ix=9; const out=side.xi[ix]; side.xi[ix]=Object.assign(me,{slot:out.slot}); side.bench.unshift(out); side.bench=side.bench.slice(0,7); } else { side.bench.unshift(me); side.bench=side.bench.slice(0,7); } }
   const T=90+sim.st1+sim.st2; sim.T=T;
-  const d=((H.str+homeAdv)-A.str)/9.5; sim.d=d; sim.lam=[1.38*Math.exp(d*.85),1.12*Math.exp(-d*.85)]; let gh=poisson(sim.lam[0]), ga=poisson(sim.lam[1]);
+  const d0=((H.str+homeAdv)-A.str)/9.5; const d=.95*Math.tanh(d0/.95); sim.d=d; /* big mismatches flatten out: 3-0s and 4-1s, not 9-0s */ sim.lam=[1.38*Math.exp(d*.85)*(meSide==='h'?.82:1),1.12*Math.exp(-d*.85)*(meSide==='a'?.82:1)]; let gh=poisson(sim.lam[0]), ga=poisson(sim.lam[1]);
   const ev=sim.events; const push=(t,o)=>{ const hm=tToHalfMin(t,sim); ev.push(Object.assign({t,half:hm.half,min:hm.min},o)); };
   const meName=meSide?meEntry().n:null; const onPitch=t=>meSide&&meOn!=null&&t>=(meOn?meOn+sim.st1:0);
   const m=S.me; const lvlMine=meSide?sim[meSide].str:65;
