@@ -1292,6 +1292,15 @@ table.ih-rec td.l small{font-size:11px;color:var(--mute)}
 .jobs45 .j.ok,.jobs45r .j.ok{color:var(--text)}.j.ok span{color:#2fbf71;font-weight:800}.j.no span{color:#e5484d;font-weight:800}.jobs45r{margin:10px 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}
 .shopq{width:100%;box-sizing:border-box;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font:inherit;font-size:15px}.shopq:focus{outline:2px solid var(--accent,#2f7bff);outline-offset:1px}
 .shcats{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;margin:0;padding-bottom:4px;scrollbar-width:none}.shcats::-webkit-scrollbar{display:none}.shcats .chip{flex:0 0 auto;margin:0}
+.drw-sub{font-size:.6em;color:var(--mute)}.drw-intro{margin:4px 0 10px}
+.drw-list{display:flex;flex-direction:column;gap:6px}.drw-row{display:grid;grid-template-columns:22px 1fr 18px 1fr;align-items:center;gap:6px;padding:8px 8px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:13px;opacity:.18;transition:opacity .35s,transform .35s,background .35s}
+.drw-row .drw-n{color:var(--mute);font-size:11px;font-weight:700}.drw-row .drw-v{color:var(--mute);text-align:center;font-weight:700}
+.drw-t{display:flex;align-items:center;gap:6px;min-width:0}.drw-t b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.drw-t.a{justify-content:flex-end;text-align:right}.drw-t .crest{flex:0 0 auto;width:20px;height:20px}
+.drw-row:not(.full) .drw-t b{visibility:hidden}.drw-row:not(.full) .drw-t .crest{visibility:hidden}.drw-row.half .drw-t.h b,.drw-row.half .drw-t.h .crest{visibility:visible}
+.drw-row.in{opacity:1}.drw-row.me.in{border-color:var(--accent,#2f7bff);background:rgba(47,123,255,.14);transform:scale(1.02)}.drw-row.half .drw-t.a::after{content:'…';font-weight:800;font-size:18px;animation:drwp 1s infinite}
+@keyframes drwp{50%{opacity:.2}}.drw-me{margin-top:10px;padding:12px;border-radius:10px;border:1px solid var(--accent,#2f7bff);background:rgba(47,123,255,.1)}.drw-me span{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}.drw-me b{display:block;font-size:16px;margin:2px 0 4px}.drw-me p{margin:0;font-size:13px;color:var(--mute);line-height:1.45}
+.drw-btns{margin-top:12px;display:flex;justify-content:center}
+@media (prefers-reduced-motion:reduce){.drw-row{transition:none}.drw-row.half .drw-t.a::after{animation:none}}
 </style>
 
 <div class="app" id="app" hidden>
@@ -8967,6 +8976,70 @@ canBuy=(()=>{ const _cb=canBuy; return function(id){ const m=S.me, it=SHOP.find(
   const back=Math.round(o.p*collectMult(o)); m.bank+=back; lifeOwn().splice(ix,1); return {ok:true,txt:`Sold for ${money(back)}.`}; }; }
 function collectMult(o){ const yrs=Math.max(0,S.season-(o.s||S.season)); const R=r45(h45(o.id+'|'+(o.s||0)+'|'+saveSeed())); return Math.max(.4,.8+R()*.25+yrs*(R()*.18-.03)); }
 
+// ===================== v65: two-legged European knockouts, draws that happen when they should, flatter AI scorelines =====================
+
+// AI games: big mismatches flatten out too
+{ const _ss65=simScore; simScore=function(h,a,neutral){ const sh=teamStr(h,true)+(neutral?0:1.8), sa=teamStr(a,true); const d0=(sh-sa)/9.5; const d=1.1*Math.tanh(d0/1.1); return [poisson(1.38*Math.exp(d*.85)),poisson(1.12*Math.exp(-d*.85))]; }; }
+
+// ---------- legs ----------
+const LEG_ST=['po','r16','qf','sf'];
+function euroLegOf(w){ for(const st of LEG_ST){ if(EURO_KO[st]===w) return {st,leg:1}; if(EURO_KO[st]!=null&&EURO_KO[st]+1===w) return {st,leg:2}; } if(EURO_KO.f===w) return {st:'f',leg:0}; return null; }
+{ const _es65=euroStageOf; euroStageOf=function(w){ const s=_es65.apply(this,arguments); if(s) return s; const L=euroLegOf(w); return L?L.st:null; }; }
+{ const _ep65=euroPlaysWeek; euroPlaysWeek=function(E,w){ if(_ep65.apply(this,arguments)) return true; const L=euroLegOf(w); return !!(L&&L.leg===2&&E.winner==null&&E.tie&&E.tie.st===L.st&&!E.tie.done); }; }
+{ const _pa65=euroPairs; euroPairs=function(E){ const w=S.week, L=euroLegOf(w); if(!L||L.leg===0) return _pa65.apply(this,arguments);
+    if(L.leg===1){ if(E.tie&&E.tie.st===L.st&&E.tie.w1===w) return E.tie.pairs; const pr=_pa65.apply(this,arguments); E.tie={st:L.st,w1:w,pairs:pr.map(p=>p.slice()),res:{},done:false}; return E.tie.pairs; }
+    if(!E.tie||E.tie.st!==L.st) return []; return E.tie.pairs.map(([h,a])=>[a,h]); }; }
+function tieFirstLeg(E,h1,a1){ return E.tie&&E.tie.res[h1+'-'+a1]; }
+// my tie this week: first-leg score and who's ahead
+function myTie(k){ const E=S.euro&&S.euro[k]; const L=euroLegOf(S.week); const cid=myClubId(); if(!E||!L||!L.leg||!E.tie||E.tie.st!==L.st) return null; const pr=E.tie.pairs.find(p=>p.includes(cid)); if(!pr) return null; const r1=E.tie.res[pr[0]+'-'+pr[1]];
+  return {leg:L.leg,st:L.st,h1:pr[0],a1:pr[1],r1}; }
+{ const _pw65=playEuroWeek; playEuroWeek=function(k,myResult){ const E=S.euro[k], w=S.week, L=euroLegOf(w); if(!E||!L||L.leg===0||!E.ko) return _pw65.apply(this,arguments);
+    const pairs=euroPairs(E); const c=S.mctx; const cid=myClubId();
+    if(L.leg===1){ for(const [h,a] of pairs){ let gh,ga; const mine=myResult&&h===myResult.h&&a===myResult.a; if(mine){ gh=myResult.rec.gh; ga=myResult.rec.ga; if(c){ c.pens=null; c.cupWin=false; c.leg=1; } } else [gh,ga]=simScore(h,a); E.tie.res[h+'-'+a]=[gh,ga]; }
+      const me=pairs.find(p=>p.includes(cid)); if(me&&cid!=null){ const r=E.tie.res[me[0]+'-'+me[1]]; const us=me[0]===cid?r[0]:r[1], th=me[0]===cid?r[1]:r[0]; news('you',`${E.name}: first leg ${us}-${th}`,`${clubNm(me[0])} ${r[0]}-${r[1]} ${clubNm(me[1])}. ${us>th?'An advantage to take into the second leg.':us<th?'A deficit to overturn in the second leg.':'All to play for in the second leg.'}`,true); }
+      return; }
+    // second leg: add up both games
+    const rec=[], next=[]; let myOut=null;
+    for(const [h2,a2] of pairs){ const h1=a2, a1=h2; const r1=E.tie.res[h1+'-'+a1]||simScore(h1,a1); const mine=myResult&&h2===myResult.h&&a2===myResult.a; let gh,ga,pens=null,aet=0;
+      if(mine){ gh=myResult.rec.gh; ga=myResult.rec.ga; aet=myResult.rec.aet?1:0; } else [gh,ga]=simScore(h2,a2);
+      let A=r1[0]+ga, B=r1[1]+gh; let winner=A>B?h1:B>A?a1:null;
+      if(winner==null){ if(mine){ winner=myResult.winner; pens=winner; } else { aet=1; if(Math.random()<.4){ const s=Math.random()<sig((teamStr(h2)-teamStr(a2))/10)?h2:a2; if(s===h2){ gh++; B++; } else { ga++; A++; } winner=s; } else { pens=Math.random()<sig((teamStr(h2)-teamStr(a2))/10)?h2:a2; winner=pens; } } }
+      rec.push({h:h1,a:a1,gh:A,ga:B,pens,aet,legs:[[r1[0],r1[1]],[ga,gh]]}); next.push(winner);
+      if(mine){ myOut={win:winner===cid,us:h1===cid?A:B,th:h1===cid?B:A,pens:!!pens}; if(c){ c.pens=pens; c.cupWin=winner===cid; c.leg=2; c.agg=[myOut.us,myOut.th]; } } }
+    E.log.push({stage:KO_NAME[L.st],matches:rec}); if(L.st==='po') E.ko.alive=E.ko.direct.concat(next); else E.ko.alive=next; E.stage=L.st; E.tie.done=true;
+    // did my side go through?
+    const meIn=rec.find(x=>x.h===cid||x.a===cid); if(meIn&&cid!=null){ const won=next[rec.indexOf(meIn)]===cid; const us=meIn.h===cid?meIn.gh:meIn.ga, th=meIn.h===cid?meIn.ga:meIn.gh; const nxt=euroNextStage(E);
+      news(won?'good':'bad',won?`Through to the ${(KO_NAME[nxt]||'next round').toLowerCase()}`:`Out of the ${E.name}`,`${us}-${th} on aggregate${meIn.pens?(won?', won on penalties':', beaten on penalties'):meIn.aet?' after extra time':''}.`); }
+    // big upsets make the news
+    rec.forEach(x=>{ const fav=teamStr(x.h)>teamStr(x.a)?x.h:x.a; const w2=next[rec.indexOf(x)]; if(w2!==fav&&Math.abs(teamStr(x.h)-teamStr(x.a))>=6&&x.h!==cid&&x.a!==cid) news('world',`${E.name} shock: ${clubNm(fav)} out`,`${clubNm(w2)} knock out ${clubNm(fav)} ${Math.max(x.gh,x.ga)}-${Math.min(x.gh,x.ga)} on aggregate${x.pens?' (penalties)':''}.`); });
+    // the next round is drawn now, not before
+    try{ const nxt=euroNextStage(E); if(nxt&&E.winner==null&&cid!=null&&E.ko.alive.includes(cid)) drawNews('E:'+k,euroStagePairs(E,nxt),null,KO_NAME[nxt],E.name); }catch(e){ console.warn('draw65',e); } }; }
+// extra time and penalties only when the tie is level after both games
+function tieLevelNow(c){ const L=euroLegOf(S.week); if(!c||!c.fx||c.fx.comp!=='E'||!L||!L.leg) return null; if(L.leg===1) return false; const E=S.euro[c.fx.euro]; const det=c.det||fxDetails(c.fx); if(!E||!E.tie||!det) return null; const r1=E.tie.res[det.a+'-'+det.h]; if(!r1) return null;
+  const [h,a]=liveScore(c.sim.T+1); return r1[0]+a===r1[1]+h; }
+{ const _et65=etNeeded; etNeeded=function(){ const c=S.mctx; const lv=tieLevelNow(c); if(lv===null) return _et65.apply(this,arguments); if(!c||!c.sim||c.sim.et||c.soDone) return false; return lv; }; }
+{ const _so65=soNeeded; soNeeded=function(){ const c=S.mctx; const lv=tieLevelNow(c); if(lv===null) return _so65.apply(this,arguments); if(!c||c.soDone||c.youth) return false; return lv&&!!c.sim.et; }; }
+// fixture names say which leg, and the first-leg score
+{ const _fd65=fxDetails; fxDetails=function(fx){ const d=_fd65.apply(this,arguments); try{ if(d&&fx&&fx.comp==='E'){ const t=myTie(fx.euro); if(t){ const cid=myClubId(); const us=t.r1?(t.h1===cid?t.r1[0]:t.r1[1]):0, th=t.r1?(t.h1===cid?t.r1[1]:t.r1[0]):0; d.name+=t.leg===1?' · 1st leg':` · 2nd leg${t.r1?` (1st leg ${us}-${th})`:''}`; d.leg=t.leg; d.r1=t.r1; d.h1=t.h1; } } }catch(e){} return d; }; }
+
+// ---------- two midweek games in one week: one on Tuesday, one on Thursday ----------
+{ const _ed65=euroDayOf; euroDayOf=function(k,st){ const o=S&&S.dayOv&&S.dayOv['E:'+k+':'+S.week]; return o!=null?o:_ed65.apply(this,arguments); }; }
+{ const _cd65=cupDayOf; cupDayOf=function(k,round){ const o=S&&S.dayOv&&S.dayOv['C:'+k+':'+round]; return o!=null?o:_cd65.apply(this,arguments); }; }
+{ const _pw65b=planWeek; planWeek=function(){ const r=_pw65b.apply(this,arguments); try{ if(S.mode==='mgr'||!S.days||INTL_WEEKS.includes(S.week)||S.week>WEEKS) return r; const fx=myFixturesThisWeek(); const eu=fx.find(f=>f.comp==='E'), cu=fx.find(f=>f.comp==='C'); if(!eu||!cu) return r;
+    const placed=S.days.filter(d=>d.type==='match'&&d.fx); if(placed.some(d=>d.fx.comp==='E')&&placed.some(d=>d.fx.comp==='C')) return r;
+    const lg=fx.find(f=>f.comp==='L'); const T=(x,o)=>({type:x,...(o||{})});
+    if(typeof satFix==='function'&&satFix(cu)&&!lg) S.days=[T('recovery'),T('prep',{fx:eu}),T('match',{fx:eu}),T('recovery'),T('prep',{fx:cu}),T('match',{fx:cu}),T('off')];
+    else { S.dayOv=S.dayOv||{}; S.dayOv['E:'+eu.euro+':'+S.week]=1; S.dayOv['C:'+cu.cup+':'+cu.round]=3; S.days=[T('prep',{fx:eu}),T('match',{fx:eu}),T('recovery'),T('match',{fx:cu}),T('prep',{fx:lg}),lg?T('match',{fx:lg}):T('recovery'),T('off')]; }
+    if(typeof applyWeekPlan==='function') applyWeekPlan(); }catch(e){ console.warn('pw65',e); } return r; }; }
+
+// ---------- the draw: a proper ceremony when you're in it ----------
+{ const _dn65=drawNews; drawNews=function(key,pairs,byes,roundName,compName){ const r=_dn65.apply(this,arguments); try{ const cid=myClubId(); if(cid==null||!pairs||pairs.length<2) return r; if(!pairs.some(p=>p.includes(cid))) return r; if(S.mode==='mgr') return r;
+    S.queue=S.queue||[]; if(S.queue.some(q=>q&&q.kind==='draw65'&&q.key===key&&q.round===roundName)) return r;
+    S.queue.push({kind:'draw65',key,round:roundName,comp:compName,pairs:pairs.map(p=>p.slice()),euro:key.startsWith('E:')}); }catch(e){ console.warn('dn65',e); } return r; }; }
+function drawOrder(p){ const cid=myClubId(); const ties=p.pairs.slice(); const mine=ties.find(t=>t.includes(cid)); let rest=ties.filter(t=>t!==mine);
+  // long domestic draws: show a handful of ties around yours
+  if(rest.length>9) rest=shuffle(rest).slice(0,9); rest=shuffle(rest); const at=Math.max(1,Math.min(rest.length,Math.floor(rest.length*.55+Math.random()*rest.length*.35))); rest.splice(at,0,mine); return rest; }
+
 // ---------- cloud saves: stored privately on the player's Claude account (db capability) ----------
 const CLOUD={db:null,uid:null,meta:{},ready:false,pending:null,timer:0,busy:false,lastErr:null};
 const CHUNK=200000;
@@ -11693,6 +11766,26 @@ VIEWS['life:2']=()=>{ const m=S.me; const lic=m.lic||{}; const cats=Object.keys(
     ${garage}<p class="note" style="margin:0">Bank: <b>${money(m.bank)}</b>. Flashy things grow your following, but too much too soon and people turn on you.</p><div id="shopList">${shopListHTML()}</div></div>`);
   return `<div class="dash c1">${body}${ownHTML}</div>`; };
 ACT.shCat=k=>{ SH.cat=k; SH.n=40; render(); }; ACT.shSort=k=>{ SH.sort=k; render(); }; ACT.shAff=()=>{ SH.aff=!SH.aff; SH.n=40; render(); }; ACT.shopMore=()=>{ SH.n+=40; const el=document.querySelector('#shopList'); if(el) el.innerHTML=shopListHTML(); };
+
+// ===================== v65 UI: the draw, live =====================
+let DRW=null; function drwStop(){ if(DRW){ clearTimeout(DRW.t); DRW=null; } }
+function drawRowHTML(t,i,cid){ const [h,a]=t; const mine=h===cid||a===cid; return `<div class="drw-row${mine?' me':''}" data-i="${i}"><span class="drw-n">${i+1}</span><span class="drw-t h">${crest(club(h))}<b>${esc(clubNm(h))}</b></span><span class="drw-v">v</span><span class="drw-t a"><b>${esc(clubNm(a))}</b>${crest(club(a))}</span></div>`; }
+{ const _sp47=showPending; showPending=function(){ const p=S.pending; if(!p||p.kind!=='draw65') { drwStop(); return _sp47.apply(this,arguments); }
+    const cid=myClubId(); if(!p.order) p.order=drawOrder(p); const n=p.order.length; const mi=p.order.findIndex(t=>t.includes(cid));
+    const where=p.euro?'Live from the draw in Nyon':'Live on television'; const two=p.euro&&/Round of 16|Quarter|Semi|play-off/i.test(p.round);
+    modal(`<div class="label">${esc(where)}</div><h2 class="disp">${esc(p.comp)}<br><span class="drw-sub">${esc(p.round)} draw</span></h2>
+      <p class="note drw-intro">${p.euro?'The balls are in the bowls. A former winner steps up to the stage.':'The balls go in the bag. The cameras are on your dressing room.'}${two?' Ties are over two legs; the first team drawn is at home in the first leg.':''}</p>
+      <div class="drw-list">${p.order.map((t,i)=>drawRowHTML(t,i,cid)).join('')}</div><div class="drw-out" id="drwOut"></div>
+      <div class="drw-btns"><button class="btn sec" data-act="drwSkip">Skip to the end</button></div>`);
+    const rows=[...document.querySelectorAll('#sheet .drw-row')]; let i=0; DRW={t:null};
+    const reveal=()=>{ if(!DRW) return; const r=rows[i]; if(!r){ drawDone(p); return; } const mine=i===mi;
+      r.classList.add('in'); if(mine){ r.classList.add('half'); DRW.t=setTimeout(()=>{ r.classList.remove('half'); r.classList.add('full'); i++; DRW.t=setTimeout(reveal,1300); },1700); } else { r.classList.add('full'); i++; DRW.t=setTimeout(reveal,i<3?900:650); } };
+    DRW.t=setTimeout(reveal,700); }; }
+function drawDone(p){ drwStop(); document.querySelectorAll('#sheet .drw-row').forEach(r=>{ r.classList.add('in','full'); r.classList.remove('half'); }); const cid=myClubId(); const t=(p.order||p.pairs).find(x=>x.includes(cid)); const out=$('#drwOut');
+  if(out&&t&&!out.innerHTML){ let react=''; try{ react=drawReact(p.key,t[0],t[1]); }catch(e){} out.innerHTML=`<div class="drw-me"><span>Your tie</span><b>${esc(clubNm(t[0]))} v ${esc(clubNm(t[1]))}</b><p>${esc(react)}</p></div>`; }
+  const b=document.querySelector('#sheet .drw-btns'); if(b) b.innerHTML='<button class="btn" data-act="next">Continue</button>'; }
+ACT.drwSkip=()=>{ const p=S.pending; if(p&&p.kind==='draw65') drawDone(p); };
+{ const _cm47=closeModal; closeModal=function(){ drwStop(); return _cm47.apply(this,arguments); }; }
 
 // ===================== MANAGER UI: shell, home, squad, player profile, tactics =====================
 const MSECTIONS=[['home','Home',['Overview']],['inbox','Inbox',['Messages']],['squad','Squad',['Players','Fitness & morale','Contracts']],['tactics','Tactics',['Team','Instructions','Set pieces']],
