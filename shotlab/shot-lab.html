@@ -69,6 +69,8 @@ canvas.swipe{position:absolute;inset:0;width:100%;height:100%;pointer-events:non
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js"></script>
 <script>
 (()=>{
 'use strict';
@@ -175,52 +177,45 @@ const ledMat=new THREE.MeshBasicMaterial({map:ledTex,color:0xffffff});
     const panel=new THREE.Mesh(new THREE.BoxGeometry(8,4,.6),new THREE.MeshBasicMaterial({color:0xfff6dc})); panel.position.set(x,45,z); panel.lookAt(0,0,-30); scene.add(panel);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffffff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); sp.scale.set(30,30,1); sp.position.set(x,45,z); scene.add(sp); }); }
 
-// ---------------- players ----------------
-function mat(c,r){ return new THREE.MeshStandardMaterial({color:c,roughness:r==null?.75:r}); }
-function limb(r1,r2,len,m){ const g=new THREE.Group(); const c=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,len,10),m); c.position.y=-len/2; c.castShadow=true; g.add(c); const j=new THREE.Mesh(new THREE.SphereGeometry(r1,10,8),m); j.castShadow=true; g.add(j); return g; }
-function makePlayer(kit,skin,opts){ opts=opts||{}; const p=new THREE.Group(); const sh=mat(kit.shirt,.6), so=mat(kit.shorts,.7), sk=mat(skin,.6), sx=mat(kit.socks,.7), bt=mat(opts.boot||0x111111,.4), hair=mat(0x16100c,.9);
-  const hips=new THREE.Group(); hips.position.y=.93; p.add(hips);
-  const torso=new THREE.Mesh(new THREE.BoxGeometry(.42,.56,.24),sh); torso.position.y=.33; torso.castShadow=true; hips.add(torso);
-  const shorts=new THREE.Mesh(new THREE.BoxGeometry(.43,.2,.26),so); shorts.position.y=.0; shorts.castShadow=true; hips.add(shorts);
-  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.055,.06,.1,8),sk); neck.position.y=.66; hips.add(neck);
-  const head=new THREE.Mesh(new THREE.SphereGeometry(.125,16,12),sk); head.position.y=.8; head.scale.set(.9,1.05,1); head.castShadow=true; hips.add(head);
-  const hr=new THREE.Mesh(new THREE.SphereGeometry(.13,16,8,0,Math.PI*2,0,Math.PI/2.1),hair); hr.position.y=.82; hr.scale.set(.92,1,1.02); hips.add(hr);
-  const legs=[],arms=[];
-  [-1,1].forEach(s=>{ const hip=new THREE.Group(); hip.position.set(.11*s,-.06,0); hips.add(hip); const th=limb(.085,.07,.42,so); hip.add(th); th.children[0].material=sk; th.children[0].scale.set(1,1,1);
-    const shortLeg=new THREE.Mesh(new THREE.CylinderGeometry(.095,.09,.16,10),so); shortLeg.position.y=-.06; hip.add(shortLeg);
-    const knee=new THREE.Group(); knee.position.y=-.42; hip.add(knee); const sh2=limb(.065,.05,.42,sx); knee.add(sh2);
-    const boot=new THREE.Mesh(new THREE.BoxGeometry(.1,.08,.27),bt); boot.position.set(0,-.44,.06); boot.castShadow=true; knee.add(boot);
-    legs.push({hip,knee});
-    const sho=new THREE.Group(); sho.position.set(.26*s,.56,0); hips.add(sho); const ua=limb(.06,.05,.3,sh); sho.add(ua); const el=new THREE.Group(); el.position.y=-.3; sho.add(el); const fa=limb(.05,.042,.27,opts.gloves?mat(0xf2f2f2,.5):sk); el.add(fa); sho.rotation.z=.12*s; arms.push({sho,el}); });
-  p.userData={hips,legs,arms,torso,head,t0:Math.random()*6};
-  return p; }
-function pose(p,t,state,k){ const U=p.userData; const [L,Rg]=U.legs; const [La,Ra]=U.arms; k=k||0;
-  // reset
-  U.hips.rotation.set(0,0,0); U.hips.position.y=.93; L.hip.rotation.set(0,0,0); Rg.hip.rotation.set(0,0,0); L.knee.rotation.set(0,0,0); Rg.knee.rotation.set(0,0,0); La.sho.rotation.set(0,0,.12*-1); Ra.sho.rotation.set(0,0,.12); La.el.rotation.set(0,0,0); Ra.el.rotation.set(0,0,0);
-  const b=Math.sin(t*2+U.t0);
-  if(state==='idle'){ U.hips.position.y=.93+b*.006; La.sho.rotation.x=.08*b; Ra.sho.rotation.x=-.08*b; L.knee.rotation.x=.08; Rg.knee.rotation.x=.08; }
-  else if(state==='ready'){ U.hips.rotation.x=.18; U.hips.position.y=.88; L.hip.rotation.x=-.35; Rg.hip.rotation.x=-.35; L.knee.rotation.x=.55; Rg.knee.rotation.x=.55; La.sho.rotation.z=-.7; Ra.sho.rotation.z=.7; La.el.rotation.x=-.4; Ra.el.rotation.x=-.4; }
-  else if(state==='run'){ const s=Math.sin(t*11); L.hip.rotation.x=s*.7; Rg.hip.rotation.x=-s*.7; L.knee.rotation.x=Math.max(0,-s)*1.1+.2; Rg.knee.rotation.x=Math.max(0,s)*1.1+.2; La.sho.rotation.x=-s*.6; Ra.sho.rotation.x=s*.6; La.el.rotation.x=-.8; Ra.el.rotation.x=-.8; U.hips.rotation.x=.12; U.hips.position.y=.93+Math.abs(s)*.03; }
-  else if(state==='kick'){ // k: 0 back-swing -> 1 follow-through
-    const sw=k<.45?-k/.45*1.2:-1.2+(k-.45)/.55*2.6; Rg.hip.rotation.x=-sw*.9; Rg.knee.rotation.x=k<.5?1.3*k/.5:Math.max(.15,1.3-(k-.5)*3); L.knee.rotation.x=.25; U.hips.rotation.x=.08+(k>.5?.15:0); U.hips.rotation.z=-.1; La.sho.rotation.z=-1.1; Ra.sho.rotation.z=.5; La.sho.rotation.x=-.3; Ra.sho.rotation.x=.6*k; }
-  else if(state==='jump'){ U.hips.position.y=.93+k*.5; L.knee.rotation.x=.5*k; Rg.knee.rotation.x=.5*k; L.hip.rotation.x=-.2*k; Rg.hip.rotation.x=-.2*k; La.sho.rotation.x=.2; Ra.sho.rotation.x=.2; La.sho.rotation.z=-.35; Ra.sho.rotation.z=.35; La.el.rotation.x=-1.5; Ra.el.rotation.x=-1.5; }
-  else if(state==='wall'){ U.hips.position.y=.93; La.sho.rotation.x=-.5; Ra.sho.rotation.x=-.5; La.sho.rotation.z=.25; Ra.sho.rotation.z=-.25; La.el.rotation.x=-.9; Ra.el.rotation.x=-.9; }
-  else if(state==='dive'){ La.sho.rotation.z=-2.7; Ra.sho.rotation.z=2.7; La.el.rotation.x=-.2; Ra.el.rotation.x=-.2; L.hip.rotation.x=-.2; Rg.hip.rotation.x=.25; L.knee.rotation.x=.4; }
-  else if(state==='celebrate'){ U.hips.position.y=.93+Math.abs(Math.sin(t*6))*.25; La.sho.rotation.z=-2.6; Ra.sho.rotation.z=2.6; La.sho.rotation.x=Math.sin(t*12)*.3; Ra.sho.rotation.x=-Math.sin(t*12)*.3; L.knee.rotation.x=.4; Rg.knee.rotation.x=.4; }
-  else if(state==='slump'){ U.hips.rotation.x=.4; U.hips.position.y=.86; La.sho.rotation.x=-1.9; Ra.sho.rotation.x=-1.9; La.el.rotation.x=-1.6; Ra.el.rotation.x=-1.6; L.knee.rotation.x=.3; Rg.knee.rotation.x=.3; }
-}
-
+// ---------------- players: a rigged footballer with motion-captured animations ----------------
+let GLB=null; const CLIP={}; const META={};
+// kit by body part, worked out from the model's rest pose (centimetres, feet at 0, arms out to the sides)
+function partColor(x,y,kit,skin,o,c){ const ax=Math.abs(x);
+  if(ax>24){ if(ax<47) return c.setHex(kit.shirt); return c.setHex(o.gloves&&ax>74?0xf4f6f8:skin); }
+  if(y>=147) return c.setHex(y>172?(o.hair||0x18110c):skin);
+  if(y>=93) return c.setHex(y>142&&ax<7?kit.trim||kit.shirt:kit.shirt);
+  if(y>=70) return c.setHex(kit.shorts);
+  if(y>=50) return c.setHex(skin);
+  if(y>=11) return c.setHex(kit.socks);
+  return c.setHex(o.boot||0x111111); }
+function makeFootballer(kit,skin,o){ o=o||{}; const root=new THREE.Group(); const body=THREE.SkeletonUtils.clone(GLB.scene); body.scale.setScalar(.01); root.add(body);
+  const c=new THREE.Color();
+  body.traverse(m=>{ if(!m.isMesh) return; m.castShadow=true; m.frustumCulled=false; const joint=/Joints/.test(m.name); const g=m.geometry.clone(); const P=g.attributes.position; const col=new Float32Array(P.count*3);
+    for(let i=0;i<P.count;i++){ partColor(P.getX(i),P.getY(i),kit,skin,o,c); if(joint) c.multiplyScalar(.72); col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b; }
+    g.setAttribute('color',new THREE.BufferAttribute(col,3)); m.geometry=g; m.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.58,metalness:0,skinning:!!m.isSkinnedMesh}); });
+  const mixer=new THREE.AnimationMixer(body); root.userData={body,mixer,cur:null,hips:body.getObjectByName('mixamorigHips'),toe:body.getObjectByName('mixamorigRightToeBase')||body.getObjectByName('mixamorigRightFoot')}; return root; }
+function play(p,name,o){ o=o||{}; const U=p.userData; const a=U.mixer.clipAction(CLIP[name]); if(U.cur===a&&!o.restart){ if(o.ts) a.timeScale=o.ts; return a; }
+  a.reset(); a.setLoop(o.once?THREE.LoopOnce:THREE.LoopRepeat,Infinity); a.clampWhenFinished=!!o.once; a.timeScale=o.ts||1; a.time=o.at||0; a.setEffectiveWeight(1); a.play();
+  if(U.cur&&U.cur!==a){ if(o.fade===0) U.cur.stop(); else U.cur.crossFadeTo(a,o.fade==null?.18:o.fade,false); } U.cur=a; return a; }
+function hipsWorld(p){ return p.userData.hips.getWorldPosition(new THREE.Vector3()); }
+// read the clips once: when the boot meets the ball, how far a dive reaches, when the wall is highest
+function analyse(){ const t=makeFootballer({shirt:0,shorts:0,socks:0},0); scene.add(t); const U=t.userData; const v=new THREE.Vector3();
+  const sample=(name,fn)=>{ const a=U.mixer.clipAction(CLIP[name]); U.mixer.stopAllAction(); a.reset(); a.play(); const d=CLIP[name].duration; const out=[]; for(let ti=0;ti<=d+1e-6;ti+=1/60){ U.mixer.setTime(ti); t.updateMatrixWorld(true); out.push(fn(ti)); } a.stop(); return out; };
+  for(const k of ['strike','pen']){ const pts=sample(k,ti=>({t:ti,p:U.toe.getWorldPosition(new THREE.Vector3())})); let best=0,bi=1; for(let i=1;i<pts.length;i++){ const sp=pts[i].p.z-pts[i-1].p.z; if(pts[i].t>CLIP[k].duration*.35&&sp>best){ best=sp; bi=i; } } META[k]={tc:pts[bi].t,foot:pts[bi].p.clone()}; }
+  for(const k of ['gkDiveA','gkDiveB','gkCatch','gkBlock']){ const pts=sample(k,ti=>({t:ti,h:hipsWorld(t)})); const h0=pts[0].h; let mx=0; pts.forEach(q=>mx=Math.max(mx,Math.abs(q.h.x-h0.x))); const q=pts.find(q=>Math.abs(q.h.x-h0.x)>=mx*.85)||pts[Math.floor(pts.length/3)]; META[k]={t85:Math.max(.2,q.t),lat:q.h.x-h0.x,max:mx}; }
+  { const pts=sample('header',ti=>({t:ti,y:hipsWorld(t).y})); let mi=0; pts.forEach((q,i)=>{ if(q.y>pts[mi].y) mi=i; }); META.header={tp:pts[mi].t,h:pts[mi].y-pts[0].y,y0:pts[0].y}; }
+  { const pts=sample('block',ti=>({t:ti,y:hipsWorld(t).y})); let mi=0; pts.forEach((q,i)=>{ if(q.y<pts[mi].y) mi=i; }); META.block={tl:pts[mi].t}; }
+  scene.remove(t); }
+let shooter,keeper; const opps=[], mates=[];
+function cast(){ shooter=makeFootballer(KITS.home,SKINS[0],{boot:0xffe14d}); scene.add(shooter);
+  keeper=makeFootballer(KITS.gk,SKINS[3],{gloves:true,boot:0x111111}); scene.add(keeper);
+  for(let i=0;i<5;i++){ const o=makeFootballer(KITS.opp,SKINS[(i+1)%SKINS.length],{boot:[0xffffff,0x111111,0xff5a1f][i%3]}); o.visible=false; scene.add(o); opps.push(o); }
+  for(let i=0;i<1;i++){ const o=makeFootballer(KITS.home,SKINS[2],{boot:0x111111}); o.visible=false; scene.add(o); mates.push(o); } }
 // ---------------- ball ----------------
 const ballTex=canvasTex(512,256,(x,w,h)=>{ x.fillStyle='#f7f8fa'; x.fillRect(0,0,w,h); x.fillStyle='#14171c'; for(let i=0;i<12;i++){ const cx=(i%6)*w/6+(i>5?w/12:0)+w/24, cy=i>5?h*.72:h*.28; x.beginPath(); for(let k=0;k<5;k++){ const a=k/5*Math.PI*2-Math.PI/2; x.lineTo(cx+Math.cos(a)*w/26,cy+Math.sin(a)*h/9); } x.closePath(); x.fill(); }
   x.strokeStyle='rgba(30,35,45,.35)'; x.lineWidth=2; for(let i=0;i<6;i++){ x.beginPath(); x.moveTo(i*w/6,0); x.lineTo(i*w/6+w/12,h); x.stroke(); } });
 const ball=new THREE.Mesh(new THREE.SphereGeometry(R,32,20),new THREE.MeshStandardMaterial({map:ballTex,roughness:.38,metalness:0})); ball.castShadow=true; scene.add(ball);
 const trail=new THREE.Line(new THREE.BufferGeometry().setFromPoints(new Array(40).fill(0).map(()=>new THREE.Vector3())),new THREE.LineBasicMaterial({color:0xffe9a8,transparent:true,opacity:.0})); scene.add(trail);
-
-// ---------------- the cast ----------------
-const shooter=makePlayer(KITS.home,SKINS[0],{boot:0xffe14d}); scene.add(shooter);
-const keeper=makePlayer(KITS.gk,SKINS[3],{gloves:true}); scene.add(keeper);
-const opps=[]; for(let i=0;i<6;i++){ const o=makePlayer(KITS.opp,SKINS[(i+1)%SKINS.length]); o.visible=false; scene.add(o); opps.push(o); }
-const mates=[]; for(let i=0;i<2;i++){ const o=makePlayer(KITS.home,SKINS[(i+2)%SKINS.length]); o.visible=false; scene.add(o); mates.push(o); }
 
 // ---------------- physics ----------------
 const KD=.0105, KM=.0062;
@@ -238,18 +233,19 @@ function setup(){ const m=ST.mode; let bx,bz;
   ST.dir=new THREE.Vector3(-bx,0,-bz).normalize();
   // shooter behind the ball, a little to the side for a right-footer
   const side=new THREE.Vector3(ST.dir.z,0,-ST.dir.x); // left of the shooting direction
-  ST.shooterStart=B.p.clone().addScaledVector(ST.dir,m==='pen'?-2.0:-1.7).addScaledVector(side,.55); ST.shooterStart.y=0;
-  shooter.position.copy(ST.shooterStart); shooter.lookAt(B.p.x,0,B.p.z); shooter.rotateY(0);
-  keeper.position.set(m==='pen'?0:bx*.12,0,-.45); keeper.rotation.set(0,Math.PI,0); keeper.userData.dive=null;
-  opps.forEach(o=>{ o.visible=false; o.userData.jump=0; }); mates.forEach(o=>o.visible=false);
+  // the run-up is part of the animation: stand him where his boot will meet the ball
+  ST.kClip=m==='strike'?'strike':(m==='pen'||m==='fk')?'pen':'strike'; const yaw=Math.atan2(ST.dir.x,ST.dir.z); const f=META[ST.kClip].foot.clone().applyAxisAngle(new THREE.Vector3(0,1,0),yaw);
+  ST.shooterStart=new THREE.Vector3(B.p.x-f.x,0,B.p.z-f.z); shooter.position.copy(ST.shooterStart); shooter.rotation.set(0,yaw,0); play(shooter,'idle',{fade:0,restart:true});
+  keeper.position.set(m==='pen'?0:bx*.12,0,-.45); keeper.rotation.set(0,Math.PI,0); keeper.userData.dive=null; play(keeper,'gkIdle',{fade:0,restart:true});
+  opps.forEach(o=>{ o.visible=false; o.userData.jump=0; o.userData.jumpY=0; o.userData.lunge=0; }); mates.forEach(o=>o.visible=false);
   ST.wall=[]; ST.defs=[];
   if(m==='fk'){ // a wall 9.15m from the ball, covering the near post
     const toNear=new THREE.Vector3((bx>0?1:-1)*GOAL_W/2*.55-bx,0,-bz).normalize(); const c=B.p.clone().addScaledVector(toNear,9.15); const n=Math.abs(bx)>8?3:4; const perp=new THREE.Vector3(toNear.z,0,-toNear.x);
-    for(let i=0;i<n;i++){ const o=opps[i]; o.visible=true; o.position.copy(c).addScaledVector(perp,(i-(n-1)/2)*.5); o.position.y=0; o.lookAt(B.p.x,0,B.p.z); ST.wall.push(o); }
+    for(let i=0;i<n;i++){ const o=opps[i]; o.visible=true; o.position.copy(c).addScaledVector(perp,(i-(n-1)/2)*.55); o.position.y=0; o.lookAt(B.p.x,0,B.p.z); play(o,'idle',{fade:0,restart:true,at:i*.7}); ST.wall.push(o); }
   } else if(m==='edge'){ // one man closing, one covering
-    const d1=opps[0]; d1.visible=true; d1.position.copy(B.p).addScaledVector(ST.dir,rnd(4.5,6.5)).addScaledVector(side,(Math.random()<.5?-1:1)*rnd(.7,1.8)); d1.position.y=0; d1.lookAt(B.p.x,0,B.p.z); ST.defs.push(d1);
-    const d2=opps[1]; d2.visible=true; d2.position.set((bx>0?-1:1)*rnd(2.5,4.2),0,rnd(-11,-8)); d2.lookAt(B.p.x,0,B.p.z); ST.defs.push(d2);
-    const mt=mates[0]; mt.visible=true; mt.position.set(bx+(bx>0?-7:7),0,bz+rnd(3,6)); mt.lookAt(0,0,0); }
+    const d1=opps[0]; d1.visible=true; d1.position.copy(B.p).addScaledVector(ST.dir,rnd(4.5,6.5)).addScaledVector(side,(Math.random()<.5?-1:1)*rnd(.7,1.8)); d1.position.y=0; d1.lookAt(B.p.x,0,B.p.z); play(d1,'gkIdle',{fade:0,restart:true}); ST.defs.push(d1);
+    const d2=opps[1]; d2.visible=true; d2.position.set((bx>0?-1:1)*rnd(2.5,4.2),0,rnd(-11,-8)); d2.lookAt(B.p.x,0,B.p.z); play(d2,'idle',{fade:0,restart:true,at:1.3}); ST.defs.push(d2);
+    const mt=mates[0]; mt.visible=true; mt.position.set(bx+(bx>0?-7:7),0,bz+rnd(3,6)); mt.lookAt(0,0,0); play(mt,'idle',{fade:0,restart:true,at:2.1}); }
   ST.phase='aim'; ST.events={}; ST.t=0; ST.slow=1; netHit=null; hideBanner(); camAim(true);
   $('hint').style.opacity=1; $('hint').textContent=m==='fk'?'Swipe over or round the wall · curve it':m==='pen'?'Pick your spot · swipe to shoot':'Swipe to shoot · curve your swipe to bend it';
   hud(); }
@@ -302,7 +298,7 @@ function shoot(o){ if(ST.phase!=='aim') return; const B=ST.ball; const m=ST.mode
   let ax=tx, ay=ty; let v=null;
   for(let it=0;it<8;it++){ const dx=ax-B.p.x, dz=0-B.p.z; const dh=Math.hypot(dx,dz); const T=dh/(speed*.9); const vy=(ay-B.p.y+.5*(G+(wx?KM*wx*speed:0))*T*T)/T; const hv=new THREE.Vector3(dx,0,dz).normalize().multiplyScalar(speed);
     v=new THREE.Vector3(hv.x,vy,hv.z); const P=predict(B.p,v,w,wx); if(!P) break; ax+=(tx-P.x)*.9; ay+=(ty-P.y)*.9; }
-  ST.launch={v,w,wx,speed,tx,ty}; ST.phase='runup'; ST.t=0; $('hint').style.opacity=0;
+  ST.launch={v,w,wx,speed,tx,ty}; ST.phase='runup'; ST.t=0; $('hint').style.opacity=0; play(shooter,ST.kClip,{once:true,fade:.12});
   // the keeper guesses on penalties
   if(m==='pen'){ ST.kGuess=Math.random()<.68?(Math.random()<.5?-1:1)*rnd(1.6,3.2):0; } }
 function gauss(){ return (Math.random()+Math.random()+Math.random()-1.5)/1.5; }
@@ -315,9 +311,13 @@ function kickNow(){ const B=ST.ball, L=ST.launch; B.v.copy(L.v); B.w=L.w; B.wx=L
   let save=false; if(P&&Math.abs(P.x)<GOAL_W/2+.1&&P.y<GOAL_H+.15){ const gap=Math.abs(P.x-target.x)+Math.max(0,Math.abs(P.y-target.y)-.6);
     if(gap<.9&&lat<=reach){ const corner=(Math.abs(P.x)>GOAL_W/2-.55?.3:0)+(P.y>GOAL_H-.5&&Math.abs(P.x)>GOAL_W/2-1.2?.25:0)+(P.y<.35&&Math.abs(P.x)>GOAL_W/2-.8?.12:0); const pace=Math.max(0,(P.v-19)*.028); const central=lat<.8?.15:0;
       save=Math.random()<Math.max(.06,Math.min(.95,.92-corner-pace+central)); } }
-  keeper.userData.dive={tx:target.x,ty:target.y,react,start:K.clone(),save,t0:0,dur:Math.max(.25,Math.min(.6,avail))};
-  // the wall jumps, defenders lunge
-  ST.wall.forEach(o=>o.userData.jump=1e-3); ST.defs.forEach(o=>o.userData.lunge=1e-3); }
+  const dxW=target.x-K.x; let clip; if(Math.abs(dxW)<.7) clip=target.y>1.35?'gkCatch':'gkBlock'; else clip=Math.sign(-META.gkDiveA.lat)===Math.sign(dxW)?'gkDiveA':'gkDiveB';
+  const win=Math.max(.18,tArr-react); const ts=Math.min(2.6,Math.max(.7,META[clip].t85/win)); const extra=Math.max(-2.2,Math.min(2.2,Math.sign(dxW)*(Math.abs(dxW)-Math.abs(META[clip].lat))));
+  keeper.userData.dive={clip,ts,extra:Math.abs(dxW)<.7?dxW:extra,win,tx:target.x,ty:target.y,react,start:K.clone(),save,t0:0,started:false};
+  // the wall jumps as the ball arrives; the nearest defender throws himself in front of it
+  const sp=Math.max(10,L.speed*.9);
+  ST.wall.forEach(o=>{ const tw=o.position.distanceTo(B.p)/sp; play(o,'header',{once:true,fade:.05,ts:Math.min(3,Math.max(.8,META.header.tp/Math.max(.2,tw-.05)))}); o.userData.jump=1; });
+  if(ST.defs[0]){ const o=ST.defs[0]; const tp=o.position.distanceTo(B.p)/sp; play(o,'block',{once:true,fade:.05,ts:Math.min(3,Math.max(.8,META.block.tl/Math.max(.2,tp)))}); o.userData.lunge=1; } }
 
 // collisions with people and the frame
 function hitBody(o,p,h,r){ const dx=p.x-o.position.x, dz=p.z-o.position.z; const y=p.y-(o.userData.jumpY||0); return dx*dx+dz*dz<(r+R)**2&&y<h; }
@@ -364,10 +364,9 @@ function frame(now){ requestAnimationFrame(frame); let dt=Math.min(.05,(now-last
   if(fadeT&&now-fadeT>0){ const a=Math.max(0,1-(now-fadeT)/350); swc.globalAlpha=a; if(a<=0){ swc.clearRect(0,0,sw.width,sw.height); fadeT=0; swc.globalAlpha=1; } }
   // slow motion as the ball arrives at goal
   let sdt=dt; if(ST.phase==='flight'&&B.p.z>-6&&B.p.z<1) sdt*=.45; ST.t+=sdt; const T=now/1000;
-  if(ST.phase==='aim'){ pose(shooter,T,'idle'); }
-  if(ST.phase==='runup'){ const k=Math.min(1,ST.t/.42); const ball0=B.p; const to=ball0.clone().addScaledVector(ST.dir,-.55).add(new THREE.Vector3(ST.dir.z,0,-ST.dir.x).multiplyScalar(.28)); shooter.position.lerpVectors(ST.shooterStart,to,k); shooter.position.y=0;
-    if(k<.75) pose(shooter,T,'run'); else pose(shooter,T,'kick',(k-.75)/.25*.45); if(k>=1){ kickNow(); ST.kickT=0; } }
-  if(ST.phase==='flight'||ST.phase==='done'){ ST.kickT=(ST.kickT||0)+dt; if(ST.kickT<.35) pose(shooter,T,'kick',.45+ST.kickT/.35*.55); else if(ST.phase==='done') pose(shooter,T,ST.res[ST.res.length-1]===1?'celebrate':'slump'); else pose(shooter,T,'idle'); }
+  if(ST.phase==='runup'&&ST.t>=META[ST.kClip].tc){ kickNow(); }
+  // everyone moves with their motion capture (slow motion included)
+  [shooter,keeper].concat(opps,mates).forEach(o=>{ if(o.visible) o.userData.mixer.update(sdt); });
   // ball physics
   if(ST.phase==='flight'||ST.phase==='done'){ const n=Math.ceil(sdt/(1/240)); const h=sdt/n;
     for(let i=0;i<n;i++){ const z0=B.p.z; step(B,h); const fr=frameCollide(B); if(fr&&!ST.events.frame){ ST.events.frame=fr; snd.clang(); }
@@ -378,29 +377,29 @@ function frame(now){ requestAnimationFrame(frame); let dt=Math.min(.05,(now-last
       for(const o of ST.wall.concat(ST.defs)){ if(hitBody(o,B.p,o===ST.defs[0]?1.75:1.85,o===ST.defs[0]?.42:.3)){ B.v.z=-Math.abs(B.v.z)*.35; B.v.x+=rnd(-4,4); B.v.y=Math.abs(B.v.y)*.4+2; B.w=0; result('blocked'); break; } }
       if(ST.phase!=='flight') break;
       // the keeper
-      const D=keeper.userData.dive; if(D&&D.save&&B.p.z>-.9&&B.p.z<.05){ const kx=keeper.position.x, ky=(keeper.userData.handY||1); if(Math.abs(B.p.x-kx)<1.1&&Math.abs(B.p.y-ky)<1.25){ const slow=B.v.length()<21&&Math.abs(B.p.x-kx)<.6; if(slow){ B.v.set(0,0,0); ST.events.caught=true; result('caught'); } else { B.v.z=-Math.abs(B.v.z)*.28; B.v.x=(B.p.x>kx?1:-1)*rnd(3,7); B.v.y=rnd(1,4); B.w=0; result('saved'); } break; } }
+      const D=keeper.userData.dive; if(D&&D.save&&B.p.z>-.9&&B.p.z<.05){ const kx=D.tx, ky=D.ty; if(Math.abs(B.p.x-kx)<1.1&&Math.abs(B.p.y-ky)<1.25){ const slow=B.v.length()<21&&Math.abs(B.p.x-kx)<.6; if(slow){ B.v.set(0,0,0); ST.events.caught=true; result('caught'); } else { B.v.z=-Math.abs(B.v.z)*.28; B.v.x=(B.p.x>kx?1:-1)*rnd(3,7); B.v.y=rnd(1,4); B.w=0; result('saved'); } break; } }
       if(z0<0&&B.p.z>=0){ if(Math.abs(B.p.x)<GOAL_W/2-R*.3&&B.p.y<GOAL_H-R*.3){ ST.events.goal=true; netHit={x:B.p.x,y:B.p.y,z:ND,t:T,amp:Math.min(.75,B.v.length()*.028)}; snd.net(); const top=B.p.y>GOAL_H-.6&&Math.abs(B.p.x)>GOAL_W/2-1.1; result('goal',ST.mode==='pen'&&Math.abs(B.w)<1&&ST.launch.speed<20&&Math.abs(B.p.x)<.8?'panenka':top?'top':ST.events.frame?'post':Math.abs(ST.launch.w)>25?'curl':''); }
         else if(B.p.z>0){ result(ST.events.frame==='bar'?'bar':ST.events.frame==='post'?'post':B.p.y>GOAL_H?'over':'wide'); } } }
     if(ST.phase==='flight'&&(ST.t>5||(B.v.length()<.6&&ST.t>.6))){ result(B.p.z<-.5&&!ST.events.frame?'short':ST.events.frame==='bar'?'bar':ST.events.frame==='post'?'post':'wide'); }
     // spin the ball
     ball.position.copy(B.p); ball.rotation.x+=B.v.length()*sdt/R*.5; ball.rotation.y+=B.w*sdt*.4; }
   // keeper
-  { const D=keeper.userData.dive; if(ST.phase==='aim'||ST.phase==='runup'){ pose(keeper,T,'ready'); keeper.rotation.z=0; keeper.userData.handY=1.2; const bx=ST.ball.p.x; keeper.position.x+=((ST.mode==='pen'?0:bx*.12)-keeper.position.x)*(1-Math.exp(-3*dt)); }
-    else if(D){ D.t0+=sdt; const a=D.t0-D.react; if(a<=0) pose(keeper,T,'ready'); else { const k=Math.min(1,a/D.dur); const e=1-Math.pow(1-k,3); const dx=D.tx-D.start.x; const reachX=Math.sign(dx)*Math.min(Math.abs(dx),3.3); keeper.position.x=D.start.x+reachX*e*(Math.abs(dx)>.6?1:.5);
-      const high=D.ty>1.3; const lean=Math.abs(dx)>.6?Math.sign(dx)*(high?1.15:1.35)*e:0; keeper.rotation.z=-lean; keeper.position.y=Math.abs(dx)>.6?(high?Math.sin(e*Math.PI)*.55+e*.25:Math.sin(e*Math.PI)*.25):Math.min(.4,D.ty>1.6?e*.45:0); keeper.userData.handY=Math.max(.2,Math.min(2.5,D.ty));
-      pose(keeper,T,Math.abs(dx)>.6?'dive':D.ty>1.5?'jump':'ready',Math.abs(dx)>.6?0:e); } } }
-  // wall / defenders animation
-  ST.wall.forEach(o=>{ const j=o.userData.jump; if(j){ o.userData.jump+=sdt; const k=Math.max(0,Math.sin(Math.min(1,o.userData.jump/.55)*Math.PI)); o.userData.jumpY=k*.45; o.position.y=k*.45; pose(o,T,'wall'); } else { pose(o,T,'wall'); o.userData.jumpY=0; } });
-  ST.defs.forEach((o,i)=>{ if(o.userData.lunge){ o.userData.lunge+=sdt; pose(o,T,i===0?'run':'ready'); if(i===0&&o.userData.lunge<.4){ const toBall=ST.ball.p.clone().sub(o.position); toBall.y=0; if(toBall.length()>.6) o.position.addScaledVector(toBall.normalize(),sdt*2.2); } } else pose(o,T,i===0?'ready':'idle'); });
-  mates.forEach(o=>{ if(o.visible) pose(o,T,ST.phase==='done'&&ST.res[ST.res.length-1]===1?'celebrate':'idle'); });
+  { const D=keeper.userData.dive; if(ST.phase==='aim'||ST.phase==='runup'){ const bx=ST.ball.p.x; keeper.position.x+=((ST.mode==='pen'?0:bx*.12)-keeper.position.x)*(1-Math.exp(-3*dt)); }
+    else if(D){ D.t0+=sdt; const a=D.t0-D.react; if(a>0&&!D.started){ D.started=true; play(keeper,D.clip,{once:true,ts:D.ts,fade:.06}); }
+      if(a>0){ const k=Math.min(1,a/D.win); const e=1-Math.pow(1-k,2); keeper.position.x=D.start.x+D.extra*e; keeper.position.y=(D.ty>1.6&&D.clip!=='gkCatch')?Math.sin(Math.min(1,k)*Math.PI*.5)*(D.ty-1.5)*.55:0; } } }
+  // the wall's height comes from the jump in the animation
+  ST.wall.forEach(o=>{ o.userData.jumpY=Math.max(0,hipsWorld(o).y-META.header.y0); });
+  if(ST.defs[0]&&ST.defs[0].userData.lunge){ const o=ST.defs[0]; o.userData.jumpY=0; }
   if(ST.phase==='done'&&ST.t>2.6){ next(); }
   netUpdate(T); ledTex.offset.x=(ledTex.offset.x+dt*.02)%1;
   if(ST.phase==='done'&&ST.res[ST.res.length-1]===1){ crowdTex.offset.y=Math.abs(Math.sin(T*9))*.004; if(crowdGain) crowdGain.gain.value=.09; } else { crowdTex.offset.y=0; if(crowdGain) crowdGain.gain.value=.05; }
   camUpdate(dt); renderer.render(scene,cam); }
 
 // test hook: lets Claude check the physics without swiping
-window.__shotlab={proj:(x,y,z)=>{ const v=new THREE.Vector3(x,y,z).project(cam); return [(v.x+1)/2*window.innerWidth,(1-v.y)/2*window.innerHeight]; },shoot:(o)=>shoot(o),state:()=>({launch:ST.launch?{speed:+ST.launch.speed.toFixed(1),w:+ST.launch.w.toFixed(1),vy:+ST.launch.v.y.toFixed(1),tx:+ST.launch.tx.toFixed(2),ty:+ST.launch.ty.toFixed(2)}:null,kind:ST.lastKind,phase:ST.phase,res:ST.res.slice(),goals:ST.goals,shot:ST.shot,mode:ST.mode,ball:ST.ball.p.toArray().map(v=>+v.toFixed(2))}),setMode:m=>{ ST.mode=m; document.querySelectorAll('.mode').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===m)); newSession(); }};
+window.__shotlab={proj:(x,y,z)=>{ const v=new THREE.Vector3(x,y,z).project(cam); return [(v.x+1)/2*window.innerWidth,(1-v.y)/2*window.innerHeight]; },shoot:(o)=>shoot(o),state:()=>({launch:ST.launch?{speed:+ST.launch.speed.toFixed(1),w:+ST.launch.w.toFixed(1),vy:+ST.launch.v.y.toFixed(1),tx:+ST.launch.tx.toFixed(2),ty:+ST.launch.ty.toFixed(2)}:null,kind:ST.lastKind,phase:ST.phase,res:ST.res.slice(),goals:ST.goals,shot:ST.shot,mode:ST.mode,ball:ST.ball.p.toArray().map(v=>+v.toFixed(2))}),dbg:()=>{ const U=shooter.userData; const b=U.body; let o=null,bn=null,sk=null; b.traverse(n=>{ if(n.name==='mixamorigRightUpLeg') o=n; if(n.name==='mixamorigRightUpLeg_1') bn=n; if(n.isSkinnedMesh&&!sk) sk=n; }); return {cur:U.cur&&U.cur.getClip().name,run:U.cur&&U.cur.isRunning(),t:U.cur&&U.cur.time,w:U.cur&&U.cur.getEffectiveWeight(),oq:o&&o.quaternion.toArray().map(v=>+v.toFixed(3)),bq:bn&&bn.quaternion.toArray().map(v=>+v.toFixed(3)),bnPar:bn&&bn.parent&&bn.parent.name,skBones:sk&&sk.skeleton.bones.slice(0,4).map(x=>x.name+':'+(x.parent&&x.parent.name)),skInTree:sk&&(()=>{let f=false; b.traverse(n=>{ if(n===sk.skeleton.bones[3]) f=true; }); return f;})(),meta:META}; },setMode:m=>{ ST.mode=m; document.querySelectorAll('.mode').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===m)); newSession(); }};
 
-resize(); setup(); $('load').hidden=true; requestAnimationFrame(frame);
+resize();
+$('load').textContent='Warming up…';
+new THREE.GLTFLoader().load('models/players.glb',g=>{ GLB=g; g.animations.forEach(c=>CLIP[c.name]=c); try{ analyse(); cast(); setup(); $('load').hidden=true; requestAnimationFrame(frame); }catch(e){ $('load').textContent='Couldn\'t set up the players'; console.error(e); } },undefined,()=>{ $('load').textContent='Couldn\'t load the players. Reload to try again.'; });
 })();
 </script>
