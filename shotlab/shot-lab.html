@@ -400,6 +400,6 @@ window.__shotlab={proj:(x,y,z)=>{ const v=new THREE.Vector3(x,y,z).project(cam);
 
 resize();
 $('load').textContent='Warming up…';
-new THREE.GLTFLoader().load('models/players.glb',g=>{ GLB=g; g.animations.forEach(c=>CLIP[c.name]=c); try{ analyse(); cast(); setup(); $('load').hidden=true; requestAnimationFrame(frame); }catch(e){ $('load').textContent='Couldn\'t set up the players'; console.error(e); } },undefined,()=>{ $('load').textContent='Couldn\'t load the players. Reload to try again.'; });
+new THREE.GLTFLoader().load('models/players.json',g=>{ GLB=g; g.animations.forEach(c=>CLIP[c.name]=c); try{ analyse(); cast(); setup(); $('load').hidden=true; requestAnimationFrame(frame); }catch(e){ $('load').textContent='Couldn\'t set up the players'; console.error(e); } },undefined,()=>{ $('load').textContent='Couldn\'t load the players. Reload to try again.'; });
 })();
 </script>
