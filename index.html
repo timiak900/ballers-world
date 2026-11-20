@@ -12141,5 +12141,62 @@ Object.assign(ACT,{
 });
 
 </script>
+<script>
+// ===================== v66: a knockout round is only ever played once; your real result always counts =====================
+// If the world sim gets to a European or cup tie before your match is finished, your result now replaces the simulated one
+// instead of the round being played a second time. Saves where that already happened are repaired on load.
+const WK66=()=>S.season*100+S.week;
+function euroRevert(E,h,a,gh,ga){ const T=E.table, H=T[h], A=T[a]; if(!H||!A) return; H[0]--;A[0]--;H[4]-=gh;H[5]-=ga;A[4]-=ga;A[5]-=gh; if(gh>ga){H[1]--;A[3]--;H[6]-=3;}else if(gh<ga){A[1]--;H[3]--;A[6]-=3;}else{H[2]--;A[2]--;H[6]--;A[6]--;} }
+function koLogFor(E,stName){ const L=(E.log||[]); for(let i=L.length-1;i>=0;i--) if(L[i].stage===stName) return L[i]; return null; }
+function swapInAlive(E,oldW,newW,st){ if(!E.ko||oldW===newW) return; const al=E.ko.alive; const i=al.indexOf(oldW); if(i>=0&&!al.includes(newW)) al[i]=newW;
+  // a draw ceremony that's still waiting to be shown uses the new names too
+  const fix=q=>{ if(q&&q.kind==='draw65'&&q.euro&&q.pairs) q.pairs=q.pairs.map(p=>p.map(x=>x===oldW?newW:x)); };
+  (S.queue||[]).forEach(fix); fix(S.pending); if(E._kp) E._kp=E._kp.map(p=>p.map(x=>x===oldW?newW:x)); }
+function euroPatchMine(k,R){ const E=S.euro[k], w=S.week, cid=myClubId(); const L=typeof euroLegOf==='function'?euroLegOf(w):null; const st=euroStageOf(w); const c=S.mctx;
+  if(st==='league'){ const lg=E.log[E.log.length-1]; const mt=lg&&lg.matches.find(x=>x.h===R.h&&x.a===R.a); if(!mt) return; euroRevert(E,mt.h,mt.a,mt.gh,mt.ga); applyEuro(E,R.h,R.a,R.gh,R.ga); mt.gh=R.gh; mt.ga=R.ga; return; }
+  if(L&&L.leg===1&&E.tie){ E.tie.res[R.h+'-'+R.a]=[R.rec.gh,R.rec.ga]; if(c){ c.pens=null; c.cupWin=false; c.leg=1; } return; }
+  const lg=koLogFor(E,KO_NAME[L&&L.leg===2?L.st:st]); if(!lg) return;
+  if(L&&L.leg===2){ const mt=lg.matches.find(x=>x.h===R.a&&x.a===R.h); if(!mt||!E.tie) return; const r1=E.tie.res[mt.h+'-'+mt.a]; if(!r1) return; const oldW=koWin(mt);
+    const A=r1[0]+R.rec.ga, B=r1[1]+R.rec.gh; let winner=A>B?mt.h:B>A?mt.a:null, pens=null; if(winner==null){ winner=R.winner; pens=winner; }
+    Object.assign(mt,{gh:A,ga:B,pens,aet:R.rec.aet?1:0,legs:[[r1[0],r1[1]],[R.rec.ga,R.rec.gh]]}); swapInAlive(E,oldW,winner,L.st);
+    const us=mt.h===cid?A:B, th=mt.h===cid?B:A; if(c){ c.pens=pens; c.cupWin=winner===cid; c.leg=2; c.agg=[us,th]; }
+    if(oldW!==winner&&cid!=null){ const nxt=euroNextStage(E); news(winner===cid?'good':'bad',winner===cid?`Through to the ${(KO_NAME[nxt]||'next round').toLowerCase()}`:`Out of the ${E.name}`,`${us}-${th} on aggregate${pens?(winner===cid?', won on penalties':', beaten on penalties'):''}.`); }
+    return; }
+  // single-game ties (the final, or old saves)
+  const mt=lg.matches.find(x=>x.h===R.h&&x.a===R.a); if(!mt) return; const oldW=koWin(mt); Object.assign(mt,R.rec); swapInAlive(E,oldW,R.winner,st);
+  if(st==='f'&&E.winner!=null&&E.winner!==R.winner){ E.winner=R.winner; news('world',`${clubNm(R.winner)} win the ${E.name}!`,`${clubNm(R.winner)} are champions of Europe in the ${E.name}.`); } }
+{ const _pw66=playEuroWeek; playEuroWeek=function(k,myResult){ const E=S.euro&&S.euro[k]; if(!E) return _pw66.apply(this,arguments);
+    if(E._doneW===WK66()){ if(myResult&&!E._doneMine){ E._doneMine=1; try{ euroPatchMine(k,myResult); }catch(e){ console.warn('ep66',e); } } return; }
+    const r=_pw66.apply(this,arguments); E._doneW=WK66(); E._doneMine=!!myResult; return r; }; }
+// cups: same idea. If the round already went ahead without you, your result replaces the simulated one
+{ const _pc66=playCupRound; playCupRound=function(k,myResult){ const cp=S.cups&&S.cups[k]; if(!cp) return _pc66.apply(this,arguments);
+    if(myResult&&cp._last&&cp._last.w===WK66()&&!cp._last.mine){ const lg=(cp.log||[]).find(l=>l.round===cp._last.round); const mt=lg&&lg.matches.find(x=>x.h===myResult.h&&x.a===myResult.a);
+      if(mt){ const oldW=koWin(mt); Object.assign(mt,myResult.rec); const i=cp.alive.indexOf(oldW); if(i>=0&&!cp.alive.includes(myResult.winner)) cp.alive[i]=myResult.winner; if(cp._draw&&cp._draw.pairs) cp._draw.pairs=cp._draw.pairs.map(p=>p.map(x=>x===oldW?myResult.winner:x)); cp._last.mine=true; if(cp.winner!=null&&cp.alive.length===1) cp.winner=cp.alive[0]; return; } }
+    const round=cp.round; const r=_pc66.apply(this,arguments); cp._last={w:WK66(),round,mine:!!myResult}; return r; }; }
+
+// ---------- repair saves where a European tie was played twice ----------
+function euroRepair(){ const m=S.me; if(!S.euro||!m||S.mode==='mgr') return; const cid=myClubId();
+  for(const k in S.euro){ const E=S.euro[k]; if(!E||!E.log) continue;
+    // 1. the same round logged twice: keep the last one (it's the one the rest of the competition followed)
+    const seen={}; for(let i=E.log.length-1;i>=0;i--){ const s=E.log[i].stage; if(!s||/League phase/.test(s)) continue; if(seen[s]) E.log.splice(i,1); else seen[s]=1; }
+    if(!E.ko||E.winner!=null||cid==null) continue;
+    // 2. your two-legged ties must match the scores you actually played
+    for(const st of ['po','r16','qf','sf']){ const lg=koLogFor(E,KO_NAME[st]); if(!lg) continue; const mt=lg.matches.find(x=>x.h===cid||x.a===cid); if(!mt) continue;
+      const nx=KO_ORDER[KO_ORDER.indexOf(st)+1]; if(nx&&(koLogFor(E,KO_NAME[nx])||(E.tie&&E.tie.st===nx&&Object.keys(E.tie.res||{}).length))) continue;
+      const w1=EURO_KO[st], rs=(m.results||[]).filter(r=>r.s===S.season&&r.key==='E:'+k&&!r.youth); const a=rs.find(r=>r.w===w1), b=rs.find(r=>r.w===w1+1); if(!a||!b) continue;
+      const us=(a.us||0)+(b.us||0), th=(a.them||0)+(b.them||0); const opp=mt.h===cid?mt.a:mt.h; const truth=us>th?cid:th>us?opp:(b.pens===cid||b.pens===opp?b.pens:null); if(truth==null) continue;
+      const shown=koWin(mt); const inAlive=E.ko.alive.includes(truth)&&!E.ko.alive.includes(truth===cid?opp:cid);
+      if(shown===truth&&inAlive&&(mt.h===cid?mt.gh:mt.ga)===us) continue;
+      const A=mt.h===cid?us:th, B=mt.h===cid?th:us; const l1=mt.h===cid?[a.us,a.them]:[a.them,a.us], l2=mt.h===cid?[b.us,b.them]:[b.them,b.us];
+      Object.assign(mt,{gh:A,ga:B,pens:us===th?truth:null,legs:[l1,l2]}); const wrong=truth===cid?opp:cid; swapInAlive(E,wrong,truth,st);
+      if(truth===cid) news('good',`Correction: through to the ${(KO_NAME[nx]||'next round').toLowerCase()}`,`A scoring mix-up had you out. You won ${us}-${th} on aggregate${us===th?' on penalties':''} and you're in the ${(KO_NAME[nx]||'next round').toLowerCase()}.`);
+      else news('bad',`${E.name}: out on aggregate`,`${us}-${th} over the two legs.`); } } }
+{ const _ls66=loadSlot; loadSlot=function(){ const r=_ls66.apply(this,arguments); try{ if(r!==false&&S) euroRepair(); }catch(e){ console.warn('rep66',e); } return r; }; }
+
+// ---------- two-legged ties say so ----------
+{ const _mr66=mRow; mRow=function(mt){ let h=_mr66.apply(this,arguments); if(mt&&mt.legs&&mt.legs.length===2&&mt.gh!=null) h+=`<div class="mpen">On aggregate · 1st leg ${mt.legs[0][0]}–${mt.legs[0][1]} · 2nd leg ${mt.legs[1][0]}–${mt.legs[1][1]}</div>`; return h; }; }
+{ const _bh66=bracketHTML; bracketHTML=function(tree){ let h=_bh66.apply(this,arguments); try{ if(tree&&tree.cols&&tree.cols.some(c=>c.some(x=>x&&x.legs))) h+=`<p class="note">Two-legged ties show the aggregate score.</p>`; }catch(e){} return h; }; }
+
+</script>
 <script>if('serviceWorker' in navigator){ addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{})); }
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});</script></body></html>
